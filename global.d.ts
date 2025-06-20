@@ -14,9 +14,14 @@ import {
   bootstrap,
   tabler,
 } from "@tabler/core";
+import axios from "axios";
 
 declare global {
   interface Window {
+    // app bootstrap
+    axios: typeof axios;
+
+    // tabler
     Alert: typeof Alert;
     Button: typeof Button;
     Carousel: typeof Carousel;
