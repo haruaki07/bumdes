@@ -19,7 +19,7 @@
     "imask": "^7.6.1",
     "laravel-vite-plugin": "^1.3.0",
     "litepicker": "^2.0.12",
-    "sass": "~1.64.2",
+    "sass-embedded": "~1.76.0",
     "tom-select": "^2.4.3",
     "vite": "^6.2.4"
   }
