@@ -1,15 +1,26 @@
 {
-    "$schema": "https://json.schemastore.org/package.json",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite"
-    },
-    "devDependencies": {
-        "axios": "^1.8.2",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^1.2.0",
-        "vite": "^6.2.4"
-    }
+  "$schema": "https://json.schemastore.org/package.json",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@tabler/core": "^1.3.2",
+    "@tabler/icons": "^3.34.0",
+    "@tabler/icons-webfont": "^3.34.0",
+    "apexcharts": "^3.54.1",
+    "autosize": "^6.0.1",
+    "axios": "^1.8.2",
+    "concurrently": "^9.0.1",
+    "dropzone": "^6.0.0-beta.2",
+    "imask": "^7.6.1",
+    "laravel-vite-plugin": "^1.3.0",
+    "litepicker": "^2.0.12",
+    "sass": "~1.89.2",
+    "tom-select": "^2.4.3",
+    "vite": "^6.2.4"
+  }
 }
