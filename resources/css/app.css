@@ -14,3 +14,8 @@ i.ti-xs {
 i.ti-xxs {
   font-size: 12px !important;
 }
+
+.form-select-sm {
+  padding-right: 24px !important;
+  background-position: right 4px center !important;
+}

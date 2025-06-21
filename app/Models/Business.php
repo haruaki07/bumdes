@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BusinessStatus;
+use App\Traits\Datatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Business extends Model
 {
-  use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes, Datatable;
 
   protected $fillable = [
     'name',
@@ -23,6 +24,15 @@ class Business extends Model
     'contact_email',
     'status',
     'rejection_reason',
+  ];
+
+  protected $dataTableColumns = [
+    'name' => 'searchable|sortable',
+    'businessType.name' => 'searchable|sortable',
+    'owner.name' => 'searchable|sortable',
+    'location' => 'searchable|sortable',
+    'status' => 'searchable|sortable',
+    'created_at' => 'sortable',
   ];
 
   public function businessType(): BelongsTo

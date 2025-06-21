@@ -7,28 +7,19 @@ use App\Models\BusinessType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 class BusinessController extends Controller
 {
   public function __construct() {}
 
-  public function index()
+  public function index(Request $request)
   {
     $user = Auth::user();
     $businesses = Business::with(['businessType', 'owner'])
       ->when($user->hasRole('warga'), function ($query) use ($user) {
         $query->where('owner_id', $user->id);
       })
-      ->when(request()->search, function ($query) {
-        $query->where('name', 'like', '%' . request()->search . '%');
-        $query->orWhereHas('businessType', function ($query) {
-          $query->where('name', 'like', '%' . request()->search . '%');
-        });
-      })
-      ->latest()
-      ->paginate(request()->limit ?? 10)
-      ->withQueryString();
+      ->datatable();
 
     return view('businesses.index', compact('businesses'));
   }
