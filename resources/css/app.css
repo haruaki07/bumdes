@@ -1,9 +1,16 @@
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
 /* increase the default tabler icon size*/
 i.ti {
-  font-size: 20px;
+  font-size: 20px !important;
+}
+
+i.ti-sm {
+  font-size: 16px !important;
+}
+
+i.ti-xs {
+  font-size: 14px !important;
+}
+
+i.ti-xxs {
+  font-size: 12px !important;
 }

@@ -10,11 +10,11 @@ return [
     |
     */
 
-    'title' => 'Tablar',
+    'title' => 'BUMDES',
     'title_prefix' => '',
     'title_postfix' => '',
-    'bottom_title' => 'Tablar',
-    'current_version' => 'v11.11',
+    'bottom_title' => 'BUMDES',
+    'current_version' => 'v0.0.0',
 
 
     /*
@@ -26,8 +26,8 @@ return [
     |
     */
 
-    'logo' => '<b>Tab</b>LAR',
-    'logo_img_alt' => 'Admin Logo',
+    'logo' => '<b>BUMDES</b>',
+    'logo_img_alt' => 'BUMDES',
 
     /*
     |--------------------------------------------------------------------------
@@ -151,31 +151,9 @@ return [
         ],
 
         [
-            'text' => 'Support 1',
-            'url' => '#',
-            'icon' => 'ti ti-help',
-            'active' => ['support1'],
-            'submenu' => [
-                [
-                    'text' => 'Ticket',
-                    'url' => 'support1',
-                    'icon' => 'ti ti-article',
-                ]
-            ],
-        ],
-
-        [
-            'text' => 'Support 2',
-            'url' => '#',
-            'icon' => 'ti ti-help',
-            'active' => ['support2'],
-            'submenu' => [
-                [
-                    'text' => 'Ticket',
-                    'url' => 'support2',
-                    'icon' => 'ti ti-article',
-                ]
-            ],
+            'text' => 'Usaha',
+            'icon' => 'ti ti-briefcase',
+            'url' => 'businesses',
         ],
 
         [
