@@ -26,12 +26,16 @@ class BusinessController extends Controller
 
   public function create()
   {
+    Gate::authorize('create', Business::class);
+
     $businessTypes = BusinessType::where('is_active', true)->get();
     return view('businesses.create', compact('businessTypes'));
   }
 
   public function store(Request $request)
   {
+    Gate::authorize('create', Business::class);
+
     $validated = $request->validate([
       'name' => ['required', 'string', 'max:255'],
       'business_type_id' => ['required', 'exists:business_types,id'],

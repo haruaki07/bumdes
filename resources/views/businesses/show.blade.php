@@ -14,10 +14,12 @@
                 </div>
                 <div class="col-auto ms-auto d-print-none">
                     <div class="btn-list">
-                        <a href="{{ route('businesses.edit', $business) }}" class="btn btn-warning">
-                            <i class="icon ti ti-edit"></i>
-                            Edit Usaha
-                        </a>
+                        @can('update', $business)
+                            <a href="{{ route('businesses.edit', $business) }}" class="btn btn-warning">
+                                <i class="icon ti ti-edit"></i>
+                                Edit Usaha
+                            </a>
+                        @endcan
                     </div>
                 </div>
             </div>

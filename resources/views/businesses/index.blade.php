@@ -14,10 +14,12 @@
                 </div>
                 <div class="col-auto ms-auto d-print-none">
                     <div class="btn-list">
-                        <a href="{{ route('businesses.create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                            <i class="icon ti ti-plus"></i>
-                            Tambah Usaha
-                        </a>
+                        @can('create', \App\Models\Business::class)
+                            <a href="{{ route('businesses.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                                <i class="icon ti ti-plus"></i>
+                                Tambah Usaha
+                            </a>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -55,29 +57,35 @@
                                     <td>{{ $business->created_at->format('d M Y H:i') }}</td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a href="{{ route('businesses.show', $business) }}"
-                                                class="btn btn-icon btn-primary">
-                                                <i class="ti ti-eye"></i>
-                                            </a>
-                                            <a href="{{ route('businesses.edit', $business) }}"
-                                                class="btn btn-icon btn-warning">
-                                                <i class="ti ti-edit"></i>
-                                            </a>
-                                            <form action="{{ route('businesses.destroy', $business) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-icon btn-danger"
-                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                                    <i class="ti ti-trash"></i>
-                                                </button>
-                                            </form>
+                                            @can('update', $business)
+                                                <a href="{{ route('businesses.show', $business) }}"
+                                                    class="btn btn-icon btn-primary">
+                                                    <i class="ti ti-eye"></i>
+                                                </a>
+                                            @endcan
+                                            @can('update', $business)
+                                                <a href="{{ route('businesses.edit', $business) }}"
+                                                    class="btn btn-icon btn-warning">
+                                                    <i class="ti ti-edit"></i>
+                                                </a>
+                                            @endcan
+                                            @can('delete', $business)
+                                                <form action="{{ route('businesses.destroy', $business) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-icon btn-danger"
+                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                                        <i class="ti ti-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Tidak ada data usaha.</td>
+                                    <td colspan="7" class="text-center">Tidak ada data usaha.</td>
                                 </tr>
                             @endforelse
                         </x-slot>
