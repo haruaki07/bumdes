@@ -69,6 +69,24 @@
                                                     <i class="ti ti-edit"></i>
                                                 </a>
                                             @endcan
+                                            @if ($business->status === 'pending')
+                                                @can('approve', $business)
+                                                    <form action="{{ route('businesses.approve', $business) }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-icon btn-success"
+                                                            onclick="return confirm('Apakah Anda yakin ingin menyetujui usaha ini?')">
+                                                            <i class="ti ti-check"></i>
+                                                        </button>
+                                                    </form>
+                                                @endcan
+                                                @can('reject', $business)
+                                                    <button type="button" class="btn btn-icon btn-danger"
+                                                        data-bs-toggle="modal" data-bs-target="#rejectModal{{ $business->id }}">
+                                                        <i class="ti ti-x"></i>
+                                                    </button>
+                                                @endcan
+                                            @endif
                                             @can('delete', $business)
                                                 <form action="{{ route('businesses.destroy', $business) }}" method="POST"
                                                     class="d-inline">
@@ -81,6 +99,53 @@
                                                 </form>
                                             @endcan
                                         </div>
+
+                                        @if ($business->status === 'pending')
+                                            @can('reject', $business)
+                                                <!-- Reject Modal -->
+                                                <div class="modal fade" id="rejectModal{{ $business->id }}" tabindex="-1"
+                                                    aria-labelledby="rejectModalLabel{{ $business->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form action="{{ route('businesses.reject', $business) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                <input type="hidden" name="business_id"
+                                                                    value="{{ $business->id }}">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title"
+                                                                        id="rejectModalLabel{{ $business->id }}">Tolak Usaha
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>Apakah Anda yakin ingin menolak usaha
+                                                                        <strong>{{ $business->name }}</strong>?
+                                                                    </p>
+                                                                    <div class="mb-3">
+                                                                        <label for="rejection_reason{{ $business->id }}"
+                                                                            class="form-label">Alasan Penolakan <span
+                                                                                class="text-danger">*</span></label>
+                                                                        <textarea class="form-control @error('rejection_reason') is-invalid @enderror" id="rejection_reason{{ $business->id }}"
+                                                                            name="rejection_reason" rows="4" required placeholder="Masukkan alasan penolakan...">{{ old('rejection_reason') }}</textarea>
+                                                                        @error('rejection_reason')
+                                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-danger">Tolak
+                                                                        Usaha</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -94,4 +159,19 @@
             </div>
         </div>
     </div>
+
+    @if ($errors->has('rejection_reason'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var businessId = '{{ old('business_id') }}';
+                if (businessId) {
+                    var modal = document.getElementById('rejectModal' + businessId);
+                    if (modal) {
+                        var bootstrapModal = new bootstrap.Modal(modal);
+                        bootstrapModal.show();
+                    }
+                }
+            });
+        </script>
+    @endif
 @endsection

@@ -103,4 +103,36 @@ class BusinessController extends Controller
       ->route('businesses.index')
       ->with('success', 'Data usaha berhasil dihapus.');
   }
+
+  public function approve(Business $business)
+  {
+    Gate::authorize('approve', $business);
+
+    $business->update([
+      'status' => 'approved',
+      'rejection_reason' => null,
+    ]);
+
+    return redirect()
+      ->route('businesses.show', $business)
+      ->with('success', 'Usaha berhasil disetujui.');
+  }
+
+  public function reject(Request $request, Business $business)
+  {
+    Gate::authorize('reject', $business);
+
+    $validated = $request->validate([
+      'rejection_reason' => ['required', 'string', 'max:1000'],
+    ]);
+
+    $business->update([
+      'status' => 'rejected',
+      'rejection_reason' => $validated['rejection_reason'],
+    ]);
+
+    return redirect()
+      ->route('businesses.show', $business)
+      ->with('success', 'Usaha berhasil ditolak.');
+  }
 }

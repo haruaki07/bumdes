@@ -16,6 +16,8 @@ Route::middleware(['auth'])->group(function () {
 
   // Business Management
   Route::resource('businesses', BusinessController::class);
+  Route::post('/businesses/{business}/approve', [BusinessController::class, 'approve'])->name('businesses.approve');
+  Route::post('/businesses/{business}/reject', [BusinessController::class, 'reject'])->name('businesses.reject');
   // Route::resource('business-types', BusinessTypeController::class);
 
   // // Funding Management
