@@ -1,4 +1,8 @@
 {
-  "compilerOptions": {},
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
   "exclude": ["node_modules", "**/node_modules/*"]
 }

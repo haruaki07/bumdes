@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\BusinessRegistrationController;
 
 Route::get('/', fn() => view("welcome"));
 Auth::routes();
@@ -14,10 +15,18 @@ Route::middleware(['auth'])->group(function () {
   // Dashboard
   // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+  // Business Registration Management
+  Route::resource('business-registrations', BusinessRegistrationController::class)->except(['edit', 'update']);
+  Route::post('/business-registrations/{businessRegistration}/approve', [BusinessRegistrationController::class, 'approve'])->name('business-registrations.approve');
+  Route::post('/business-registrations/{businessRegistration}/reject', [BusinessRegistrationController::class, 'reject'])->name('business-registrations.reject');
+  Route::get('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'revise'])->name('business-registrations.revise');
+  Route::post('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'storeRevision'])->name('business-registrations.store-revision');
+
   // Business Management
   Route::resource('businesses', BusinessController::class);
-  Route::post('/businesses/{business}/approve', [BusinessController::class, 'approve'])->name('businesses.approve');
-  Route::post('/businesses/{business}/reject', [BusinessController::class, 'reject'])->name('businesses.reject');
+  Route::post('/businesses/{business}/request-name-change', [BusinessController::class, 'requestNameChange'])->name('businesses.request-name-change');
+  Route::post('/businesses/{business}/approve-name-change', [BusinessController::class, 'approveNameChange'])->name('businesses.approve-name-change');
+  Route::post('/businesses/{business}/reject-name-change', [BusinessController::class, 'rejectNameChange'])->name('businesses.reject-name-change');
   // Route::resource('business-types', BusinessTypeController::class);
 
   // // Funding Management

@@ -46,13 +46,13 @@ class BusinessController extends Controller
     ]);
 
     $validated['owner_id'] = Auth::id();
-    $validated['status'] = 'pending';
+    $validated['status'] = 'active';
 
     $business = Business::create($validated);
 
     return redirect()
       ->route('businesses.show', $business)
-      ->with('success', 'Usaha berhasil didaftarkan dan menunggu persetujuan admin.');
+      ->with('success', 'Usaha berhasil dibuat.');
   }
 
   public function show(Business $business)
@@ -78,13 +78,16 @@ class BusinessController extends Controller
     Gate::authorize('update', $business);
 
     $validated = $request->validate([
-      'name' => ['required', 'string', 'max:255'],
       'business_type_id' => ['required', 'exists:business_types,id'],
       'description' => ['required', 'string'],
       'location' => ['required', 'string', 'max:255'],
       'contact_phone' => ['required', 'string', 'max:20'],
       'contact_email' => ['nullable', 'email', 'max:255'],
     ]);
+
+    if ($request->has('name') && (Auth::user()->hasRole('admin') || Auth::user()->hasRole('petugas'))) {
+      $validated['name'] = $request->validate(['name' => ['required', 'string', 'max:255']])['name'];
+    }
 
     $business->update($validated);
 
@@ -104,35 +107,48 @@ class BusinessController extends Controller
       ->with('success', 'Data usaha berhasil dihapus.');
   }
 
-  public function approve(Business $business)
+  public function requestNameChange(Request $request, Business $business)
   {
-    Gate::authorize('approve', $business);
-
-    $business->update([
-      'status' => 'approved',
-      'rejection_reason' => null,
-    ]);
-
-    return redirect()
-      ->route('businesses.show', $business)
-      ->with('success', 'Usaha berhasil disetujui.');
-  }
-
-  public function reject(Request $request, Business $business)
-  {
-    Gate::authorize('reject', $business);
+    Gate::authorize('requestNameChange', $business);
 
     $validated = $request->validate([
-      'rejection_reason' => ['required', 'string', 'max:1000'],
+      'name_change_request' => ['required', 'string', 'max:255'],
+      'name_change_reason' => ['required', 'string', 'max:1000'],
     ]);
 
+    $business->update($validated);
+
+    return redirect()
+      ->route('businesses.show', $business)
+      ->with('success', 'Permintaan perubahan nama usaha berhasil diajukan dan menunggu persetujuan admin.');
+  }
+
+  public function approveNameChange(Business $business)
+  {
+    Gate::authorize('approveNameChange', $business);
+
     $business->update([
-      'status' => 'rejected',
-      'rejection_reason' => $validated['rejection_reason'],
+      'name' => $business->name_change_request,
+      'name_change_request' => null,
+      'name_change_reason' => null,
     ]);
 
     return redirect()
       ->route('businesses.show', $business)
-      ->with('success', 'Usaha berhasil ditolak.');
+      ->with('success', 'Permintaan perubahan nama usaha berhasil disetujui.');
+  }
+
+  public function rejectNameChange(Request $request, Business $business)
+  {
+    Gate::authorize('rejectNameChange', $business);
+
+    $business->update([
+      'name_change_request' => null,
+      'name_change_reason' => null,
+    ]);
+
+    return redirect()
+      ->route('businesses.show', $business)
+      ->with('success', 'Permintaan perubahan nama usaha berhasil ditolak.');
   }
 }

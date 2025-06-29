@@ -152,23 +152,29 @@ return [
 
         [
             'text' => 'Usaha',
-            'icon' => 'ti ti-briefcase',
+            'icon' => 'ti ti-building',
             'url' => 'businesses',
         ],
 
         [
-            'text' => 'Support 3',
-            'url' => '#',
-            'icon' => 'ti ti-help',
-            'active' => ['support3'],
-            'submenu' => [
-                [
-                    'text' => 'Ticket',
-                    'url' => 'support3',
-                    'icon' => 'ti ti-article',
-                ]
-            ],
+            'text' => 'Pengajuan Usaha',
+            'icon' => 'ti ti-briefcase',
+            'url' => 'business-registrations',
         ],
+
+        // [
+        //     'text' => 'Support 3',
+        //     'url' => '#',
+        //     'icon' => 'ti ti-help',
+        //     'active' => ['support3'],
+        //     'submenu' => [
+        //         [
+        //             'text' => 'Ticket',
+        //             'url' => 'support3',
+        //             'icon' => 'ti ti-article',
+        //         ]
+        //     ],
+        // ],
 
     ],
 

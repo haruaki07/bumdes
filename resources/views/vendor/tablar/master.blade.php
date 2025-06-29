@@ -7,6 +7,11 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+  <meta name="turbo-prefetch" content="false">
+
+
   {{-- Custom Meta Tags --}}
   @yield('meta_tags')
   {{-- Title --}}
@@ -18,7 +23,7 @@
 
   <!-- CSS/JS files -->
   @if (config('tablar', 'vite'))
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/sass/tabler.scss', 'resources/sass/tabler-icons.scss'])
   @endif
 
   {{-- Livewire Styles --}}

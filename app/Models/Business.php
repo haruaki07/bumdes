@@ -9,7 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Policies\BusinessPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 
+#[UsePolicy(BusinessPolicy::class)]
 class Business extends Model
 {
   use HasFactory, SoftDeletes, Datatable;
@@ -24,6 +27,8 @@ class Business extends Model
     'contact_email',
     'status',
     'rejection_reason',
+    'name_change_request',
+    'name_change_reason',
   ];
 
   protected $dataTableColumns = [
@@ -48,5 +53,15 @@ class Business extends Model
   public function fundingRequests(): HasMany
   {
     return $this->hasMany(FundingRequest::class);
+  }
+
+  public function businessRegistration(): BelongsTo
+  {
+    return $this->belongsTo(BusinessRegistration::class);
+  }
+
+  public function hasNameChangeRequest(): bool
+  {
+    return !empty($this->name_change_request);
   }
 }

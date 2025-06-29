@@ -4,34 +4,30 @@ namespace App\Enums;
 
 enum BusinessStatus: string
 {
-  case APPROVED = 'approved';
-  case REJECTED = 'rejected';
-  case PENDING = 'pending';
+  case ACTIVE = 'active';
+  case INACTIVE = 'inactive';
 
   public function label(): string
   {
     return match ($this) {
-      self::APPROVED => 'Approved',
-      self::REJECTED => 'Rejected',
-      self::PENDING => 'Pending',
+      self::ACTIVE => 'Aktif',
+      self::INACTIVE => 'Tidak Aktif',
     };
   }
 
   public function color(): string
   {
     return match ($this) {
-      self::APPROVED => 'green',
-      self::REJECTED => 'red',
-      self::PENDING => 'yellow',
+      self::ACTIVE => 'success',
+      self::INACTIVE => 'danger',
     };
   }
 
   public static function fromString(string $status): self
   {
     return match ($status) {
-      'approved' => self::APPROVED,
-      'rejected' => self::REJECTED,
-      default => self::PENDING,
+      'active' => self::ACTIVE,
+      'inactive' => self::INACTIVE,
     };
   }
 }
