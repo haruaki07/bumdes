@@ -14,8 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $this->call([
             RoleSeeder::class,
             BusinessTypeSeeder::class,
@@ -34,5 +32,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123'),
         ]);
         $warga->assignRole('warga');
+
+        User::factory()->count(5)->create()->each(function ($user) {
+            $user->assignRole('warga');
+        });
+
+        // Seed business registrations and businesses
+        $this->call([\Database\Seeders\BusinessAndRegistrationSeeder::class]);
     }
 }

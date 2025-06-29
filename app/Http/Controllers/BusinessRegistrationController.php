@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BusinessRegistrationStatus;
+use App\Enums\BusinessRegistrationTimelineAction;
 use App\Enums\BusinessStatus;
 use App\Models\Business;
 use App\Models\BusinessRegistration;
@@ -55,10 +56,8 @@ class BusinessRegistrationController extends Controller
 
         $registration = BusinessRegistration::create($validated);
 
-        // create timeline entry
         $registration->timeline()->create([
-            'action' => 'submitted',
-            'description' => 'Pengajuan usaha berhasil dibuat',
+            'action' => BusinessRegistrationTimelineAction::SUBMITTED,
             'performed_by' => Auth::id(),
         ]);
 
@@ -116,10 +115,8 @@ class BusinessRegistrationController extends Controller
             // link the registration to the business
             $businessRegistration->update(['business_id' => $business->id]);
 
-            // create timeline entry
             $businessRegistration->timeline()->create([
-                'action' => BusinessRegistrationStatus::APPROVED,
-                'description' => 'Pengajuan usaha disetujui dan usaha berhasil dibuat',
+                'action' => BusinessRegistrationTimelineAction::UPDATED,
                 'performed_by' => Auth::id(),
                 'metadata' => ['business_id' => $business->id],
             ]);
@@ -143,12 +140,10 @@ class BusinessRegistrationController extends Controller
             'rejection_reason' => $validated['rejection_reason'],
         ]);
 
-
         $businessRegistration->timeline()->create([
-            'action' => 'rejected',
-            'description' => 'Pengajuan usaha ditolak',
+            'action' => BusinessRegistrationTimelineAction::REJECTED,
             'performed_by' => Auth::id(),
-            'metadata' => ['rejection_reason' => $validated['rejection_reason']],
+            'metadata' => ['rejection_reason' => $validated['rejection_reason']]
         ]);
 
         return redirect()
@@ -195,10 +190,13 @@ class BusinessRegistrationController extends Controller
 
             // create timeline entry for the original registration
             $businessRegistration->timeline()->create([
-                'action' => 'revised',
-                'description' => 'Pengajuan usaha direvisi',
+                'action' => BusinessRegistrationTimelineAction::REVISED,
                 'performed_by' => Auth::id(),
-                'metadata' => ['parent_id' => $businessRegistration->id, 'revision_id' => $revision->id, 'revision_number' => $revision->revision_number],
+                'metadata' => [
+                    'parent_id' => $businessRegistration->id,
+                    'revision_id' => $revision->id,
+                    'revision_number' => $revision->revision_number
+                ],
             ]);
 
             return $revision;

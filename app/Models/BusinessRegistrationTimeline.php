@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BusinessRegistrationTimelineAction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,7 @@ class BusinessRegistrationTimeline extends Model
   ];
 
   protected $casts = [
+    'action' => BusinessRegistrationTimelineAction::class,
     'metadata' => 'array',
   ];
 

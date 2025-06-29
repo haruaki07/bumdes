@@ -167,19 +167,7 @@
                 @foreach ($timeline as $item)
                   <div class="timeline-event">
                     <div class="timeline-event-icon border">
-                      @if ($item->action === 'submitted')
-                        <i class="icon ti ti-plus text-blue"></i>
-                      @elseif ($item->action === 'approved')
-                        <i class="icon ti ti-check text-green"></i>
-                      @elseif ($item->action === 'rejected')
-                        <i class="icon ti ti-x text-red"></i>
-                      @elseif ($item->action === 'revised')
-                        <i class="icon ti ti-refresh text-cyan"></i>
-                      @elseif ($item->action === 'updated')
-                        <i class="icon ti ti-edit text-yellow"></i>
-                      @else
-                        <i class="icon ti ti-circle text-muted"></i>
-                      @endif
+                      <i class="icon {{ $item->action->icon() }} text-{{ $item->action->color() }}"></i>
                     </div>
                     <div class="card timeline-event-card">
                       <div class="card-body">
@@ -188,14 +176,14 @@
                           {{ $item->created_at->format('d/m/Y H:i') }}
                         </div>
                         <h4>
-                          {{ ucfirst($item->action) }}
-                          @if ($item->action === 'revised')
-                            <span class="badge bg-info text-info-fg">Revisi
+                          {{ $item->action->label() }}
+                          @if ($item->action === \App\Enums\BusinessRegistrationTimelineAction::REVISED)
+                            <span class="badge bg-info text-info-fg ms-1">Revisi
                               #{{ $item->metadata['revision_number'] }}</span>
                           @endif
                         </h4>
                         <p class="text-secondary">
-                          {{ $item->description }}
+                          {{ $item->action->description() }}
                         </p>
                       </div>
                     </div>
