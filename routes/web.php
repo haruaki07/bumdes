@@ -56,6 +56,10 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
+Route::get('/hello', function () {
+    return 'Hello World';
+});
+
 // Redirect root to dashboard for authenticated users
 // Route::get('/', function () {
 //   return redirect()->route('dashboard');
