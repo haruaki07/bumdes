@@ -6,7 +6,7 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => view('welcome'));
+Route::get('/', fn () => view('welcome'));
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -56,8 +56,8 @@ Route::middleware(['auth'])->group(function () {
     // });
 });
 
-Route::get("/hello", function () {
-  return "Hello World";
+Route::get('/hello', function () {
+    return 'Hello World';
 });
 
 // Redirect root to dashboard for authenticated users
