@@ -26,7 +26,7 @@ jobs:
         run: composer global require laravel/pint
 
       - name: Run Pint
-        run: pint --diff main --no-interaction
+        run: pint
 
       - name: Commit linted files
         uses: stefanzweifel/git-auto-commit-action@v5
