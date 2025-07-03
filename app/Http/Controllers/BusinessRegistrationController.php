@@ -10,8 +10,8 @@ use App\Models\BusinessRegistration;
 use App\Models\BusinessType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class BusinessRegistrationController extends Controller
 {
@@ -35,6 +35,7 @@ class BusinessRegistrationController extends Controller
         Gate::authorize('create', BusinessRegistration::class);
 
         $businessTypes = BusinessType::where('is_active', true)->get();
+
         return view('business-registrations.create', compact('businessTypes'));
     }
 
@@ -143,7 +144,7 @@ class BusinessRegistrationController extends Controller
         $businessRegistration->timeline()->create([
             'action' => BusinessRegistrationTimelineAction::REJECTED,
             'performed_by' => Auth::id(),
-            'metadata' => ['rejection_reason' => $validated['rejection_reason']]
+            'metadata' => ['rejection_reason' => $validated['rejection_reason']],
         ]);
 
         return redirect()
@@ -195,7 +196,7 @@ class BusinessRegistrationController extends Controller
                 'metadata' => [
                     'parent_id' => $businessRegistration->id,
                     'revision_id' => $revision->id,
-                    'revision_number' => $revision->revision_number
+                    'revision_number' => $revision->revision_number,
                 ],
             ]);
 

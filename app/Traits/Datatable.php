@@ -39,18 +39,17 @@ trait Datatable
 
         $query->when($sort && isset($columns[$sort]), function ($query) use ($columns, $sort, $direction) {
             if (isset($columns[$sort]) && Str::contains($columns[$sort], 'sortable')) {
-                if (!Str::contains($sort, '.')) {
+                if (! Str::contains($sort, '.')) {
                     $query->orderBy($sort, $direction);
                 } else {
                     [$relation, $relationColumn] = explode('.', $sort, 2);
                     $query->withAggregate($relation, $relationColumn);
-                    $query->orderBy(Str::snake($relation . '_' . $relationColumn), $direction);
+                    $query->orderBy(Str::snake($relation.'_'.$relationColumn), $direction);
                 }
             }
         }, function ($query) {
             $query->latest();
         });
-
 
         $limit = (int) $request->query('limit', 10);
         $result = $query->paginate($limit)->withQueryString();

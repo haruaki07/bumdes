@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('business_registration_timelines', function (Blueprint $table) {
-            $table->text('description')->after("action");
+            $table->text('description')->after('action');
         });
     }
 };

@@ -25,7 +25,7 @@ class BusinessRegistrationPolicy
 
     public function view(?User $user, BusinessRegistration $businessRegistration): bool
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -57,7 +57,7 @@ class BusinessRegistrationPolicy
 
         return $businessRegistration->applicant_id === $user->id &&
             $businessRegistration->status === 'pending' &&
-            !$businessRegistration->is_revised;
+            ! $businessRegistration->is_revised;
     }
 
     public function approve(User $user, BusinessRegistration $businessRegistration): bool

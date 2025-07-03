@@ -16,7 +16,6 @@ return [
     'bottom_title' => 'BUMDES',
     'current_version' => 'v0.0.0',
 
-
     /*
     |--------------------------------------------------------------------------
     | Admin Panel Logo
@@ -68,7 +67,7 @@ return [
     */
 
     'layout' => 'vertical',
-    //boxed, combo, condensed, fluid, fluid-vertical, horizontal, navbar-overlap, navbar-sticky, rtl, vertical, vertical-right, vertical-transparent
+    // boxed, combo, condensed, fluid, fluid-vertical, horizontal, navbar-overlap, navbar-sticky, rtl, vertical, vertical-right, vertical-transparent
 
     'layout_light_sidebar' => false,
     'layout_light_topbar' => false,
@@ -147,7 +146,7 @@ return [
         [
             'text' => 'Home',
             'icon' => 'ti ti-home',
-            'url' => 'home'
+            'url' => 'home',
         ],
 
         [

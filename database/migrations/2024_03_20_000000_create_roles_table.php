@@ -6,26 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-  public function up(): void
-  {
-    Schema::create('roles', function (Blueprint $table) {
-      $table->id();
-      $table->string('name')->unique();
-      $table->string('display_name');
-      $table->string('description')->nullable();
-      $table->timestamps();
-    });
+    public function up(): void
+    {
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('display_name');
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
 
-    Schema::create('role_user', function (Blueprint $table) {
-      $table->foreignId('role_id')->constrained()->onDelete('cascade');
-      $table->foreignId('user_id')->constrained()->onDelete('cascade');
-      $table->primary(['role_id', 'user_id']);
-    });
-  }
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->primary(['role_id', 'user_id']);
+        });
+    }
 
-  public function down(): void
-  {
-    Schema::dropIfExists('role_user');
-    Schema::dropIfExists('roles');
-  }
+    public function down(): void
+    {
+        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('roles');
+    }
 };
