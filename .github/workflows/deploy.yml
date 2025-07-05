@@ -79,7 +79,7 @@ jobs:
           MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
         run: rsync
           -e "ssh -i ~/.ssh/key"
-          -a "$VENDOR_ARCHIVE" "$ASSETS_ARCHIVE"
+          -a "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
           "$MACHINE_USER@$MACHINE_IP:$MACHINE_WORKDIR"
 
       - name: Deploy
@@ -91,5 +91,5 @@ jobs:
           ssh -i ~/.ssh/key "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
             cd "$MACHINE_WORKDIR"
             git pull
-            ./scripts/deploy.sh "$VENDOR_ARCHIVE" "$ASSETS_ARCHIVE"
+            ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
           EOF
