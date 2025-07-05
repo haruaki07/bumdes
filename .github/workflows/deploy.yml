@@ -1,0 +1,99 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.3]
+    env:
+      DEPLOY_MACHINE: myvm
+      PHP_EXTENSIONS: json, dom, curl, libxml, mbstring, gd
+      ARCHIVE_ASSETS: assets.tar.xz
+      ARCHIVE_VENDOR: vendor.tar.xz
+
+    steps:
+      - name: Setup Tailscale
+        id: tailscale
+        uses: tailscale/github-action@main
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: 1.84.2
+
+      - name: Get Machine IP
+        id: machine-ip
+        run: echo "machine-ip=$(tailscale ip -6 $DEPLOY_MACHINE)" >> $GITHUB_OUTPUT
+
+      - name: Add SSH key
+        id: ssh
+        env:
+          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
+          printf "%s" "$SSH_KEY" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install NPM dependencies
+        run: npm ci --include=dev
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Archive assets
+        run: tar -cJf ${{ env.ARCHIVE_ASSETS }} public/build
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Archive composer deps
+        run: tar -cjf ${{ env.ARCHIVE_VENDOR }} vendor
+
+      - name: Copy files
+        env:
+          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
+          MACHINE_USER: ${{ secrets.MACHINE_USER }}
+          MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
+          VENDOR_ARCHIVE: ${{ env.ARCHIVE_VENDOR }}
+          ASSETS_ARCHIVE: ${{ env.ARCHIVE_ASSETS }}
+        run: rsync
+          -e "ssh -i ~/.ssh/key"
+          -a "$VENDOR_ARCHIVE" "$ASSETS_ARCHIVE"
+          "$MACHINE_USER@$MACHINE_IP:$MACHINE_WORKDIR"
+
+      - name: Pull latest
+        env:
+          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
+          MACHINE_USER: ${{ secrets.MACHINE_USER }}
+          MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
+          VENDOR_ARCHIVE: ${{ env.ARCHIVE_VENDOR }}
+          ASSETS_ARCHIVE: ${{ env.ARCHIVE_ASSETS }}
+        run: |
+          ssh -i ~/.ssh/key "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
+            cd "$MACHINE_WORKDIR"
+            git pull
+            ./scripts/deploy.sh "$VENDOR_ARCHIVE" "$ASSETS_ARCHIVE"
+          EOF
