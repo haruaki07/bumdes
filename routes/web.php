@@ -24,9 +24,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Business Management
     Route::resource('businesses', BusinessController::class);
-    Route::post('/businesses/{business}/request-name-change', [BusinessController::class, 'requestNameChange'])->name('businesses.request-name-change');
-    Route::post('/businesses/{business}/approve-name-change', [BusinessController::class, 'approveNameChange'])->name('businesses.approve-name-change');
-    Route::post('/businesses/{business}/reject-name-change', [BusinessController::class, 'rejectNameChange'])->name('businesses.reject-name-change');
     // Route::resource('business-types', BusinessTypeController::class);
 
     // // Funding Management
