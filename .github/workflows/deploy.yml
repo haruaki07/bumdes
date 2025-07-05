@@ -34,11 +34,11 @@ jobs:
         id: ssh
         env:
           MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
-          printf "%s" "$SSH_KEY" > ~/.ssh/key
+          printf "%s" "$SSH_PRIVATE_KEY" > ~/.ssh/key
           chmod 600 ~/.ssh/key
 
       - name: Checkout code
@@ -57,6 +57,12 @@ jobs:
           node-version: 20
           cache: "npm"
 
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Archive composer deps
+        run: tar -cjf ${{ env.ARCHIVE_VENDOR }} vendor
+
       - name: Install NPM dependencies
         run: npm ci --include=dev
 
@@ -66,19 +72,11 @@ jobs:
       - name: Archive assets
         run: tar -cJf ${{ env.ARCHIVE_ASSETS }} public/build
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
-
-      - name: Archive composer deps
-        run: tar -cjf ${{ env.ARCHIVE_VENDOR }} vendor
-
       - name: Copy files
         env:
           MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
           MACHINE_USER: ${{ secrets.MACHINE_USER }}
           MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
-          VENDOR_ARCHIVE: ${{ env.ARCHIVE_VENDOR }}
-          ASSETS_ARCHIVE: ${{ env.ARCHIVE_ASSETS }}
         run: rsync
           -e "ssh -i ~/.ssh/key"
           -a "$VENDOR_ARCHIVE" "$ASSETS_ARCHIVE"
@@ -89,8 +87,6 @@ jobs:
           MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
           MACHINE_USER: ${{ secrets.MACHINE_USER }}
           MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
-          VENDOR_ARCHIVE: ${{ env.ARCHIVE_VENDOR }}
-          ASSETS_ARCHIVE: ${{ env.ARCHIVE_ASSETS }}
         run: |
           ssh -i ~/.ssh/key "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
             cd "$MACHINE_WORKDIR"
