@@ -61,7 +61,7 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Archive composer deps
-        run: tar -cjf ${{ env.ARCHIVE_VENDOR }} vendor
+        run: tar -cJf ${{ env.ARCHIVE_VENDOR }} vendor
 
       - name: Install NPM dependencies
         run: npm ci --include=dev
