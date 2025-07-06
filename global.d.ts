@@ -1,6 +1,5 @@
 import * as tabler from "@tabler/core";
 import axios from "axios";
-import { visit } from "@hotwired/turbo";
 
 declare global {
   interface Window {
@@ -9,8 +8,5 @@ declare global {
 
     // tabler
     tabler: typeof tabler;
-
-    // turbo drive
-    visit: typeof visit;
   }
 }

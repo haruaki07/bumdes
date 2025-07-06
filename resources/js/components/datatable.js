@@ -1,5 +1,3 @@
-import { visit } from "@hotwired/turbo";
-
 class Datatable {
   constructor(id) {
     this.id = id;
@@ -95,9 +93,7 @@ class Datatable {
       url.searchParams.set(key, value);
     }
 
-    visit(this.tableEl.dataset.datatableUrl + url.search, {
-      action: "replace",
-    });
+    window.location.href = this.tableEl.dataset.datatableUrl + url.search;
   }
 
   static initialized = new Set();

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class BusinessRegistrationController extends Controller
 {
@@ -43,28 +44,49 @@ class BusinessRegistrationController extends Controller
     {
         Gate::authorize('create', BusinessRegistration::class);
 
-        $validated = $request->validate([
+        $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'business_type_id' => ['required', 'exists:business_types,id'],
             'description' => ['required', 'string'],
             'location' => ['required', 'string', 'max:255'],
             'contact_phone' => ['required', 'string', 'max:20'],
             'contact_email' => ['nullable', 'email', 'max:255'],
+            'document' => ['required', 'file', 'mimes:pdf,doc,docx,jpg,png', 'max:5120'], // 5MB max
         ]);
 
-        $validated['applicant_id'] = Auth::id();
-        $validated['status'] = 'pending';
+        try {
+            DB::beginTransaction();
+            $document_url = Storage::disk('public')->putFileAs(
+                'business_documents',
+                $request->document,
+                Auth::id().'_'.time().'_'.$request->document->getClientOriginalName()
+            );
 
-        $registration = BusinessRegistration::create($validated);
+            $data = $request->except('document');
+            $data['document_url'] = $document_url;
+            $data['applicant_id'] = Auth::id();
+            $data['status'] = 'pending';
 
-        $registration->timeline()->create([
-            'action' => BusinessRegistrationTimelineAction::SUBMITTED,
-            'performed_by' => Auth::id(),
-        ]);
+            $registration = BusinessRegistration::create($data);
 
-        return redirect()
-            ->route('business-registrations.show', $registration)
-            ->with('success', 'Pengajuan usaha berhasil dibuat dan menunggu persetujuan admin.');
+            $registration->timeline()->create([
+                'action' => BusinessRegistrationTimelineAction::SUBMITTED,
+                'performed_by' => Auth::id(),
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('business-registrations.show', $registration)
+                ->with('success', 'Pengajuan usaha berhasil dibuat dan menunggu persetujuan admin.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['document' => 'Gagal mengunggah dokumen: '.$e->getMessage()]);
+        }
     }
 
     public function show(BusinessRegistration $businessRegistration)

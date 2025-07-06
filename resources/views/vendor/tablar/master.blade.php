@@ -7,11 +7,6 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <meta name="turbo-refresh-method" content="morph">
-  <meta name="turbo-refresh-scroll" content="preserve">
-  <meta name="turbo-prefetch" content="false">
-
-
   {{-- Custom Meta Tags --}}
   @yield('meta_tags')
   {{-- Title --}}

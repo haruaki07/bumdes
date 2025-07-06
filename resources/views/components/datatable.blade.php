@@ -81,3 +81,10 @@
     </div>
   @endif
 </div>
+
+
+@pushOnce('js')
+  <script type="module">
+    Datatable.init("[data-datatable-id]");
+  </script>
+@endpushOnce

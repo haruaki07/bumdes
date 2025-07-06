@@ -24,6 +24,7 @@ class BusinessRegistration extends Model
         'location',
         'contact_phone',
         'contact_email',
+        'document_url',
         'status',
         'rejection_reason',
         'approved_by',
