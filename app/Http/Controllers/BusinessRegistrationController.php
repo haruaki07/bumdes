@@ -139,7 +139,7 @@ class BusinessRegistrationController extends Controller
             $businessRegistration->update(['business_id' => $business->id]);
 
             $businessRegistration->timeline()->create([
-                'action' => BusinessRegistrationTimelineAction::UPDATED,
+                'action' => BusinessRegistrationTimelineAction::APPROVED,
                 'performed_by' => Auth::id(),
                 'metadata' => ['business_id' => $business->id],
             ]);
