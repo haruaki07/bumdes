@@ -8,7 +8,6 @@ enum BusinessRegistrationTimelineAction: string
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
     case REVISED = 'revised';
-    case UPDATED = 'updated';
 
     public function label(): string
     {
@@ -17,7 +16,6 @@ enum BusinessRegistrationTimelineAction: string
             self::APPROVED => 'Disetujui',
             self::REJECTED => 'Ditolak',
             self::REVISED => 'Direvisi',
-            self::UPDATED => 'Diperbarui',
             default => '-',
         };
     }
@@ -29,7 +27,6 @@ enum BusinessRegistrationTimelineAction: string
             self::APPROVED => 'Pengajuan usaha disetujui dan usaha berhasil dibuat',
             self::REJECTED => 'Pengajuan usaha ditolak',
             self::REVISED => 'Pengajuan usaha direvisi',
-            self::UPDATED => 'Pengajuan usaha diperbarui',
             default => '-',
         };
     }
@@ -41,7 +38,6 @@ enum BusinessRegistrationTimelineAction: string
             self::APPROVED => 'ti ti-check',
             self::REJECTED => 'ti ti-x',
             self::REVISED => 'ti ti-refresh',
-            self::UPDATED => 'ti ti-edit',
             default => 'ti ti-circle',
         };
     }
@@ -53,7 +49,6 @@ enum BusinessRegistrationTimelineAction: string
             self::APPROVED => 'green',
             self::REJECTED => 'red',
             self::REVISED => 'cyan',
-            self::UPDATED => 'yellow',
             default => 'muted',
         };
     }
@@ -65,7 +60,6 @@ enum BusinessRegistrationTimelineAction: string
             'approved' => self::APPROVED,
             'rejected' => self::REJECTED,
             'revised' => self::REVISED,
-            'updated' => self::UPDATED,
             default => self::SUBMITTED,
         };
     }
