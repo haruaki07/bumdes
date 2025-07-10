@@ -16,15 +16,10 @@
           <div class="btn-list">
             @if ($businessRegistration->status === 'pending' && $businessRegistration->canBeRevised())
               @can('approve', $businessRegistration)
-                <form action="{{ route('business-registrations.approve', $businessRegistration) }}" method="POST"
-                  class="d-inline m-0">
-                  @csrf
-                  <button type="submit" class="btn btn-success"
-                    onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan usaha ini?')">
-                    <i class="icon ti ti-check"></i>
-                    Setujui Pengajuan
-                  </button>
-                </form>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                  <i class="icon ti ti-check"></i>
+                  Setujui Pengajuan
+                </button>
               @endcan
               @can('reject', $businessRegistration)
                 <button type="button" class="btn btn-danger d-inline-block" data-bs-toggle="modal"
@@ -198,6 +193,31 @@
   </div>
 
   @if ($businessRegistration->status === 'pending')
+    @can('approve', $businessRegistration)
+      <!-- Approve Modal -->
+      <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form action="{{ route('business-registrations.approve', $businessRegistration) }}" method="POST">
+              @csrf
+              <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Setujui Pengajuan Usaha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Apakah Anda yakin ingin menyetujui pengajuan usaha
+                  <strong>{{ $businessRegistration->name }}</strong>?
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-success">Setujui Pengajuan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    @endcan
     @can('reject', $businessRegistration)
       <!-- Reject Modal -->
       <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
