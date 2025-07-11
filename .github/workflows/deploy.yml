@@ -30,16 +30,9 @@ jobs:
         id: machine-ip
         run: echo "machine-ip=$(tailscale ip -4 $DEPLOY_MACHINE)" >> $GITHUB_OUTPUT
 
-      - name: Add SSH key
-        id: ssh
-        env:
-          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
-          printf "%s" "$SSH_PRIVATE_KEY" > ~/.ssh/key
-          chmod 600 ~/.ssh/key
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,7 +71,6 @@ jobs:
           MACHINE_USER: ${{ secrets.MACHINE_USER }}
           MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
         run: rsync
-          -e "ssh -i ~/.ssh/key"
           -a "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
           "$MACHINE_USER@$MACHINE_IP:$MACHINE_WORKDIR"
 
@@ -88,7 +80,7 @@ jobs:
           MACHINE_USER: ${{ secrets.MACHINE_USER }}
           MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
         run: |
-          ssh -i ~/.ssh/key "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
+          ssh "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
             cd "$MACHINE_WORKDIR"
             git pull
             ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
