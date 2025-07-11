@@ -30,9 +30,17 @@ jobs:
         id: machine-ip
         run: echo "machine-ip=$(tailscale ip -4 $DEPLOY_MACHINE)" >> $GITHUB_OUTPUT
 
-      - uses: webfactory/ssh-agent@v0.9.0
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add SSH known hosts
+        env:
+          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
 
       - name: Checkout code
         uses: actions/checkout@v4
