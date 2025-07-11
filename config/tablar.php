@@ -10,10 +10,10 @@ return [
     |
     */
 
-    'title' => 'BUMDES',
+    'title' => config('app.name'),
     'title_prefix' => '',
     'title_postfix' => '',
-    'bottom_title' => 'BUMDES',
+    'bottom_title' => config('app.name'),
     'current_version' => 'v0.0.0',
 
     /*
@@ -25,8 +25,8 @@ return [
     |
     */
 
-    'logo' => '<b>BUMDES</b>',
-    'logo_img_alt' => 'BUMDES',
+    'logo' => '<b>'.config('app.name').'</b>',
+    'logo_img_alt' => config('app.name'),
 
     /*
     |--------------------------------------------------------------------------
