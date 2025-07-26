@@ -25,6 +25,7 @@ class BusinessRegistrationFactory extends Factory
             'location' => $this->faker->address,
             'contact_phone' => $this->faker->phoneNumber,
             'contact_email' => $this->faker->safeEmail,
+            'document_url' => $this->faker->imageUrl(),
             'status' => $status,
             'approved_by' => $status === 'approved' ? $user->id : null,
             'approved_at' => $status === 'approved' ? now() : null,
