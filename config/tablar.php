@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'logo' => '<b>'.config('app.name').'</b>',
+    'logo' => '<b>' . config('app.name') . '</b>',
     'logo_img_alt' => config('app.name'),
 
     /*
@@ -161,6 +161,14 @@ return [
             'url' => 'business-registrations',
         ],
 
+        // e-billing app
+        [
+            'group' => 'e-billing',
+            'text' => 'Dashboard',
+            'icon' => 'ti ti-layout-dashboard',
+            'url' => 'e-billing',
+        ],
+
         // [
         //     'text' => 'Support 3',
         //     'url' => '#',
@@ -196,6 +204,7 @@ return [
         TakiElias\Tablar\Menu\Filters\ClassesFilter::class,
         TakiElias\Tablar\Menu\Filters\LangFilter::class,
         TakiElias\Tablar\Menu\Filters\DataFilter::class,
+        \App\Filters\RouteGroupFilter::class,
     ],
 
     /*

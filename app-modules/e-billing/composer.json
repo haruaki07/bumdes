@@ -1,0 +1,24 @@
+{
+	"name": "modules/e-billing",
+	"description": "",
+	"type": "library",
+	"version": "1.0",
+	"license": "proprietary",
+	"require": {},
+	"autoload": {
+		"psr-4": {
+			"Modules\\EBilling\\": "src/",
+			"Modules\\EBilling\\Tests\\": "tests/",
+			"Modules\\EBilling\\Database\\Factories\\": "database/factories/",
+			"Modules\\EBilling\\Database\\Seeders\\": "database/seeders/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Modules\\EBilling\\Providers\\EBillingServiceProvider"
+			]
+		}
+	}
+}
