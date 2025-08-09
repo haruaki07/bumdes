@@ -1,4 +1,4 @@
-<p class="m-0 text-muted">Menampilkan <span>{{ $paginator->perPage() }}</span>
+<p class="m-0 text-muted">Menampilkan <span>{{ $paginator->count() }}</span>
   dari <span>{{ $paginator->total() }}</span> hasil
 </p>
 <ul class="pagination m-0 ms-auto">
