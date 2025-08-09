@@ -174,7 +174,7 @@ return [
             'text' => 'Data Master',
             'url' => '#',
             'icon' => 'ti ti-database',
-            'active' => ['master-data/*'],
+            'active' => ['e-billing/master-data/*'],
             'submenu' => [
                 [
                     'group' => 'e-billing',

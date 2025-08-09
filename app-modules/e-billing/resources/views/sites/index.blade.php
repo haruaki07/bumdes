@@ -32,8 +32,9 @@
           <x-datatable tableId="sitesTable" title="Daftar Site" :data="$sites">
             <x-slot:thead>
               <tr>
+                <th>#</th>
                 <x-sortable-header field="name" label="Nama" />
-                <x-sortable-header field="description" label="Description" />
+                <x-sortable-header field="description" label="Deskripsi" />
                 <th>Aksi</th>
               </tr>
             </x-slot>
@@ -41,6 +42,7 @@
             <x-slot:tbody>
               @forelse ($sites as $site)
                 <tr>
+                  <td>{{ $loop->iteration }}</td>
                   <td class="fw-medium">{{ $site->name }}</td>
                   <td>{{ $site->description ?? '-' }}</td>
                   <td>

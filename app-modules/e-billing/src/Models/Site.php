@@ -17,4 +17,9 @@ class Site extends Model
         "name",
         "description"
     ];
+
+    protected $dataTableColumns = [
+        'name' => 'searchable|sortable',
+        'description' => 'searchable|sortable',
+    ];
 }
