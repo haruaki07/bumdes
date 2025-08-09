@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'logo' => '<b>' . config('app.name') . '</b>',
+    'logo' => '<b>'.config('app.name').'</b>',
     'logo_img_alt' => config('app.name'),
 
     /*

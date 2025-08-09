@@ -10,14 +10,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Device extends Model
 {
     /** @use HasFactory<\Database\Factories\DeviceFactory> */
-    use HasFactory, Datatable, SoftDeletes;
+    use Datatable, HasFactory, SoftDeletes;
 
     protected $table = 'ebil_devices';
 
     protected $fillable = [
-        "brand",
-        "model",
-        "description"
+        'brand',
+        'model',
+        'description',
     ];
 
     protected $dataTableColumns = [

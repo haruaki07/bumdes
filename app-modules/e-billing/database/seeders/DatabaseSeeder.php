@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SiteSeeder::class,
-            DeviceSeeder::class
+            DeviceSeeder::class,
         ]);
     }
 }

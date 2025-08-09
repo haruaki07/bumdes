@@ -27,18 +27,18 @@ class DeviceController
             ->action(route('e-billing.master-data.devices.store'))
             ->method('POST')
 
-            ->input('brand', 'Merek', ["topGap" => ""])
+            ->input('brand', 'Merek', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan nama perangkat')
 
-            ->input('model', 'Model', ["topGap" => ""])
+            ->input('model', 'Model', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan model perangkat')
 
-            ->textarea('description', 'Deskripsi', ["topGap" => ""])
+            ->textarea('description', 'Deskripsi', ['topGap' => ''])
             ->placeholder('Masukkan deskripsi perangkat (opsional)')
 
-            ->button('Simpan', "", ["topGap" => "d-inline-flex"])
+            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
             ->addClass('btn btn-primary');
 
         return view('e-billing::devices.create', compact('form'));
@@ -78,21 +78,21 @@ class DeviceController
             ->action(route('e-billing.master-data.devices.update', $device))
             ->method('PUT')
 
-            ->input('brand', 'Merek', ["topGap" => ""])
+            ->input('brand', 'Merek', ['topGap' => ''])
             ->required()
             ->value($device->brand)
             ->placeholder('Masukkan nama perangkat')
 
-            ->input('model', 'Model', ["topGap" => ""])
+            ->input('model', 'Model', ['topGap' => ''])
             ->required()
             ->value($device->model)
             ->placeholder('Masukkan model perangkat')
 
-            ->textarea('description', 'Deskripsi', ["topGap" => ""])
+            ->textarea('description', 'Deskripsi', ['topGap' => ''])
             ->value($device->description)
             ->placeholder('Masukkan deskripsi perangkat (opsional)')
 
-            ->button('Simpan', "", ["topGap" => "d-inline-flex"])
+            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
             ->addClass('btn btn-primary');
 
         return view('e-billing::devices.edit', compact('form'));

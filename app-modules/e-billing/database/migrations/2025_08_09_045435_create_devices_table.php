@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('ebil_devices', function (Blueprint $table) {
             $table->id();
-            $table->string("brand");
-            $table->string("model");
+            $table->string('brand');
+            $table->string('model');
             $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
