@@ -44,16 +44,19 @@
                   <td class="fw-medium">{{ $site->name }}</td>
                   <td>{{ $site->description ?? '-' }}</td>
                   <td>
-                    <a href="{{ route('e-billing.master-data.sites.show', $site) }}" class="btn btn-icon btn-primary">
+                    <a href="{{ route('e-billing.master-data.sites.show', $site) }}" class="btn btn-icon btn-primary"
+                      data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
                     {{-- @can('update', $site) --}}
-                    <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-icon btn-warning">
+                    <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-icon btn-warning"
+                      data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                       <i class="ti ti-edit"></i>
                     </a>
                     {{-- @endcan --}}
                     <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')">
+                      onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')"
+                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                       <i class="ti ti-trash"></i>
                     </button>
                   </td>
