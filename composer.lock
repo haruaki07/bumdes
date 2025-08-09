@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90d981f56e18e5b0732e38c31a216786",
+    "content-hash": "407d2c79586368a39589de6dfe9bb770",
     "packages": [
         {
             "name": "brick/math",
@@ -6926,6 +6926,66 @@
             "time": "2025-06-27T19:55:54+00:00"
         },
         {
+            "name": "takielias/lab",
+            "version": "0.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/takielias/laravel-ajax-builder.git",
+                "reference": "0b55dd73f1a73e9fc7ba5f86d3fc2ac96dca49cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/takielias/laravel-ajax-builder/zipball/0b55dd73f1a73e9fc7ba5f86d3fc2ac96dca49cb",
+                "reference": "0b55dd73f1a73e9fc7ba5f86d3fc2ac96dca49cb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~10|~11|~12"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~8|~9|~10",
+                "phpunit/phpunit": "~9.0|~10|~11"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Lab": "Takielias\\Lab\\Facades\\Lab"
+                    },
+                    "providers": [
+                        "Takielias\\Lab\\LabServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Takielias\\Lab\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Laravel Ajax Builder",
+                    "email": "taki.elias@email.com",
+                    "homepage": "https://ebuz.xyz"
+                }
+            ],
+            "description": "The Laravel Ajax Builder is a Laravel package for easily creating AJAX JSON responses. It allows setting status codes, messages, views, data, alerts, and redirect URLs through a fluent interface, streamlining the process of sending AJAX responses in Laravel applications.",
+            "homepage": "https://github.com/takielias/laravel-ajax-builder",
+            "keywords": [
+                "AjaxBuilder",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/takielias/laravel-ajax-builder/issues",
+                "source": "https://github.com/takielias/laravel-ajax-builder/tree/0.17"
+            },
+            "time": "2025-03-14T05:31:39+00:00"
+        },
+        {
             "name": "takielias/tablar",
             "version": "12.03",
             "source": {
@@ -6986,6 +7046,76 @@
                 "source": "https://github.com/takielias/tablar/tree/12.03"
             },
             "time": "2025-05-30T10:13:16+00:00"
+        },
+        {
+            "name": "takielias/tablar-kit",
+            "version": "12.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/takielias/tablar-kit.git",
+                "reference": "ac7ef038517c74b5e937711b1f51d7ea329fb717"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/takielias/tablar-kit/zipball/ac7ef038517c74b5e937711b1f51d7ea329fb717",
+                "reference": "ac7ef038517c74b5e937711b1f51d7ea329fb717",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "^10.0|^11.0|^12.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "illuminate/view": "^10.0|^11.0|^12.0",
+                "nesbot/carbon": "^2.72.2|^3.0",
+                "takielias/lab": "*",
+                "takielias/tablar": "*"
+            },
+            "require-dev": {
+                "gajus/dindent": "^2.0",
+                "orchestra/testbench": "~9|~10",
+                "phpunit/phpunit": "^10.0|~11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "TablarKit": "TakiElias\\TablarKit\\Facades\\TablarKit"
+                    },
+                    "providers": [
+                        "TakiElias\\TablarKit\\TablarKitServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Helpers/functions.php"
+                ],
+                "psr-4": {
+                    "TakiElias\\TablarKit\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taki Elias",
+                    "email": "taki.elias@email.com",
+                    "homepage": "https://ebuz.xyz"
+                }
+            ],
+            "description": "The Elegance of Tablar Dashboard",
+            "homepage": "https://github.com/takielias/tablar-kit",
+            "keywords": [
+                "Tablar",
+                "TablarKit",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/takielias/tablar-kit/issues",
+                "source": "https://github.com/takielias/tablar-kit/tree/12.12"
+            },
+            "time": "2025-07-15T09:16:25+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
