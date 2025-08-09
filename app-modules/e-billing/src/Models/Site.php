@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Site extends Model
 {
-    use Datatable, SoftDeletes, HasFactory;
+    use Datatable, HasFactory, SoftDeletes;
 
     protected $table = 'ebil_sites';
 
     protected $fillable = [
-        "name",
-        "description"
+        'name',
+        'description',
     ];
 }

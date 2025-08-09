@@ -21,7 +21,7 @@ class SiteFactory extends Factory
     {
         return [
             'name' => $this->faker->city,
-            'description' => $this->faker->sentence
+            'description' => $this->faker->sentence,
         ];
     }
 }

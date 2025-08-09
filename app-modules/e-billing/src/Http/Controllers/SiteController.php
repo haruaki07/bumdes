@@ -27,14 +27,14 @@ class SiteController
             ->action(route('e-billing.master-data.sites.store'))
             ->method('POST')
 
-            ->input('name', 'Nama', ["topGap" => ""])
+            ->input('name', 'Nama', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan nama site')
 
-            ->textarea('description', 'Deskripsi', ["topGap" => ""])
+            ->textarea('description', 'Deskripsi', ['topGap' => ''])
             ->placeholder('Masukkan deskripsi site (opsional)')
 
-            ->button('Simpan', "", ["topGap" => "d-inline-flex"])
+            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
             ->addClass('btn btn-primary');
 
         return view('e-billing::sites.create', compact('form'));
@@ -46,13 +46,13 @@ class SiteController
     public function store(Request $request)
     {
         $data = $request->validate([
-            "name" => "required|string|max:100",
-            "description" => "nullable|string",
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
         ]);
 
         $site = Site::create($data);
 
-        return redirect()->route('e-billing.master-data.sites.show', $site)->with("success", "Site '{$site->name}' berhasil dibuat!");
+        return redirect()->route('e-billing.master-data.sites.show', $site)->with('success', "Site '{$site->name}' berhasil dibuat!");
     }
 
     /**
@@ -72,16 +72,16 @@ class SiteController
             ->action(route('e-billing.master-data.sites.update', $site))
             ->method('PUT')
 
-            ->input('name', 'Nama', ["topGap" => ""])
+            ->input('name', 'Nama', ['topGap' => ''])
             ->required()
             ->value($site->name)
             ->placeholder('Masukkan nama site')
 
-            ->textarea('description', 'Deskripsi', ["topGap" => ""])
+            ->textarea('description', 'Deskripsi', ['topGap' => ''])
             ->value($site->description)
             ->placeholder('Masukkan deskripsi site (opsional)')
 
-            ->button('Simpan', "", ["topGap" => "d-inline-flex"])
+            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
             ->addClass('btn btn-primary');
 
         return view('e-billing::sites.edit', compact('form'));
@@ -93,13 +93,13 @@ class SiteController
     public function update(Request $request, Site $site)
     {
         $data = $request->validate([
-            "name" => "required|string|max:100",
-            "description" => "nullable|string",
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
         ]);
 
         $site->update($data);
 
-        return redirect()->route('e-billing.master-data.sites.show', $site)->with("success", "Site '{$site->name}' berhasil diperbarui!");
+        return redirect()->route('e-billing.master-data.sites.show', $site)->with('success', "Site '{$site->name}' berhasil diperbarui!");
     }
 
     /**
@@ -109,6 +109,6 @@ class SiteController
     {
         $site->delete();
 
-        return redirect()->route('e-billing.master-data.sites.index')->with("success", "Site '{$site->name}' berhasil dihapus!");
+        return redirect()->route('e-billing.master-data.sites.index')->with('success', "Site '{$site->name}' berhasil dihapus!");
     }
 }
