@@ -7,19 +7,19 @@
             Data Master
           </div>
           <h2 class="page-title">
-            Detail Site
+            Detail Paket
           </h2>
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-warning">
+            <a href="{{ route('e-billing.master-data.packages.edit', $package) }}" class="btn btn-warning">
               Edit
             </a>
             <button class="btn btn-danger"
-              onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')">
+              onclick="deleteConfirm('{{ route('e-billing.master-data.packages.destroy', $package) }}')">
               Hapus
             </button>
-            <a href="{{ route('e-billing.master-data.sites.index') }}" class="btn btn-secondary">
+            <a href="{{ route('e-billing.master-data.packages.index') }}" class="btn btn-secondary">
               Kembali
             </a>
           </div>
@@ -35,18 +35,33 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Informasi Site</h3>
+              <h3 class="card-title">Informasi Paket</h3>
             </div>
             <div class="card-body">
               <div class="datagrid">
                 <div class="datagrid-item">
-                  <div class="datagrid-title">Nama Site</div>
-                  <div class="datagrid-content">{{ $site->name }}</div>
+                  <div class="datagrid-title">Nama Paket</div>
+                  <div class="datagrid-content">{{ $package->name }}</div>
                 </div>
 
                 <div class="datagrid-item">
                   <div class="datagrid-title">Deskripsi</div>
-                  <div class="datagrid-content">{{ $site->description ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $package->description ?? '-' }}</div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Bandwidth</div>
+                  <div class="datagrid-content">{{ $package->bandwidth }} Mbps</div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Harga</div>
+                  <div class="datagrid-content">IDR {{ number_format($package->price, 0, ',', '.') }}</div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Jatuh Tempo</div>
+                  <div class="datagrid-content">{{ $package->due }} Hari</div>
                 </div>
               </div>
             </div>
@@ -62,12 +77,12 @@
               <div class="datagrid">
                 <div class="datagrid-item">
                   <div class="datagrid-title">Tanggal Pembuatan</div>
-                  <div class="datagrid-content">{{ $site->created_at->format('d/m/Y') }}</div>
+                  <div class="datagrid-content">{{ $package->created_at->format('d/m/Y') }}</div>
                 </div>
 
                 <div class="datagrid-item">
                   <div class="datagrid-title">Tanggal Perubahan</div>
-                  <div class="datagrid-content">{{ $site->updated_at->format('d/m/Y') }}</div>
+                  <div class="datagrid-content">{{ $package->updated_at->format('d/m/Y') }}</div>
                 </div>
               </div>
             </div>

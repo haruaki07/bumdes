@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'logo' => '<b>'.config('app.name').'</b>',
+    'logo' => '<b>' . config('app.name') . '</b>',
     'logo_img_alt' => config('app.name'),
 
     /*
@@ -187,6 +187,12 @@ return [
                     'text' => 'Perangkat',
                     'route' => 'e-billing.master-data.devices.index',
                     'icon' => 'ti ti-router',
+                ],
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Paket',
+                    'route' => 'e-billing.master-data.packages.index',
+                    'icon' => 'ti ti-package',
                 ],
                 [
                     'group' => 'e-billing',

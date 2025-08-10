@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SiteSeeder::class,
             DeviceSeeder::class,
+            PackageSeeder::class,
         ]);
     }
 }

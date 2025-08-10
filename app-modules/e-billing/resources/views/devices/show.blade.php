@@ -13,7 +13,7 @@
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
             <a href="{{ route('e-billing.master-data.devices.edit', $device) }}" class="btn btn-warning">
-              Ubah
+              Edit
             </a>
             <button class="btn btn-danger"
               onclick="deleteConfirm('{{ route('e-billing.master-data.devices.destroy', $device) }}')">
