@@ -14,6 +14,7 @@ class PackageController
     public function index()
     {
         $packages = Package::datatable();
+
         return view('e-billing::packages.index', compact('packages'));
     }
 
