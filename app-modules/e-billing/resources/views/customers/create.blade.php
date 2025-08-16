@@ -185,7 +185,7 @@
                     <option value="">Pilih Perangkat</option>
                     @foreach ($devices as $device)
                       <option value="{{ $device->id }}" {{ old('device_id') == $device->id ? 'selected' : '' }}>
-                        {{ $device->brand }}
+                        {{ $device->brand }} - {{ $device->model }}
                       </option>
                     @endforeach
                   </select>
