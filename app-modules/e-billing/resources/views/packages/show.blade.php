@@ -56,7 +56,7 @@
 
                 <div class="datagrid-item">
                   <div class="datagrid-title">Harga</div>
-                  <div class="datagrid-content">IDR {{ number_format($package->price, 0, ',', '.') }}</div>
+                  <div class="datagrid-content">Rp{{ number_format($package->price, 0, ',', '.') }}</div>
                 </div>
 
                 <div class="datagrid-item">

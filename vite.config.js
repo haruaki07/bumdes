@@ -9,8 +9,16 @@ export default defineConfig({
         "resources/js/app.js",
         "resources/sass/tabler.scss",
         "resources/sass/tabler-icons.scss",
+        "resources/js/leaflet.js",
       ],
-      refresh: true,
+      refresh: [
+        "resources/views/**/*.blade.php",
+        "resources/js/**/*.js",
+        "resources/css/**/*.css",
+        "app-modules/*/resources/views/**/*.blade.php",
+        "app-modules/*/resources/js/**/*.js",
+        "app-modules/*/resources/css/**/*.css",
+      ],
     }),
   ],
 });

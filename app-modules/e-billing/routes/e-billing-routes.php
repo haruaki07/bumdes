@@ -3,6 +3,7 @@
 // use Modules\EBilling\Http\Controllers\EBillingController;
 
 use Illuminate\Support\Facades\Route;
+use Modules\EBilling\Http\Controllers\CustomerController;
 use Modules\EBilling\Http\Controllers\DeviceController;
 use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\SiteController;
@@ -15,7 +16,7 @@ Route::middleware(['web'])->group(function () {
             Route::resource('sites', SiteController::class);
             Route::resource('devices', DeviceController::class);
             Route::resource('packages', PackageController::class);
-            Route::get('customers', fn() => view('e-billing::dashboard'))->name('customers.index');
+            Route::resource('customers', CustomerController::class);
         });
     });
 });
