@@ -11,7 +11,7 @@ use Modules\EBilling\Enums\CustomerStatus;
 class Customer extends Model
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use HasFactory, Datatable, SoftDeletes;
+    use Datatable, HasFactory, SoftDeletes;
 
     protected $table = 'ebil_customers';
 
@@ -31,16 +31,16 @@ class Customer extends Model
         'status',
         'site_id',
         'package_id',
-        'device_id'
+        'device_id',
     ];
 
     protected $dataTableColumns = [
-        "name" => "searchable|sortable",
-        "email" => "searchable|sortable",
-        "phone" => "searchable|sortable",
-        "package.name" => "searchable|sortable",
-        "due" => "searchable|sortable",
-        "status" => "searchable|sortable"
+        'name' => 'searchable|sortable',
+        'email' => 'searchable|sortable',
+        'phone' => 'searchable|sortable',
+        'package.name' => 'searchable|sortable',
+        'due' => 'searchable|sortable',
+        'status' => 'searchable|sortable',
     ];
 
     protected $casts = [

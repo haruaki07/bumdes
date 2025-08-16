@@ -10,7 +10,7 @@ use Modules\EBilling\Http\Controllers\SiteController;
 
 Route::middleware(['web'])->group(function () {
     Route::prefix('e-billing')->as('e-billing.')->middleware(['auth'])->group(function () {
-        Route::get('/', fn() => view('e-billing::dashboard'))->name('dashboard');
+        Route::get('/', fn () => view('e-billing::dashboard'))->name('dashboard');
 
         Route::prefix('master-data')->as('master-data.')->group(function () {
             Route::resource('sites', SiteController::class);

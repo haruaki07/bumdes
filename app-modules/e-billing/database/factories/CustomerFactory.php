@@ -18,7 +18,7 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id'  => $this->faker->unique()->randomNumber(5) . "@wificlp.id",
+            'customer_id' => $this->faker->unique()->randomNumber(5).'@wificlp.id',
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
@@ -30,7 +30,7 @@ class CustomerFactory extends Factory
             'serial_number' => $this->faker->optional()->bothify('HWTC####????'),
             'mac_address' => $this->faker->optional()->macAddress(),
             'registration_date' => $this->faker->dateTime(),
-            'status' => $this->faker->randomElement(CustomerStatus::cases())
+            'status' => $this->faker->randomElement(CustomerStatus::cases()),
         ];
     }
 }

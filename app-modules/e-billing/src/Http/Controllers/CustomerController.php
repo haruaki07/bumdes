@@ -28,7 +28,7 @@ class CustomerController
     {
         $sites = Site::all();
         $devices = Device::all();
-        $packages  = Package::all();
+        $packages = Package::all();
 
         return view('e-billing::customers.create', compact('sites', 'devices', 'packages'));
     }
@@ -51,12 +51,12 @@ class CustomerController
             'device_id' => 'required|exists:ebil_devices,id',
             'serial_number' => 'nullable|string|max:100',
             'mac_address' => 'nullable|string|max:100',
-            'due' => 'required|integer'
+            'due' => 'required|integer',
         ]);
 
         Customer::create([
             ...$data,
-            'registration_date' => now()
+            'registration_date' => now(),
         ]);
 
         return redirect()->route('e-billing.master-data.customers.index')->with('success', 'Pelanggan berhasil ditambahkan.');
@@ -77,7 +77,7 @@ class CustomerController
     {
         $sites = Site::all();
         $devices = Device::all();
-        $packages  = Package::all();
+        $packages = Package::all();
 
         return view('e-billing::customers.edit', compact('customer', 'sites', 'devices', 'packages'));
     }
@@ -100,7 +100,7 @@ class CustomerController
             'device_id' => 'required|exists:ebil_devices,id',
             'serial_number' => 'nullable|string|max:100',
             'mac_address' => 'nullable|string|max:100',
-            'due' => 'required|integer'
+            'due' => 'required|integer',
         ]);
 
         $customer->update($data);
