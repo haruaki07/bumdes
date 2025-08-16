@@ -90,15 +90,15 @@
                 <div>
                   <label class="form-label required">Alamat Pelanggan</label>
                   @php $oldAddress = old('address') ?? $customer->address; @endphp
-                  <div id="addressDisplay" class="text-muted"
+                  <div id="addressDisplay" class="text-muted mb-2"
                     @if (!$oldAddress) style="display:none;" @endif>
                     {{ $oldAddress }}
                   </div>
-                  <button type="button" class="btn mt-2" data-bs-toggle="modal"
+                  <button type="button" class="btn" data-bs-toggle="modal"
                     data-bs-target="#addressModal">Ganti</button>
 
-                  <input style="opacity:0;height:1px;display:block;" name="address" id="addressInput"
-                    value="{{ old('address') ?? $customer->address }}" required>
+                  <input style="opacity:0;height:1px;display:block;pointer-events:none;" tabindex="-1" name="address"
+                    id="addressInput" value="{{ old('address') ?? $customer->address }}" required>
                   <input type="hidden" name="latitude" id="latitudeInput"
                     value="{{ old('latitude') ?? $customer->latitude }}">
                   <input type="hidden" name="longitude" id="longitudeInput"
