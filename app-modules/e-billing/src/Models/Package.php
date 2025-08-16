@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Package extends Model
 {
     /** @use HasFactory<\Database\Factories\PackageFactory> */
-    use HasFactory, Datatable, SoftDeletes;
+    use Datatable, HasFactory, SoftDeletes;
 
     protected $table = 'ebil_packages';
 
@@ -19,7 +19,7 @@ class Package extends Model
         'description',
         'bandwidth', // in Mbps
         'price', // in IDR
-        'due' // day
+        'due', // day
     ];
 
     protected $dataTableColumns = [
