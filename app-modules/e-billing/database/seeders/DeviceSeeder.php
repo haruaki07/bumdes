@@ -12,15 +12,8 @@ class DeviceSeeder extends Seeder
      */
     public function run(): void
     {
-        Device::insert([
-            [
-                'brand' => 'Huawei',
-                'model' => 'HG8245H5',
-            ],
-            [
-                'brand' => 'KingType',
-                'model' => 'EW45',
-            ],
-        ]);
+        Device::factory()
+            ->count(4)
+            ->create();
     }
 }

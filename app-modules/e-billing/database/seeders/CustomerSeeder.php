@@ -27,7 +27,7 @@ class CustomerSeeder extends Seeder
                     'device_id' => $devices->random()->id,
                 ];
             })
-            ->count(10)
+            ->count(5)
             ->create();
     }
 }

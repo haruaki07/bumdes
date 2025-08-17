@@ -18,15 +18,15 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id' => $this->faker->unique()->randomNumber(5).'@wificlp.id',
+            'customer_id' => $this->faker->unique()->randomNumber(5, true).'@wificlp.id',
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
-            'longitude' => $this->faker->longitude(),
-            'latitude' => $this->faker->latitude(),
-            'map_url' => $this->faker->url(),
-            'due' => $this->faker->numberBetween(1, 100),
+            'longitude' => $this->faker->optional()->longitude(),
+            'latitude' => $this->faker->optional()->latitude(),
+            'map_url' => $this->faker->optional()->url(),
+            'due' => $this->faker->numberBetween(1, 31),
             'serial_number' => $this->faker->optional()->bothify('HWTC####????'),
             'mac_address' => $this->faker->optional()->macAddress(),
             'registration_date' => $this->faker->dateTime(),
