@@ -41,8 +41,9 @@ class PackageController
             ->number('price', 'Harga (IDR)', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan harga paket')
+            ->step('any')
 
-            ->number('due', 'Jatuh Tempo (Hari)', ['topGap' => ''])
+            ->number('due', 'Tanggal jatuh tempo', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan jatuh tempo paket')
 
@@ -106,8 +107,9 @@ class PackageController
             ->required()
             ->placeholder('Masukkan harga paket')
             ->value($package->price)
+            ->step('any')
 
-            ->number('due', 'Jatuh Tempo (Hari)', ['topGap' => ''])
+            ->number('due', 'Tanggal jatuh tempo', ['topGap' => ''])
             ->required()
             ->placeholder('Masukkan jatuh tempo paket')
             ->value($package->due)
