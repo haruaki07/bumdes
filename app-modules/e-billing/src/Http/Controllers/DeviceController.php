@@ -3,6 +3,7 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Modules\EBilling\Models\Device;
 use TakiElias\TablarKit\Builder\FormBuilder;
 
@@ -51,8 +52,15 @@ class DeviceController
     {
         $data = $request->validate([
             'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'model' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('ebil_devices', 'model')->where('brand', $request->brand),
+            ],
             'description' => 'nullable|string|max:1000',
+        ], [
+            'model.unique' => 'Model perangkat dengan merek :input sudah ada.',
         ]);
 
         Device::create($data);
@@ -105,8 +113,15 @@ class DeviceController
     {
         $data = $request->validate([
             'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'model' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('ebil_devices', 'model')->where('brand', $request->brand)->ignore($device->id),
+            ],
             'description' => 'nullable|string|max:1000',
+        ], [
+            'model.unique' => 'Model perangkat dengan merek :input sudah ada.',
         ]);
 
         $device->update($data);
