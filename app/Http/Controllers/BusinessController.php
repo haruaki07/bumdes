@@ -16,7 +16,7 @@ class BusinessController extends Controller
     {
         $user = Auth::user();
         $businesses = Business::with(['businessType', 'owner'])
-            ->when($user->hasRole('warga'), function ($query) use ($user) {
+            ->when($user->role === 'warga', function ($query) use ($user) {
                 $query->where('owner_id', $user->id);
             })
             ->datatable();
@@ -86,7 +86,7 @@ class BusinessController extends Controller
             'contact_email' => ['nullable', 'email', 'max:255'],
         ]);
 
-        if ($request->has('name') && (Auth::user()->hasRole('admin') || Auth::user()->hasRole('petugas'))) {
+        if ($request->has('name') && (Auth::user()->role === 'admin' || Auth::user()->role === 'operator')) {
             $validated['name'] = $request->validate(['name' => ['required', 'string', 'max:255']])['name'];
         }
 

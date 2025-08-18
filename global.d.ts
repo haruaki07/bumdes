@@ -1,5 +1,6 @@
 import * as tabler from "@tabler/core";
 import axios from "axios";
+import TomSelect from "tom-select";
 
 declare global {
   interface Window {
@@ -8,5 +9,6 @@ declare global {
 
     // tabler
     tabler: typeof tabler;
+    TomSelect: typeof TomSelect;
   }
 }

@@ -1,4 +1,4 @@
-<x-e-billing::layouts.dashboard>
+<x-e-billing::layouts.panel>
   <!-- Page header -->
   <div class="page-header d-print-none">
     <div class="container-xl">
@@ -63,4 +63,4 @@
       </div>
     </div>
   </div>
-</x-e-billing::layouts.dashboard>
+</x-e-billing::layouts.panel>

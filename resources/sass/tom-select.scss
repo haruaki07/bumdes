@@ -1,0 +1,15 @@
+.ts-control.ts-control {
+    border-radius: var(--tblr-border-radius);
+    border: 1px solid var(--tblr-border-color);
+}
+
+.ts-dropdown.ts-dropdown {
+    background: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    box-shadow: var(--tblr-shadow-dropdown);
+    z-index: 1001;
+}
+
+.ts-dropdown.ts-dropdown .active {
+    background-color: var(--tblr-tertiary-bg);
+}

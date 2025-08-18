@@ -5,7 +5,7 @@
     'limit' => true,
     'sort' => true,
     'pagination' => true,
-    'searchPlaceholder' => 'Search...',
+    'searchPlaceholder' => 'kata kunci',
     'limitOptions' => [10, 25, 50, 100],
     'currentLimit' => null,
     'currentSearch' => null,
@@ -30,7 +30,7 @@
     <div class="d-flex">
       @if ($limit)
         <div class="text-muted">
-          Show
+          Tampilkan
           <div class="mx-2 d-inline-block">
             <select class="form-select form-select-sm" style="width: 54px;" aria-label="Jumlah data per halaman"
               data-datatable-limit="{{ $tableId }}">
@@ -45,13 +45,13 @@
               @endforeach
             </select>
           </div>
-          entries
+          entri
         </div>
       @endif
 
       @if ($search)
         <div class="ms-auto text-muted">
-          Search:
+          Cari:
           <div class="ms-2 d-inline-block">
             <input type="text" class="form-control form-control-sm"
               value="{{ $currentSearch ?? (request()->search ?? '') }}" aria-label="{{ $searchPlaceholder }}"

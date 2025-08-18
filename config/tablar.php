@@ -166,22 +166,42 @@ return [
             'group' => 'e-billing',
             'text' => 'Dashboard',
             'icon' => 'ti ti-layout-dashboard',
-            'url' => 'e-billing',
+            'route' => 'e-billing.dashboard',
         ],
 
-        // [
-        //     'text' => 'Support 3',
-        //     'url' => '#',
-        //     'icon' => 'ti ti-help',
-        //     'active' => ['support3'],
-        //     'submenu' => [
-        //         [
-        //             'text' => 'Ticket',
-        //             'url' => 'support3',
-        //             'icon' => 'ti ti-article',
-        //         ]
-        //     ],
-        // ],
+        [
+            'group' => 'e-billing',
+            'text' => 'Data Master',
+            'url' => '#',
+            'icon' => 'ti ti-database',
+            'active' => ['e-billing/master-data/*'],
+            'submenu' => [
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Site',
+                    'route' => 'e-billing.master-data.sites.index',
+                    'icon' => 'ti ti-world-pin',
+                ],
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Perangkat',
+                    'route' => 'e-billing.master-data.devices.index',
+                    'icon' => 'ti ti-router',
+                ],
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Paket',
+                    'route' => 'e-billing.master-data.packages.index',
+                    'icon' => 'ti ti-package',
+                ],
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Pelanggan',
+                    'route' => 'e-billing.master-data.customers.index',
+                    'icon' => 'ti ti-users',
+                ],
+            ],
+        ],
 
     ],
 

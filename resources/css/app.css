@@ -1,4 +1,5 @@
 @import "../sass/dropzone.scss";
+@import "../sass/tom-select.scss";
 
 /* increase the default tabler icon size*/
 i.ti {

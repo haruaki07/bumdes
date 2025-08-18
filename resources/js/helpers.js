@@ -1,0 +1,33 @@
+window.deleteConfirm = async function (url, method = "DELETE") {
+  const res = await new Promise((resolve) => {
+    bootbox.confirm({
+      title: "Hapus Data?",
+      message: "Data yang dihapus tidak dapat dikembalikan.",
+      buttons: {
+        cancel: { label: "Batal" },
+        confirm: { label: "Ya", className: "btn-danger" },
+      },
+      callback: (result) => resolve(result),
+    });
+  });
+
+  if (!res) return;
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = url;
+
+  const csrf = document.createElement("input");
+  csrf.hidden = true;
+  csrf.name = "_token";
+  csrf.value = document.querySelector("meta[name=csrf-token]").content;
+
+  const meth = document.createElement("input");
+  meth.hidden = true;
+  meth.name = "_method";
+  meth.value = method;
+
+  form.append(csrf, meth);
+  document.body.append(form);
+  form.submit();
+};
