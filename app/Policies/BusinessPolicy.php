@@ -21,24 +21,24 @@ class BusinessPolicy
             return false;
         }
 
-        return $user->hasRole('admin') ||
-          $user->hasRole('petugas') ||
-          $business->owner_id === $user->id;
+        return $user->role === 'admin' ||
+            $user->role === 'petugas' ||
+            $business->owner_id === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('petugas');
+        return $user->role === 'admin' || $user->role === 'petugas';
     }
 
     public function update(User $user, Business $business): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('petugas');
+        return $user->role === 'admin' || $user->role === 'petugas';
     }
 
     public function delete(User $user, Business $business): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('petugas');
+        return $user->role === 'admin' || $user->role === 'petugas';
     }
 
     public function requestNameChange(User $user, Business $business): bool
@@ -48,11 +48,11 @@ class BusinessPolicy
 
     public function approveNameChange(User $user, Business $business): bool
     {
-        return ($user->hasRole('admin') || $user->hasRole('petugas')) && $business->hasNameChangeRequest();
+        return ($user->role === 'admin' || $user->role === 'petugas') && $business->hasNameChangeRequest();
     }
 
     public function rejectNameChange(User $user, Business $business): bool
     {
-        return ($user->hasRole('admin') || $user->hasRole('petugas')) && $business->hasNameChangeRequest();
+        return ($user->role === 'admin' || $user->role === 'petugas') && $business->hasNameChangeRequest();
     }
 }

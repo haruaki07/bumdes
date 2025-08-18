@@ -15,29 +15,32 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
             BusinessTypeSeeder::class,
         ]);
 
-        $admin = User::factory()->create([
+        User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@mail.com',
             'password' => Hash::make('123'),
+            'role' => 'admin',
         ]);
-        $admin->assignRole('admin');
 
-        $warga = User::factory()->create([
+        User::factory()->create([
+            'name' => 'Operator',
+            'email' => 'operator@mail.com',
+            'password' => Hash::make('123'),
+            'role' => 'operator',
+        ]);
+
+        User::factory()->create([
             'name' => 'Warga',
             'email' => 'warga@mail.com',
             'password' => Hash::make('123'),
+            'role' => 'warga',
         ]);
-        $warga->assignRole('warga');
 
-        User::factory()->count(5)->create()->each(function ($user) {
-            $user->assignRole('warga');
-        });
-
-        // Seed business registrations and businesses
-        $this->call([\Database\Seeders\BusinessAndRegistrationSeeder::class]);
+        $this->call([
+            BusinessAndRegistrationSeeder::class,
+        ]);
     }
 }

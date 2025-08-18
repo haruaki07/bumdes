@@ -22,7 +22,7 @@ class BusinessRegistrationController extends Controller
     {
         $user = Auth::user();
         $registrations = BusinessRegistration::with(['businessType', 'applicant', 'approver'])
-            ->when($user->hasRole('warga'), function ($query) use ($user) {
+            ->when($user->role === 'warga', function ($query) use ($user) {
                 $query->where('applicant_id', $user->id);
             })
             ->whereNot('is_revised', true)

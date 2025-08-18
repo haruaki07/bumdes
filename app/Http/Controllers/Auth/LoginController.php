@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -25,7 +28,14 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected function redirectTo(): string
+    {
+        if (request()->routeIs('e-billing.*')) {
+            return '/e-billing';
+        }
+
+        return '/home';
+    }
 
     /**
      * Create a new controller instance.
@@ -35,6 +45,61 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
+        if (request()->routeIs('e-billing.*')) {
+            $this->middleware('auth:ebil')->only('logout');
+        } else {
+            $this->middleware('auth')->only('logout');
+        }
+    }
+
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLoginForm()
+    {
+        $url = route('login');
+
+        if (request()->routeIs('e-billing.*')) {
+            $url = route('e-billing.login');
+        }
+
+        return view('auth.login', compact('url'));
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+
+        if ($request->wantsJson()) {
+            return new JsonResponse([], 204);
+        }
+
+        return $request->routeIs('e-billing.*')
+            ? redirect()->route('e-billing.login')
+            : redirect()->route('login');
+    }
+
+    protected function guard(): \Illuminate\Contracts\Auth\StatefulGuard
+    {
+        if (request()->routeIs('e-billing.*')) {
+            return Auth::guard('ebil');
+        }
+
+        return Auth::guard();
     }
 }

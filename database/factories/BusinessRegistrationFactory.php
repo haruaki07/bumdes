@@ -22,6 +22,7 @@ class BusinessRegistrationFactory extends Factory
             'business_type_id' => $businessType->id,
             'applicant_id' => $user->id,
             'description' => $this->faker->sentence(8),
+            'document_url' => $this->faker->url,
             'location' => $this->faker->address,
             'contact_phone' => $this->faker->phoneNumber,
             'contact_email' => $this->faker->safeEmail,

@@ -13,7 +13,7 @@
           <p class="text-secondary">Silakan masukkan kredensial Anda di bawah ini untuk masuk, atau <a
               href="{{ route('register') }}">daftar</a> jika Anda belum memiliki akun.</p>
         </div>
-        <form action="{{ route('login') }}" method="post" autocomplete="off" novalidate>
+        <form action="{{ $url ?? route('login') }}" method="post" autocomplete="off" novalidate>
           @csrf
           <div class="mb-3">
             <label class="form-label">Email</label>

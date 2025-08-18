@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'ebil' => [
+            'driver' => 'session',
+            'provider' => 'ebil_users',
+        ],
     ],
 
     /*
@@ -63,6 +67,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        'ebil_users' => [
+            'driver' => 'eloquent',
+            'model' => Modules\EBilling\Models\User::class,
         ],
 
         // 'users' => [

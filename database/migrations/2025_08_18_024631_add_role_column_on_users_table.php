@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ebil_devices', function (Blueprint $table) {
-            $table->dropUnique(['brand']);
-            $table->unique(['brand', 'model']);
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['admin', 'operator', 'warga'])->after('password');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ebil_devices', function (Blueprint $table) {
-            $table->dropUnique(['brand', 'model']);
-            $table->string('brand')->unique()->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
         });
     }
 };

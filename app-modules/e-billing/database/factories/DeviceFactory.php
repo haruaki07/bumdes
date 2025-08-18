@@ -25,13 +25,15 @@ class DeviceFactory extends Factory
             'KingType' => ['KT-4110', 'KT-5100', 'GPON ONT HG323RW', 'EW45'],
         ];
 
-        $brand = $this->faker->randomElement(array_keys($brandsWithModels));
+        $pairs = [];
+        foreach ($brandsWithModels as $brand => $models) {
+            foreach ($models as $model) {
+                $pairs[] = compact('brand', 'model');
+            }
+        }
 
-        $model = $this->faker->randomElement($brandsWithModels[$brand]);
+        $pair = $this->faker->unique()->randomElement($pairs);
 
-        return [
-            'brand' => $brand,
-            'model' => $model,
-        ];
+        return $pair;
     }
 }
