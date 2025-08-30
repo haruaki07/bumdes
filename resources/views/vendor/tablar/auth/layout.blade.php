@@ -17,7 +17,7 @@
 
 </head>
 
-<body class=" border-top-wide border-primary d-flex flex-column">
+<body class="d-flex flex-column">
   <div class="page page-center">
     @yield('content')
   </div>
