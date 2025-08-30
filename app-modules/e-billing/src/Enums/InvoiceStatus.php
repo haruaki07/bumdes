@@ -12,7 +12,7 @@ enum InvoiceStatus: string
     {
         return match ($this) {
             self::UNPAID => 'Belum Dibayar',
-            self::PAID => 'Sudah Dibayar',
+            self::PAID => 'Lunas',
             self::EXPIRED => 'Kedaluwarsa',
         };
     }

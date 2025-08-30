@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Invoice;
@@ -38,20 +37,39 @@ class InvoiceController extends Controller
 
     public function customerShow(Request $request, $customerId)
     {
-        $customer = Customer::where('customer_id', $customerId)->first();
-        if (! $customer) {
-            abort(404);
+        // Check if the customerId is an invoice number
+        if (str_starts_with($customerId, 'INV')) {
+            $invoice = Invoice::where('invoice_number', $customerId)->first();
+            $customer = Customer::find($invoice->customer_id);
+        } else {
+            $customer = Customer::where('customer_id', $customerId)->first();
+            if (! $customer) {
+                return view('e-billing::invoices.customer.not-found', [
+                    'title' => 'Pelanggan tidak ditemukan',
+                    'message' => 'Nomor pelanggan tidak valid atau tidak terdaftar. Pastikan Anda menggunakan tautan yang benar atau hubungi admin untuk bantuan.',
+                    'customerId' => $customerId,
+                ]);
+            }
+
+            if (! $customer->invoice_number) {
+                return view('e-billing::invoices.customer.not-found', [
+                    'title' => 'Belum ada tagihan aktif',
+                    'message' => 'Saat ini Anda belum memiliki tagihan. Jika Anda merasa ini sebuah kesalahan, silakan hubungi admin.',
+                    'customer' => $customer,
+                    'customerId' => $customerId,
+                ]);
+            }
+
+            $invoice = Invoice::where('invoice_number', $customer->invoice_number)->first();
         }
 
-        if (! $customer->invoice_number) {
-            abort(404, 'Anda belum memiliki tagihan.');
-        }
-
-        $invoice = Invoice::where('invoice_number', $customer->invoice_number)
-            ->where('status', InvoiceStatus::UNPAID)
-            ->first();
         if (! $invoice) {
-            abort(404, 'Tagihan tidak ditemukan.');
+            return view('e-billing::invoices.customer.not-found', [
+                'title' => 'Tagihan tidak ditemukan',
+                'message' => 'Tagihan mungkin telah diarsipkan atau tidak tersedia. Silakan coba lagi nanti atau hubungi admin.',
+                'customer' => $customer,
+                'customerId' => $customerId,
+            ]);
         }
 
         $paymentMethods = PaymentMethod::all();
@@ -73,6 +91,15 @@ class InvoiceController extends Controller
         $invoice = Invoice::where('invoice_number', $customer->invoice_number)->first();
         if (! $invoice) {
             abort(404);
+        }
+
+        // Prevent requesting payment for paid or expired invoices
+        $currentStatus = method_exists($invoice->status, 'value') ? strtoupper((string) $invoice->status->value) : strtoupper((string) $invoice->status);
+        if (in_array($currentStatus, ['PAID', 'LUNAS'])) {
+            return response()->json(['status' => 'error', 'message' => 'Tagihan sudah dibayar. Tidak dapat melakukan pembayaran ulang.'], 422);
+        }
+        if (in_array($currentStatus, ['EXPIRED', 'KADALUARSA'])) {
+            return response()->json(['status' => 'error', 'message' => 'Tagihan telah kadaluarsa. Silakan hubungi admin untuk meminta tagihan baru.'], 422);
         }
 
         $paymentMethod = PaymentMethod::find($request->input('payment_method'));

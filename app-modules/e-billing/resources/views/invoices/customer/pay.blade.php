@@ -99,7 +99,8 @@
           @endif
 
           <div class="mt-4">
-            <a href="{{ route('e-billing.invoice.customer-show', ['customer_id' => $customerId]) }}" class="btn">
+            <a href="{{ route('e-billing.invoice.customer-show', ['customer_id' => $customerId]) }}" class="btn"
+              id="btnBack">
               Kembali ke Invoice
             </a>
           </div>
@@ -157,6 +158,8 @@
 
           if (['SUCCEEDED', 'AUTHORIZED'].includes(data.payment_status)) {
             showAlert('success', 'Pembayaran berhasil. Anda dapat menutup halaman ini.');
+            document.getElementById('btnBack')?.href =
+              `{{ route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) }}`;
             clearInterval(timerId);
             return;
           }

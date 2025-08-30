@@ -100,13 +100,9 @@
           $periodEnd = $invDate ? $invDate->copy()->locale('id')->setDay($dueDay)->subDay() : null;
           $periodLabel = $periodEnd ? $periodEnd->locale('id')->translatedFormat('F Y') : '-';
           $pkg = (array) ($invoice->package_detail ?? []);
-          $statusRaw = strtoupper((string) ($invoice->status->value ?? 'UNPAID'));
-          $statusLabel = match ($statusRaw) {
-              'PAID', 'LUNAS' => 'LUNAS',
-              'UNPAID', 'BELUM_BAYAR' => 'BELUM BAYAR',
-              'EXPIRED' => 'KADALUARSA',
-              default => $statusRaw,
-          };
+
+          $isPaid = $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::PAID;
+          $isExpired = $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::EXPIRED;
         @endphp
 
         <div class="d-flex align-items-end justify-content-between">
@@ -158,9 +154,33 @@
           <div class="text-center fs-3">
             <div class="text-uppercase text-muted small">Periode</div>
             <div class="fw-semibold">{{ strtoupper($periodLabel) }}</div>
-            <div class="fw-bold text-uppercase">{{ $statusLabel }}</div>
+            <div class="fw-bold text-uppercase {{ $isPaid ? 'text-success' : ($isExpired ? 'text-danger' : '') }}">
+              {{ $invoice->status->label() }}
+            </div>
           </div>
         </div>
+
+        @if ($isPaid)
+          <div class="alert alert-success no-print" role="alert">
+            <div class="d-flex">
+              <div><i class="ti ti-checks me-2"></i></div>
+              <div>
+                <div class="fw-bold">Tagihan sudah dibayar</div>
+                Terima kasih, pembayaran Anda telah kami terima.
+              </div>
+            </div>
+          </div>
+        @elseif ($isExpired)
+          <div class="alert alert-danger no-print" role="alert">
+            <div class="d-flex">
+              <div><i class="ti ti-alert-triangle me-2"></i></div>
+              <div>
+                <div class="fw-bold">Tagihan telah kadaluarsa</div>
+                Silakan hubungi admin untuk membuat tagihan baru.
+              </div>
+            </div>
+          </div>
+        @endif
 
 
         <div class="table-responsive mb-3">
@@ -168,10 +188,10 @@
             <thead class="table-light">
               <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 33%;">Deskripsi</th>
+                <th style="width: 30%;">Deskripsi</th>
                 <th style="width: 15%;">Tarif</th>
-                <th style="width: 32%;">Pemakaian</th>
-                <th style="width: 15%;" class="text-end">Total</th>
+                <th style="width: 33%;">Pemakaian</th>
+                <th style="width: 16%;" class="text-end">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -218,9 +238,10 @@
             <i class="icon ti ti-printer"></i>
             Print
           </button>
-          <button type="button" class="btn btn-primary"data-bs-toggle="modal" data-bs-target="#paymentMethodModal">
-            Bayar
-          </button>
+          @if ($invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID)
+            <button type="submit" class="btn btn-success" data-bs-toggle="loading-button"
+              data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Bayar Sekarang</button>
+          @endif
         </div>
       </div>
     </div>
@@ -301,8 +322,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-success" data-bs-toggle="loading-button"
-            data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Bayar Sekarang</button>
+          @if ($invoice)
+          @else
+          @endif
         </div>
       </form>
     </div>
@@ -356,7 +378,13 @@
           setPaymentMethodAlert(msg, 'danger');
         } catch (err) {
           console.error(err);
-          setPaymentMethodAlert('Terjadi kesalahan jaringan. Silakan coba lagi.', 'danger');
+          // If server returned a JSON error, surface it
+          const resp = err?.response?.data;
+          if (resp?.message) {
+            setPaymentMethodAlert(resp.message, 'danger');
+          } else {
+            setPaymentMethodAlert('Terjadi kesalahan jaringan. Silakan coba lagi.', 'danger');
+          }
         } finally {
           btnSubmit._loadingButtonInstance.stop();
         }
