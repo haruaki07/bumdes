@@ -47,6 +47,8 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             ->name('invoice.request-payment');
         Route::get('/invoice/pay/status', [InvoiceController::class, 'payStatus'])
             ->name('invoice.pay.status');
+        Route::delete('/invoice/{customer_id}/saved-payment-method', [InvoiceController::class, 'removeSavedPaymentMethod'])
+            ->name('invoice.remove-saved-payment-method');
         Route::post('/webhooks/xendit', [WebhookController::class, 'xendit'])
             ->name('webhooks.xendit');
     });

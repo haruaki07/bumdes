@@ -258,65 +258,94 @@
         <div class="modal-body">
           <div id="paymentMethodAlert"></div>
           <input type="hidden" name="customer_id" value="{{ $customer->customer_id }}" />
-          <div class="accordion" id="paymentMethodsAccordion">
-            @foreach ($paymentMethods->groupBy('type') as $type => $methods)
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed py-2 px-3 fs-4" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#type-{{ Str::slug($type) }}" aria-expanded="false"
-                    aria-controls="type-{{ Str::slug($type) }}">
-                    <div class="w-full d-flex align-items-center">
-                      {{ \Modules\EBilling\Enums\PaymentMethodType::from($type)->label() }}
-                      <div class="d-flex align-items-center ms-auto payment-method-previews">
-                        @php
-                          $previewMethods = collect($methods)->filter(fn($m) => !empty($m->brand_logo))->take(2);
-                        @endphp
-                        @foreach ($previewMethods as $method)
-                          <span class="payment payment-xs ms-2"
-                            style="background-image: url('{{ asset($method->brand_logo) }}');"></span>
-                        @endforeach
-                        @if ($methods->count() - $previewMethods->count() > 0)
-                          <span
-                            class="payment payment-xs ms-2">+{{ $methods->count() - $previewMethods->count() }}</span>
-                        @endif
-                      </div>
-                    </div>
-                    <div class="accordion-button-toggle">
-                      <i class="ti ti-chevron-down"></i>
-                    </div>
-                  </button>
-                </h2>
-                <div id="type-{{ Str::slug($type) }}" class="accordion-collapse collapse"
-                  data-bs-parent="#paymentMethodsAccordion">
-                  <div class="accordion-body pt-1">
-                    <div class="row g-3">
-                      @foreach ($methods as $method)
-                        <div class="col-4">
-                          <label class="form-imagecheck w-full bg-white">
-                            <input name="payment_method" type="radio" value="{{ $method->id }}"
-                              class="form-imagecheck-input" required />
-                            <span class="form-imagecheck-figure p-3">
-                              @if ($method->brand_logo)
-                                <img src="{{ asset($method->brand_logo) }}" alt=""
-                                  class="form-imagecheck-image mx-auto object-fit-contain"
-                                  style="height:3rem;opacity:1" />
-                              @else
-                                <p class="text-center fw-semibold m-0" style="line-height:3rem;">{{ $method->name }}
-                                </p>
-                              @endif
-                            </span>
-                          </label>
+          @if (!empty($savedPaymentMethod))
+            <div id="savedMethodPanel" class="card border mb-3">
+              <div class="card-body py-3 d-flex align-items-center">
+                <div class="me-3">
+                  @if ($savedPaymentMethod->brand_logo)
+                    <span class="payment"
+                      style="background-image:url('{{ asset($savedPaymentMethod->brand_logo) }}');"></span>
+                  @else
+                    <span class="badge bg-primary">{{ $savedPaymentMethod->name ?? $savedPaymentMethod->code }}</span>
+                  @endif
+                </div>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Metode pembayaran tersimpan</div>
+                  <div class="text-secondary small">{{ $savedPaymentMethod->name ?? $savedPaymentMethod->code }}</div>
+                </div>
+                <div class="btn-list ms-auto">
+                  <button type="button" id="changeMethodBtn" class="btn btn-outline-secondary btn-sm">Ganti
+                    metode</button>
+                  <button type="button" id="removeSavedMethodBtn" class="btn btn-outline-danger btn-sm">Hapus</button>
+                </div>
+              </div>
+              <!-- Hidden input to use saved method by default -->
+              <input type="hidden" name="payment_method" value="{{ $savedPaymentMethod->id }}" />
+            </div>
+          @endif
+          <div id="paymentMethodsBox" class="{{ !empty($savedPaymentMethod) ? 'd-none' : '' }}">
+            <div class="mb-2 text-secondary small">Pilih salah satu metode di bawah ini</div>
+            <div class="accordion" id="paymentMethodsAccordion">
+              @foreach ($paymentMethods->groupBy('type') as $type => $methods)
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed py-2 px-3 fs-4" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#type-{{ Str::slug($type) }}" aria-expanded="false"
+                      aria-controls="type-{{ Str::slug($type) }}">
+                      <div class="w-full d-flex align-items-center">
+                        {{ \Modules\EBilling\Enums\PaymentMethodType::from($type)->label() }}
+                        <div class="d-flex align-items-center ms-auto payment-method-previews">
+                          @php
+                            $previewMethods = collect($methods)->filter(fn($m) => !empty($m->brand_logo))->take(2);
+                          @endphp
+                          @foreach ($previewMethods as $method)
+                            <span class="payment payment-xs ms-2"
+                              style="background-image: url('{{ asset($method->brand_logo) }}');"></span>
+                          @endforeach
+                          @if ($methods->count() - $previewMethods->count() > 0)
+                            <span
+                              class="payment payment-xs ms-2">+{{ $methods->count() - $previewMethods->count() }}</span>
+                          @endif
                         </div>
-                      @endforeach
+                      </div>
+                      <div class="accordion-button-toggle">
+                        <i class="ti ti-chevron-down"></i>
+                      </div>
+                    </button>
+                  </h2>
+                  <div id="type-{{ Str::slug($type) }}" class="accordion-collapse collapse"
+                    data-bs-parent="#paymentMethodsAccordion">
+                    <div class="accordion-body pt-1">
+                      <div class="row g-3">
+                        @foreach ($methods as $method)
+                          <div class="col-4">
+                            <label class="form-imagecheck w-full bg-white">
+                              <input name="payment_method" type="radio" value="{{ $method->id }}"
+                                class="form-imagecheck-input" />
+                              <span class="form-imagecheck-figure p-3">
+                                @if ($method->brand_logo)
+                                  <img src="{{ asset($method->brand_logo) }}" alt=""
+                                    class="form-imagecheck-image mx-auto object-fit-contain"
+                                    style="height:3rem;opacity:1" />
+                                @else
+                                  <p class="text-center fw-semibold m-0" style="line-height:3rem;">{{ $method->name }}
+                                  </p>
+                                @endif
+                              </span>
+                            </label>
+                          </div>
+                        @endforeach
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            @endforeach
+              @endforeach
+            </div>
           </div>
 
           <label class="form-check mb-0 mt-3">
-            <input class="form-check-input" type="checkbox" name="save" />
+            <input class="form-check-input" type="checkbox" name="save"
+              {{ !empty($savedPaymentMethod) ? 'checked' : '' }} />
             <span class="form-check-label">Simpan metode pembayaran untuk digunakan kembali di lain waktu</span>
           </label>
 
@@ -353,12 +382,46 @@
       };
 
       const paymentMethodForm = document.getElementById('paymentMethodForm');
+      const savedMethodPanel = document.getElementById('savedMethodPanel');
+      const paymentMethodsBox = document.getElementById('paymentMethodsBox');
+      const changeMethodBtn = document.getElementById('changeMethodBtn');
+      const removeSavedMethodBtn = document.getElementById('removeSavedMethodBtn');
+
+      const enableMethodList = () => {
+        if (savedMethodPanel) savedMethodPanel.classList.add('d-none');
+        if (paymentMethodsBox) paymentMethodsBox.classList.remove('d-none');
+        // Remove hidden saved input so radios are used
+        const hiddenSaved = paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
+        if (hiddenSaved) hiddenSaved.remove();
+      }
+
+      if (changeMethodBtn) {
+        changeMethodBtn.addEventListener('click', enableMethodList);
+      }
+
+      if (removeSavedMethodBtn) {
+        removeSavedMethodBtn.addEventListener('click', async () => {
+          const customerId = paymentMethodForm.querySelector('input[name="customer_id"]').value;
+          try {
+            const res = await axios.delete(`/e-billing/api/invoice/${customerId}/saved-payment-method`);
+            setPaymentMethodAlert(res?.data?.message || 'Metode tersimpan dihapus.', 'success');
+            enableMethodList();
+            const saveCheckbox = paymentMethodForm.querySelector('input[name="save"]');
+            if (saveCheckbox) saveCheckbox.checked = false;
+          } catch (err) {
+            setPaymentMethodAlert('Gagal menghapus metode tersimpan. Coba lagi.', 'danger');
+          }
+        });
+      }
+
       paymentMethodForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const btnSubmit = paymentMethodForm.querySelector('button[type="submit"]');
-
-        if (!paymentMethodForm.checkValidity()) {
-          event.stopPropagation();
+        // Validate: either have hidden saved input or a selected radio
+        const hasSavedInput = !!paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
+        const selectedRadio = paymentMethodForm.querySelector(
+          'input[name="payment_method"][type="radio"]:checked');
+        if (!hasSavedInput && !selectedRadio) {
           setPaymentMethodAlert('Silakan pilih metode pembayaran!', 'warning');
           return;
         }

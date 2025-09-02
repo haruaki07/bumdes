@@ -74,7 +74,20 @@ class InvoiceController extends Controller
 
         $paymentMethods = PaymentMethod::all();
 
-        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods'));
+        // Resolve saved payment method (simple "remember me" for channels)
+        $savedPaymentMethod = null;
+        $savedPaymentCode = null;
+        if ($customer && ! empty($customer->payment_method_code)) {
+            $savedPaymentMethod = PaymentMethod::where('code', $customer->payment_method_code)->first();
+            if ($savedPaymentMethod) {
+                $savedPaymentCode = PaymentCode::where([
+                    'customer_id' => $customer->id,
+                    'payment_method_id' => $savedPaymentMethod->id,
+                ])->first();
+            }
+        }
+
+        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods', 'savedPaymentMethod', 'savedPaymentCode'));
     }
 
     public function requestPayment(Request $request, $customerId, PaymentServiceInterface $paymentService)
@@ -107,12 +120,12 @@ class InvoiceController extends Controller
             abort(404);
         }
 
-        $reusable = $request->boolean('save');
+        $savePaymentMethod = $request->boolean('save');
         $reusableCode = null;
         $paymentCode = PaymentCode::where(['customer_id' => $customer->id, 'payment_method_id' => $paymentMethod->id])->first();
-        if ($reusable && $paymentCode) {
+        if ($savePaymentMethod && $paymentCode) {
             $reusableCode = $paymentCode->code;
-        } elseif (! $reusable && $paymentCode) {
+        } elseif (! $savePaymentMethod && $paymentCode) {
             $paymentCode->delete();
         }
 
@@ -124,7 +137,7 @@ class InvoiceController extends Controller
                     paymentMethod: $paymentMethod,
                     customer: $customer,
                     package: $customer->package,
-                    reusable: $reusable,
+                    reusable: $savePaymentMethod,
                     reusableCode: $reusableCode,
                 )
             );
@@ -155,7 +168,7 @@ class InvoiceController extends Controller
             ];
 
             // Save reusable payment code if applicable
-            if ($reusable && ($paymentMethod->type === PaymentMethodType::VIRTUAL_ACCOUNT || $paymentMethod->type === PaymentMethodType::QR)) {
+            if ($savePaymentMethod && ($paymentMethod->type === PaymentMethodType::VIRTUAL_ACCOUNT || $paymentMethod->type === PaymentMethodType::QR)) {
                 PaymentCode::updateOrCreate(
                     [
                         'customer_id' => $customer->id,
@@ -165,6 +178,12 @@ class InvoiceController extends Controller
                         'code' => substr($result->action['value'], $paymentMethod->prefix_length),
                     ]
                 );
+            }
+
+            // Persist customer's preferred payment method when requested
+            if ($savePaymentMethod) {
+                $customer->payment_method_code = $paymentMethod->code;
+                $customer->save();
             }
 
             $expiry = Carbon::parse($expiresAt)->toImmutable();
@@ -186,6 +205,36 @@ class InvoiceController extends Controller
         }
 
         return response()->json($response ?? ['status' => 'error', 'message' => 'Terjadi kesalahan saat memproses permintaan.']);
+    }
+
+    public function removeSavedPaymentMethod(Request $request, $customerId)
+    {
+        $customer = Customer::where('customer_id', $customerId)->first();
+        if (! $customer) {
+            return response()->json(['status' => 'error', 'message' => 'Pelanggan tidak ditemukan.'], 404);
+        }
+
+        if (empty($customer->payment_method_code)) {
+            return response()->json(['status' => 'success', 'message' => 'Tidak ada metode tersimpan.']);
+        }
+
+        $method = PaymentMethod::where('code', $customer->payment_method_code)->first();
+        // Clear preferred method on customer
+        $customer->payment_method_code = null;
+        $customer->save();
+
+        // Optionally remove reusable code for that method
+        if ($method) {
+            PaymentCode::where([
+                'customer_id' => $customer->id,
+                'payment_method_id' => $method->id,
+            ])->delete();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Metode pembayaran tersimpan telah dihapus.',
+        ]);
     }
 
     public function pay(Request $request)

@@ -37,6 +37,7 @@ class Customer extends Model
         'due_reminder_days',
         'next_billing_date',
         'invoice_number',
+        'payment_method_code',
         'grace_period',
     ];
 
