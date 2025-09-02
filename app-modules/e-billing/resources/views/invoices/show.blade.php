@@ -7,6 +7,11 @@
           <h2 class="page-title">Detail Invoice</h2>
         </div>
         <div class="col-auto ms-auto d-print-none">
+          <a class="btn btn-primary"
+            href="{{ route('e-billing.invoice.customer-show', $invoice->customer->customer_id) }}" target="_blank">
+            <i class="ti ti-file-invoice icon"></i>
+            Lihat Invoice
+          </a>
           <a class="btn btn-secondary" href="{{ route('e-billing.invoices.index') }}">Kembali</a>
         </div>
       </div>
@@ -31,19 +36,7 @@
                 <div class="datagrid-item">
                   <div class="datagrid-title">Status</div>
                   <div class="datagrid-content">
-                    @php
-                      $color = match ($invoice->status) {
-                          \Modules\EBilling\Enums\InvoiceStatus::PAID,
-                          \Modules\EBilling\Enums\InvoiceStatus::COMPLETED
-                              => 'success',
-                          \Modules\EBilling\Enums\InvoiceStatus::UNPAID => 'warning',
-                          \Modules\EBilling\Enums\InvoiceStatus::PROCESSING => 'info',
-                          \Modules\EBilling\Enums\InvoiceStatus::EXPIRED,
-                          \Modules\EBilling\Enums\InvoiceStatus::CANCELED
-                              => 'danger',
-                      };
-                    @endphp
-                    <x-common.badge :label="$invoice->status->value" :color="$color" />
+                    <x-common.badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
                   </div>
                 </div>
                 <div class="datagrid-item">
