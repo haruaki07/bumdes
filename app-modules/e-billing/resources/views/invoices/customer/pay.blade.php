@@ -20,8 +20,8 @@
 @endsection
 
 @section('content')
-  <div class="container container-tight py-4">
-    <div class="card card-md">
+  <div class="container container-narrow py-4 my-auto">
+    <div class="card">
       <div class="card-body p-4">
         @if (!empty($error))
           <div class="alert alert-danger" role="alert">{{ $error }}</div>
@@ -98,6 +98,11 @@
             <div class="alert alert-warning">Respon pembayaran tidak dapat ditangani. Silakan coba lagi.</div>
           @endif
 
+          <div id="instructionsSection" class="mt-4 d-none">
+            <h4 class="mb-3">Cara Pembayaran</h4>
+            <div id="instructionsTabs"></div>
+          </div>
+
           <div class="mt-4">
             <a href="{{ route('e-billing.invoice.customer-show', ['customer_id' => $customerId]) }}" class="btn"
               id="btnBack">
@@ -113,7 +118,7 @@
 @section('tablar_js')
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const session = @json(collect($session)->only(['expires_at', 'action']) ?? null);
+      const session = @json(collect($session)->only(['expires_at', 'action', 'payment_method']) ?? null);
       const action = session?.action || {};
       const {
         type,
@@ -158,8 +163,10 @@
 
           if (['SUCCEEDED', 'AUTHORIZED'].includes(data.payment_status)) {
             showAlert('success', 'Pembayaran berhasil. Anda dapat menutup halaman ini.');
-            document.getElementById('btnBack').href =
-              `{{ route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) }}`;
+            @if ($session['reference_id'] ?? false)
+              document.getElementById('btnBack').href =
+                `{{ route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) }}`;
+            @endif
             clearInterval(timerId);
             return;
           }
@@ -211,6 +218,167 @@
         tick();
       }
 
+      // Payment Instructions
+      (function loadPaymentInstructions() {
+        const methodCode = session?.payment_method?.code;
+        if (!methodCode) return;
+        const baseUrl = @json(asset('assets/e-billing/payment_instructions'));
+        const url = `${baseUrl}/${methodCode}.json`;
+
+        // Determine full payment code placeholder value
+        const fullPaymentCode = (descriptor === 'VIRTUAL_ACCOUNT_NUMBER' || descriptor === 'PAYMENT_CODE') ?
+          (value || document.getElementById('codeBox')?.textContent?.trim() || '') :
+          (document.getElementById('codeBox')?.textContent?.trim() || '');
+
+        const vars = {
+          fullPaymentCode,
+          iBankingSource: guessInternetBankingUrl(methodCode)
+        };
+
+        fetch(url, {
+            headers: {
+              'Accept': 'application/json'
+            }
+          })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (!data || !data.instructions) return;
+            renderInstructionsTabs(data.instructions, vars);
+          })
+          .catch(() => {});
+      })();
+
+      function guessInternetBankingUrl(code) {
+        // Minimal mapping; extend as needed
+        const map = {
+          'BCA_VIRTUAL_ACCOUNT': 'https://ibank.klikbca.com',
+          'BRI_VIRTUAL_ACCOUNT': 'https://ib.bri.co.id',
+          'BNI_VIRTUAL_ACCOUNT': 'https://ibank.bni.co.id',
+          'MANDIRI_VIRTUAL_ACCOUNT': 'https://ibank.bankmandiri.co.id'
+        };
+        return map[code] || '#';
+      }
+
+      function applyVars(str, vars) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (vars[k] ?? ''));
+      }
+
+      function sanitizeHtml(input) {
+        // allow only a, strong, em, br and text
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = input;
+        const allowed = new Set(['A', 'STRONG', 'EM', 'BR']);
+
+        (function walk(node) {
+          const children = Array.from(node.childNodes);
+          for (const child of children) {
+            if (child.nodeType === Node.TEXT_NODE) continue;
+            if (child.nodeType === Node.ELEMENT_NODE) {
+              if (!allowed.has(child.tagName)) {
+                // Replace disallowed element with its text content
+                const text = document.createTextNode(child.textContent || '');
+                node.replaceChild(text, child);
+                continue;
+              }
+              if (child.tagName === 'A') {
+                const href = child.getAttribute('href') || '';
+                if (!/^https?:\/\//i.test(href) && href !== '#') {
+                  child.removeAttribute('href');
+                }
+                child.setAttribute('rel', 'noopener');
+                child.setAttribute('target', '_blank');
+              }
+              walk(child);
+            } else {
+              node.removeChild(child);
+            }
+          }
+        })(wrapper);
+
+        return wrapper.innerHTML;
+      }
+
+      function renderInstructionsTabs(instructions, vars) {
+        const section = document.getElementById('instructionsSection');
+        const tabsHost = document.getElementById('instructionsTabs');
+        if (!section || !tabsHost) return;
+
+        const categories = Object.keys(instructions || {});
+        if (!categories.length) return;
+
+        const nav = document.createElement('ul');
+        nav.className = 'nav nav-tabs';
+
+        const content = document.createElement('div');
+        content.className = 'tab-content border border-top-0 p-3 rounded-bottom';
+
+        const makeId = (k) => `ins-${k.replace(/[^a-z0-9]/gi, '')}-${Math.random().toString(36).slice(2, 7)}`;
+        let first = true;
+
+        for (const key of categories) {
+          const pretty = key.toUpperCase();
+          const paneId = makeId(key);
+
+          // Tab button
+          const li = document.createElement('li');
+          li.className = 'nav-item';
+          const a = document.createElement('a');
+          a.className = 'nav-link' + (first ? ' active' : '');
+          a.dataset.bsToggle = 'tab';
+          a.href = `#${paneId}`;
+          a.textContent = pretty;
+          li.appendChild(a);
+          nav.appendChild(li);
+
+          // Pane
+          const pane = document.createElement('div');
+          pane.className = 'tab-pane fade' + (first ? ' show active' : '');
+          pane.id = paneId;
+
+          const steps = Array.isArray(instructions[key]) ? instructions[key] : [];
+          if (!steps.length) {
+            const empty = document.createElement('div');
+            empty.className = 'text-secondary';
+            empty.textContent = 'Tidak ada petunjuk untuk kanal ini.';
+            pane.appendChild(empty);
+          } else {
+            for (const block of steps) {
+              const card = document.createElement('div');
+              card.className = 'card mb-3';
+              const cb = document.createElement('div');
+              cb.className = 'card-body';
+              const h = document.createElement('h5');
+              h.className = 'card-title';
+              h.textContent = block.title || 'Langkah';
+              cb.appendChild(h);
+
+              const ol = document.createElement('ol');
+              ol.className = 'mb-0 ps-3';
+              const stepsArr = Array.isArray(block.steps) ? block.steps : [];
+              for (const s of stepsArr) {
+                const li = document.createElement('li');
+                li.className = 'mb-1';
+                const applied = applyVars(String(s), vars);
+                li.innerHTML = sanitizeHtml(applied);
+                ol.appendChild(li);
+              }
+              cb.appendChild(ol);
+              card.appendChild(cb);
+              pane.appendChild(card);
+            }
+          }
+
+          content.appendChild(pane);
+          first = false;
+        }
+
+        tabsHost.innerHTML = '';
+        tabsHost.appendChild(nav);
+        tabsHost.appendChild(content);
+        section.classList.remove('d-none');
+      }
+
       // Helpers
       function bindCopy(btnId, text) {
         const btn = document.getElementById(btnId);
@@ -218,11 +386,20 @@
           btn.addEventListener('click', async () => {
             try {
               await navigator.clipboard.writeText(text);
+              copyFeedback(btn);
             } catch (_) {
               alert('Gagal menyalin.');
             }
           });
         }
+      }
+
+      function copyFeedback(btn) {
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="icon ti ti-check"></i> Tersalin';
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+        }, 1500);
       }
 
       function disableButton(id) {

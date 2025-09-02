@@ -90,7 +90,7 @@
 @endsection
 
 @section('content')
-  <div class="container container-tight py-4 invoice-wrapper">
+  <div class="container container-tight py-4 invoice-wrapper my-auto">
     <div class="card card-md invoice-card">
       <div class="card-body p-4">
         @php

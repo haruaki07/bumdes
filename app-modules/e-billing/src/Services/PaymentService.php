@@ -38,7 +38,7 @@ class PaymentService implements PaymentServiceInterface
             'request_amount' => $input->amount,
             'channel_code' => $input->paymentMethod->code,
             'channel_properties' => [
-                'expires_at' => now()->addMinutes(5)->toISOString(),
+                'expires_at' => now()->addHours(1)->toISOString(),
                 ...$channelProperties ?? [],
             ],
             'items' => [

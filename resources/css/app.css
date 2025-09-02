@@ -1,6 +1,12 @@
 @import "../sass/dropzone.scss";
 @import "../sass/tom-select.scss";
 
+html,
+body,
+body .page {
+  height: 100%;
+}
+
 /* increase the default tabler icon size*/
 i.ti {
   font-size: 20px !important;
