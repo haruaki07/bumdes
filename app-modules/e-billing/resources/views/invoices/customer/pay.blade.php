@@ -232,7 +232,7 @@
 
         const vars = {
           fullPaymentCode,
-          iBankingSource: guessInternetBankingUrl(methodCode)
+          iBankingSource: getIbankingUrl(methodCode)
         };
 
         fetch(url, {
@@ -248,7 +248,7 @@
           .catch(() => {});
       })();
 
-      function guessInternetBankingUrl(code) {
+      function getIbankingUrl(code) {
         // Minimal mapping; extend as needed
         const map = {
           'BCA_VIRTUAL_ACCOUNT': 'https://ibank.klikbca.com',
