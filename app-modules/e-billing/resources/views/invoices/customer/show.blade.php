@@ -239,8 +239,9 @@
             Print
           </button>
           @if ($invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID)
-            <button type="submit" class="btn btn-success" data-bs-toggle="loading-button"
-              data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Bayar Sekarang</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentMethodModal">
+              Bayar
+            </button>
           @endif
         </div>
       </div>
@@ -249,7 +250,7 @@
 
   <div class="modal fade no-print" id="paymentMethodModal" tabindex="-1">
     <div class="modal-dialog" role="document">
-      <form id="paymentMethodForm" class="modal-content">
+      <form id="paymentMethodForm" class="modal-content" novalidate>
         <div class="modal-header">
           <h5 class="modal-title">Pilih Metode Pembayaran</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Batal"></button>
@@ -293,7 +294,7 @@
                         <div class="col-4">
                           <label class="form-imagecheck w-full bg-white">
                             <input name="payment_method" type="radio" value="{{ $method->id }}"
-                              class="form-imagecheck-input" />
+                              class="form-imagecheck-input" required />
                             <span class="form-imagecheck-figure p-3">
                               @if ($method->brand_logo)
                                 <img src="{{ asset($method->brand_logo) }}" alt=""
@@ -322,9 +323,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
-          @if ($invoice)
-          @else
-          @endif
+          <button type="submit" class="btn btn-success" data-bs-toggle="loading-button"
+            data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Bayar Sekarang</button>
         </div>
       </form>
     </div>
@@ -356,6 +356,12 @@
       paymentMethodForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const btnSubmit = paymentMethodForm.querySelector('button[type="submit"]');
+
+        if (!paymentMethodForm.checkValidity()) {
+          event.stopPropagation();
+          setPaymentMethodAlert('Silakan pilih metode pembayaran!', 'warning');
+          return;
+        }
 
         try {
           btnSubmit._loadingButtonInstance.start();

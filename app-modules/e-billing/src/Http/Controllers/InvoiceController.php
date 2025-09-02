@@ -94,7 +94,7 @@ class InvoiceController extends Controller
         }
 
         // Prevent requesting payment for paid or expired invoices
-        $currentStatus = method_exists($invoice->status, 'value') ? strtoupper((string) $invoice->status->value) : strtoupper((string) $invoice->status);
+        $currentStatus = $invoice->status->value;
         if (in_array($currentStatus, ['PAID', 'LUNAS'])) {
             return response()->json(['status' => 'error', 'message' => 'Tagihan sudah dibayar. Tidak dapat melakukan pembayaran ulang.'], 422);
         }

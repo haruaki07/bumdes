@@ -158,7 +158,7 @@
 
           if (['SUCCEEDED', 'AUTHORIZED'].includes(data.payment_status)) {
             showAlert('success', 'Pembayaran berhasil. Anda dapat menutup halaman ini.');
-            document.getElementById('btnBack')?.href =
+            document.getElementById('btnBack').href =
               `{{ route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) }}`;
             clearInterval(timerId);
             return;
