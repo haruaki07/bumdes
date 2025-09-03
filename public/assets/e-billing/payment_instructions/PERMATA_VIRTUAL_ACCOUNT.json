@@ -1,0 +1,77 @@
+{
+  "instructions": {
+    "atm": [
+      {
+        "title": "Temukan ATM Terdekat",
+        "steps": ["Masukkan kartu ATM Permata anda", "Masukkan PIN"]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih menu \"Transaksi Lainnya\"",
+          "Pilih menu \"Pembayaran\"",
+          "Pilih menu \"Pembayaran Lainnya\"",
+          "Pilih menu \"Virtual Account\"",
+          "Masukkan Nomor Virtual Account <strong>{{fullPaymentCode}}</strong>",
+          "Lalu pilih rekening debet yang akan digunakan",
+          "Konfirmasi detail transaksi anda"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "ibanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Buka situs <a href=\"{{iBankingSource}}\">{{iBankingSource}}</a> kemudian login"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih \"Pembayaran Tagihan\"",
+          "Pilih \"Virtual Account\"",
+          "Masukk Nomor Virtual Account <strong>{{fullPaymentCode}}</strong>",
+          "Periksa kembali detail pembayaran anda",
+          "Masukkan otentikasi transaksi/token"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "mbanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": ["Buka aplikasi Permata ME", "Masukkan User ID dan Password"]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih \"Bayar Tagihan\"",
+          "Pilih \"My Trees\" pada \"Lainnya\"",
+          "Masukkan Nomor Virtual Account Anda <strong>{{fullPaymentCode}}</strong>",
+          "Konfirmasi detail transaksi Anda",
+          "Masukkan PIN"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "instructions": [
+    {
+      "title": "Catatan",
+      "steps": [
+        "Anda dapat melakukan pembayaran melalui Alfamart Grup (Alfamart, Afamidi, Dan+Dan, Lawson)",
+        "Anda dapat melakukan pembayaran dibawah Rp. 2,500,000 melalui Alfamart, Afamidi, Dan+Dan, Lawson.",
+        "Pembayaran diatas Rp. 2,500,000 tidak dapat dilakukan di Alfamidi."
+      ]
+    },
+    {
+      "title": "Temukan Cabang Terdekat",
+      "steps": [
+        "Kunjungi ALFAMART terdekat sebelum invoice kadaluarsa",
+        "Sebutkan pembayaran melalui <strong>\"{{merchantName}}\" via Xendit</strong> ke kasir, atau berikan kode barcode untuk di scan oleh kasir."
+      ]
+    },
+    {
+      "title": "Detail Pembayaran",
+      "steps": [
+        "Berikan kode pembayaran yang ada di invoice, dan pastikan nominal yang akan dibayarkan sudah benar",
+        "Informasikan pada kasir jika Anda ingin membayar menggunakan uang tunai saja, atau kombinasi uang tunai dengan Kartu Debit/Prabayar atau Dompet Digital.",
+        "Jumlah uang tunai maksimal yang diperbolehkan hanya Rp. 2,500,000, sisanya dapat menggunakan metode Kartu Debit/Prabayar atau Dompet Digital.",
+        "Lanjutkan pembayaran anda dengan nominal yang disebutkan di invoice"
+      ]
+    },
+    {
+      "title": "Transaksi Berhasil",
+      "steps": [
+        "Terima bukti pembayaran anda dari kasir",
+        "Pembayaran anda berhasil"
+      ]
+    }
+  ]
+}

@@ -232,7 +232,8 @@
 
         const vars = {
           fullPaymentCode,
-          iBankingSource: getIbankingUrl(methodCode)
+          iBankingSource: getIbankingUrl(methodCode),
+          merchantName: "{{ 'E-Billing' }}" // for qris, should be using global config
         };
 
         fetch(url, {
@@ -243,7 +244,7 @@
           .then(res => res.ok ? res.json() : null)
           .then(data => {
             if (!data || !data.instructions) return;
-            renderInstructionsTabs(data.instructions, vars);
+            renderInstructions(data.instructions, vars);
           })
           .catch(() => {});
       })();
@@ -254,7 +255,9 @@
           'BCA_VIRTUAL_ACCOUNT': 'https://ibank.klikbca.com',
           'BRI_VIRTUAL_ACCOUNT': 'https://ib.bri.co.id',
           'BNI_VIRTUAL_ACCOUNT': 'https://ibank.bni.co.id',
-          'MANDIRI_VIRTUAL_ACCOUNT': 'https://ibank.bankmandiri.co.id'
+          'MANDIRI_VIRTUAL_ACCOUNT': 'https://ibank.bankmandiri.co.id',
+          'BSI_VIRTUAL_ACCOUNT': 'https://bsinet.bankbsi.co.id',
+          'PERMATA_VIRTUAL_ACCOUNT': 'https://www.permatanet.com'
         };
         return map[code] || '#';
       }
@@ -297,6 +300,53 @@
         })(wrapper);
 
         return wrapper.innerHTML;
+      }
+
+      function renderInstructions(instructions, vars) {
+        // Support array-form (no categories) and object-form (with categories)
+        if (Array.isArray(instructions)) {
+          return renderInstructionList(instructions, vars);
+        }
+        return renderInstructionsTabs(instructions, vars);
+      }
+
+      function renderInstructionList(blocks, vars) {
+        const section = document.getElementById('instructionsSection');
+        const tabsHost = document.getElementById('instructionsTabs');
+        if (!section || !tabsHost) return;
+
+        const container = document.createElement('div');
+        const steps = Array.isArray(blocks) ? blocks : [];
+        if (!steps.length) return;
+
+        for (const block of steps) {
+          const card = document.createElement('div');
+          card.className = 'card mb-3';
+          const cb = document.createElement('div');
+          cb.className = 'card-body';
+          const h = document.createElement('h5');
+          h.className = 'card-title';
+          h.textContent = block.title || 'Langkah';
+          cb.appendChild(h);
+
+          const ol = document.createElement('ol');
+          ol.className = 'mb-0 ps-3';
+          const stepsArr = Array.isArray(block.steps) ? block.steps : [];
+          for (const s of stepsArr) {
+            const li = document.createElement('li');
+            li.className = 'mb-1';
+            const applied = applyVars(String(s), vars);
+            li.innerHTML = sanitizeHtml(applied);
+            ol.appendChild(li);
+          }
+          cb.appendChild(ol);
+          card.appendChild(cb);
+          container.appendChild(card);
+        }
+
+        tabsHost.innerHTML = '';
+        tabsHost.appendChild(container);
+        section.classList.remove('d-none');
       }
 
       function renderInstructionsTabs(instructions, vars) {
