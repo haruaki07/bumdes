@@ -11,6 +11,7 @@ use Modules\EBilling\Http\Controllers\InvoiceController;
 use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
 use Modules\EBilling\Http\Controllers\SiteController;
+use Modules\EBilling\Http\Controllers\TransferReceiptController;
 use Modules\EBilling\Http\Controllers\WebhookController;
 
 Route::prefix('e-billing')->as('e-billing.')->group(function () {
@@ -33,6 +34,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             });
 
             Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
+            Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
 
             Route::prefix('settings')->as('settings.')->group(function () {
                 Route::resource('payment-methods', PaymentMethodController::class)->only(['index', 'show', 'update']);
@@ -49,6 +51,8 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             ->name('invoice.pay.status');
         Route::delete('/invoice/{customer_id}/saved-payment-method', [InvoiceController::class, 'removeSavedPaymentMethod'])
             ->name('invoice.remove-saved-payment-method');
+        Route::post('/invoice/{invoice}/transfer-receipts', [TransferReceiptController::class, 'store'])
+            ->name('invoice.transfer-receipts.store');
         Route::post('/webhooks/xendit', [WebhookController::class, 'xendit'])
             ->name('webhooks.xendit');
     });

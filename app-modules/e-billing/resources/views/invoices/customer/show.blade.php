@@ -22,8 +22,8 @@
         padding: 0 !important;
       }
 
-      .page-center {
-        justify-content: flex-start !important;
+      .invoice-wrapper {
+        margin: 0 !important;
       }
     }
 

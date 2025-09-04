@@ -53,7 +53,7 @@ class WebhookController extends Controller
         }
 
         $newStatus = match ($status) {
-            'AUTHORIZED', 'PENDING' => InvoiceStatus::PROCESSING,
+            'AUTHORIZED', 'PENDING' => InvoiceStatus::UNPAID,
             'SUCCEEDED' => InvoiceStatus::PAID,
             default => null,
         };

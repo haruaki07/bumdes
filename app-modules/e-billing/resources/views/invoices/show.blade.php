@@ -8,7 +8,8 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <a class="btn btn-primary"
-            href="{{ route('e-billing.invoice.customer-show', $invoice->customer->customer_id) }}" target="_blank">
+            href="{{ route('e-billing.invoice.customer-show', $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID ? $invoice->customer->customer_id : $invoice->invoice_number) }}"
+            target="_blank">
             <i class="ti ti-file-invoice icon"></i>
             Lihat Invoice
           </a>
@@ -26,6 +27,16 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Informasi Invoice</h3>
+              <div class="card-actions">
+                @if ($invoice->status->value !== \Modules\EBilling\Enums\InvoiceStatus::PAID->value)
+                  <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">
+                    @csrf
+                    <button class="btn btn-success btn-sm" onclick="return confirm('Tandai invoice sebagai lunas?')">
+                      <i class="ti ti-cash"></i> Tandai Lunas
+                    </button>
+                  </form>
+                @endif
+              </div>
             </div>
             <div class="card-body">
               <div class="datagrid">
@@ -109,6 +120,49 @@
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row-deck row-cards mt-3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Bukti Transfer</h3>
+            </div>
+            <div class="card-body">
+              @if (isset($receipts) && count($receipts))
+                <div class="table-responsive">
+                  <table class="table table-vcenter card-table">
+                    <thead>
+                      <tr>
+                        <th>Waktu</th>
+                        <th>File</th>
+                        <th>Status</th>
+                        <th>Catatan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach ($receipts as $r)
+                        <tr>
+                          <td>{{ $r->created_at->format('d/m/Y H:i') }}</td>
+                          <td>
+                            <a href="{{ Storage::url($r->file_path) }}" target="_blank"
+                              rel="noopener">{{ $r->original_name ?? basename($r->file_path) }}</a>
+                          </td>
+                          <td>
+                            <x-common.badge :label="ucfirst($r->status)" :color="$r->status === 'approved' ? 'success' : ($r->status === 'rejected' ? 'danger' : 'warning')" />
+                          </td>
+                          <td>{{ $r->note ?? '-' }}</td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              @else
+                <div class="text-secondary">Belum ada bukti transfer.</div>
+              @endif
             </div>
           </div>
         </div>

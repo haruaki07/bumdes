@@ -3,15 +3,16 @@
 namespace Modules\EBilling\Services;
 
 use App\Http\Integrations\Xendit\Requests\Payment\CreatePaymentRequest;
+use App\Http\Integrations\Xendit\Requests\Payment\GetPaymentRequest;
 use App\Http\Integrations\Xendit\XenditConnector;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
 use Modules\EBilling\Services\DTOs\Payment\CreatePaymentRequestIn;
-use Modules\EBilling\Services\DTOs\Payment\CreatePaymentRequestOut;
+use Modules\EBilling\Services\DTOs\Payment\PaymentRequest;
 
 class PaymentService implements PaymentServiceInterface
 {
-    public function createPaymentRequest(CreatePaymentRequestIn $input): CreatePaymentRequestOut
+    public function createPaymentRequest(CreatePaymentRequestIn $input): PaymentRequest
     {
         $xendit = new XenditConnector;
         $request = new CreatePaymentRequest;
@@ -38,7 +39,7 @@ class PaymentService implements PaymentServiceInterface
             'request_amount' => $input->amount,
             'channel_code' => $input->paymentMethod->code,
             'channel_properties' => [
-                'expires_at' => now()->addHours(1)->toISOString(),
+                'expires_at' => now()->addHour()->toISOString(),
                 ...$channelProperties ?? [],
             ],
             'items' => [
@@ -67,7 +68,29 @@ class PaymentService implements PaymentServiceInterface
 
         $data = $response->json();
 
-        return new CreatePaymentRequestOut(
+        return new PaymentRequest(
+            paymentRequestId: $data['payment_request_id'],
+            status: $data['status'],
+            action: isset($data['actions']) && count($data['actions']) > 0 ? $data['actions'][0] : null,
+            responseObject: $data,
+            expiresAt: $data['channel_properties']['expires_at'] ?? null,
+        );
+    }
+
+    public function getPaymentStatus(string $paymentId): PaymentRequest
+    {
+        $xendit = new XenditConnector;
+        $request = new GetPaymentRequest($paymentId);
+
+        $response = $xendit->send($request);
+
+        if ($response->failed()) {
+            $response->throw();
+        }
+
+        $data = $response->json();
+
+        return new PaymentRequest(
             paymentRequestId: $data['payment_request_id'],
             status: $data['status'],
             action: isset($data['actions']) && count($data['actions']) > 0 ? $data['actions'][0] : null,

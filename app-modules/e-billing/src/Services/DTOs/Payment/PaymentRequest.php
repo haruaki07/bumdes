@@ -2,7 +2,7 @@
 
 namespace Modules\EBilling\Services\DTOs\Payment;
 
-class CreatePaymentRequestOut
+class PaymentRequest
 {
     public function __construct(
         public string $paymentRequestId,

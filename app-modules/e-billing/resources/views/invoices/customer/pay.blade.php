@@ -20,7 +20,7 @@
 @endsection
 
 @section('content')
-  <div class="container container-narrow py-4 my-auto">
+  <div class="container container-narrow py-4 my-auto" style="max-width: 900px;">
     <div class="card">
       <div class="card-body p-4">
         @if (!empty($error))
@@ -51,7 +51,8 @@
             </div>
           </div>
 
-          <div class="alert alert-info d-flex gap-2" role="alert" id="countdownAlert">
+          <div class="alert alert-info d-flex gap-2" role="alert" id="countdownAlert"
+            @if ($descriptor === 'BANK_TRANSFER_DETAILS') style="display:none" @endif>
             <i class="ti ti-info-circle alert-icon"></i>
             <div>
               Selesaikan pembayaran sebelum
@@ -62,7 +63,78 @@
 
           {{-- Handle action types --}}
           @if ($actionType === 'PRESENT_TO_CUSTOMER')
-            @if ($descriptor === 'QR_STRING')
+            @if ($descriptor === 'BANK_TRANSFER_DETAILS')
+              @php
+                $bank = $value['bank'] ?? 'Bank';
+                $accNo = $value['account_number'] ?? '';
+                $accName = $value['account_name'] ?? config('app.name');
+                $note = $value['note'] ?? '';
+              @endphp
+              <div>
+                <div class="alert alert-secondary" role="alert">
+                  Silakan transfer sesuai detail berikut, lalu kirim bukti ke admin untuk konfirmasi.
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="text-secondary">Bank</div>
+                        <div class="h4 mb-2">{{ $bank }}</div>
+                        <div class="text-secondary">No. Rekening</div>
+                        <div class="h4 mono" id="codeBox">{{ $accNo }}</div>
+                        <button class="btn btn-outline-primary mt-2" id="btnCopyCode">
+                          <i class="icon ti ti-copy"></i> Salin No. Rekening
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row mb-2">
+                          <div class="col-6 text-secondary">Nama Pemilik</div>
+                          <div class="col-6 text-end">{{ $accName }}</div>
+                        </div>
+                        <div class="row mb-2">
+                          <div class="col-6 text-secondary">Nominal</div>
+                          <div class="col-6 text-end">Rp {{ $amountFormatted }}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-6 text-secondary">Berita/Referensi</div>
+                          <div class="col-6 text-end">{{ $referenceId }}</div>
+                        </div>
+                        @if ($note)
+                          <hr>
+                          <div class="small text-secondary">{{ $note }}</div>
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card mt-3">
+                  <div class="card-body">
+                    <h4 class="card-title mb-3">Unggah Bukti Transfer</h4>
+                    <form id="receiptForm" class="row g-2">
+                      <div class="col-12 col-md-6">
+                        <input type="file" name="file" id="receiptFile" class="form-control" accept="image/*,.pdf"
+                          required>
+                        <div class="form-hint">JPG, PNG, atau PDF. Maks 4MB.</div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <input type="text" name="note" class="form-control" placeholder="Catatan (opsional)">
+                      </div>
+                      <div class="col-12">
+                        <button type="submit" class="btn btn-primary" id="btnUploadReceipt">
+                          <i class="ti ti-upload"></i> Unggah Bukti
+                        </button>
+                        <span class="text-secondary small ms-2" id="uploadStatus"></span>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            @elseif ($descriptor === 'QR_STRING')
               <div class="text-center">
                 <p class="mb-3">Scan QR berikut di aplikasi pembayaran Anda:</p>
                 <div id="qr" class="qr-box d-inline-flex align-items-center justify-content-center"></div>
@@ -116,9 +188,10 @@
 @endsection
 
 @section('tablar_js')
+  <script id="sessionData" type="application/json">{!! json_encode(collect($session)->only(['expires_at', 'action', 'payment_method', 'reference_id', 'id'])) !!}</script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const session = @json(collect($session)->only(['expires_at', 'action', 'payment_method']) ?? null);
+      const session = JSON.parse(document.getElementById('sessionData').textContent);
       const action = session?.action || {};
       const {
         type,
@@ -145,13 +218,17 @@
           disableButton('btnGoNow');
         }
       }
-      updateCountdown();
-      timerId = setInterval(updateCountdown, 1000);
+      if (!(type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS')) {
+        updateCountdown();
+        timerId = setInterval(updateCountdown, 1000);
+      }
 
       // Polling status
       const statusUrl = @json($session ? route('e-billing.invoice.pay.status', ['token' => request()->query('token')]) : null);
       async function pollStatus() {
         if (!statusUrl) return;
+        // Do not poll for manual bank transfer; admin will confirm manually
+        if (type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS') return;
         try {
           const res = await fetch(statusUrl, {
             headers: {
@@ -163,10 +240,9 @@
 
           if (['SUCCEEDED', 'AUTHORIZED'].includes(data.payment_status)) {
             showAlert('success', 'Pembayaran berhasil. Anda dapat menutup halaman ini.');
-            @if ($session['reference_id'] ?? false)
-              document.getElementById('btnBack').href =
-                `{{ route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) }}`;
-            @endif
+            document.getElementById('btnBack').href =
+              `{{ route('e-billing.invoice.customer-show', ['customer_id' => '_CUSTOMER_ID_']) }}`
+              .replace('_CUSTOMER_ID_', session?.reference_id ?? '');
             clearInterval(timerId);
             return;
           }
@@ -230,10 +306,19 @@
           (value || document.getElementById('codeBox')?.textContent?.trim() || '') :
           (document.getElementById('codeBox')?.textContent?.trim() || '');
 
+        const accountNumber = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.account_number || document
+          .getElementById('codeBox')?.textContent?.trim() || '') : '';
+        const accountName = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.account_name || '') : '';
+        const bankName = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.bank || '') : '';
+
         const vars = {
           fullPaymentCode,
           iBankingSource: getIbankingUrl(methodCode),
-          merchantName: "{{ 'E-Billing' }}" // for qris, should be using global config
+          merchantName: "{{ 'E-Billing' }}", // for qris, should be using global config
+          accountNumber,
+          accountName,
+          bankName,
+          invoiceNumber: session?.reference_id || ''
         };
 
         fetch(url, {
@@ -430,6 +515,43 @@
       }
 
       // Helpers
+      // Upload transfer receipt
+      (function bindUpload() {
+        if (!(type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS')) return;
+        const form = document.getElementById('receiptForm');
+        if (!form) return;
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const file = document.getElementById('receiptFile')?.files?.[0];
+          if (!file) return;
+          const btn = document.getElementById('btnUploadReceipt');
+          const statusEl = document.getElementById('uploadStatus');
+          const token = new URLSearchParams(window.location.search).get('token');
+          const requestUrl = @json(route('e-billing.invoice.transfer-receipts.store', ['invoice' => '__INVOICE_ID__']));
+          const url = requestUrl.replace('__INVOICE_ID__', session?.reference_id ?? '');
+          const formData = new FormData(form);
+          btn.setAttribute('disabled', 'disabled');
+          statusEl.textContent = 'Mengunggah…';
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: formData
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok) throw new Error(data?.message || 'Gagal mengunggah');
+            statusEl.textContent = 'Bukti terkirim. Menunggu verifikasi admin.';
+          } catch (err) {
+            statusEl.textContent = (err?.message || 'Gagal mengunggah.');
+          } finally {
+            btn.removeAttribute('disabled');
+          }
+        });
+      })();
+
       function bindCopy(btnId, text) {
         const btn = document.getElementById(btnId);
         if (btn && text && navigator.clipboard) {
