@@ -3,17 +3,27 @@
     <div class="container-xl">
       <div class="row g-2 align-items-center">
         <div class="col">
-          <div class="page-pretitle">Transaksi</div>
-          <h2 class="page-title">Detail Invoice</h2>
+          <div class="page-pretitle">Invoice</div>
+          <h2 class="page-title d-flex align-items-center gap-2">
+            <span>#{{ $invoice->invoice_number }}</span>
+            <x-common.badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
+          </h2>
         </div>
         <div class="col-auto ms-auto d-print-none">
-          <a class="btn btn-primary"
-            href="{{ route('e-billing.invoice.customer-show', $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID ? $invoice->customer->customer_id : $invoice->invoice_number) }}"
-            target="_blank">
-            <i class="ti ti-file-invoice icon"></i>
-            Lihat Invoice
+          <a class="btn btn-secondary" href="{{ route('e-billing.invoices.index') }}">
+            Kembali
           </a>
-          <a class="btn btn-secondary" href="{{ route('e-billing.invoices.index') }}">Kembali</a>
+          <a class="btn btn-outline-primary" href="{{ $invoice->public_url }}" target="_blank">
+            <i class="ti ti-external-link icon"></i> Halaman Publik
+          </a>
+          @if ($invoice->status->value !== \Modules\EBilling\Enums\InvoiceStatus::PAID->value)
+            <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">
+              @csrf
+              <button class="btn btn-success">
+                <i class="ti ti-cash icon"></i> Tandai Lunas
+              </button>
+            </form>
+          @endif
         </div>
       </div>
     </div>
@@ -22,21 +32,75 @@
   <div class="page-body">
     <div class="container-xl">
       @include('tablar::common.alert')
+
+      <div class="row row-cards mb-3">
+        <div class="col-sm-6 col-lg-3">
+          <div class="card card-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span class="avatar bg-primary text-white text-capitalize">Rp</span>
+                </div>
+                <div class="col">
+                  <div class="text-secondary">Jumlah</div>
+                  <div class="fw-bold">Rp{{ number_format($invoice->amount, 0, ',', '.') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card card-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span class="avatar bg-{{ $invoice->status->color() }} text-white"><i class="ti ti-flag"></i></span>
+                </div>
+                <div class="col">
+                  <div class="text-secondary">Status</div>
+                  <div class="fw-bold">{{ $invoice->status->label() }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card card-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span class="avatar bg-muted text-white"><i class="ti ti-calendar-plus"></i></span>
+                </div>
+                <div class="col">
+                  <div class="text-secondary">Dibuat</div>
+                  <div class="fw-bold">{{ $invoice->created_at->format('d/m/Y H:i') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card card-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span class="avatar bg-info text-white"><i class="ti ti-calendar-check"></i></span>
+                </div>
+                <div class="col">
+                  <div class="text-secondary">Dibayar</div>
+                  <div class="fw-bold">{{ $invoice->paid_at?->format('d/m/Y H:i') ?? '-' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row row-deck row-cards">
-        <div class="col-12">
+        <div class="col-lg-4">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Informasi Invoice</h3>
-              <div class="card-actions">
-                @if ($invoice->status->value !== \Modules\EBilling\Enums\InvoiceStatus::PAID->value)
-                  <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">
-                    @csrf
-                    <button class="btn btn-success btn-sm" onclick="return confirm('Tandai invoice sebagai lunas?')">
-                      <i class="ti ti-cash"></i> Tandai Lunas
-                    </button>
-                  </form>
-                @endif
-              </div>
+              <h3 class="card-title">Rincian Invoice</h3>
             </div>
             <div class="card-body">
               <div class="datagrid">
@@ -45,29 +109,24 @@
                   <div class="datagrid-content">{{ $invoice->invoice_number }}</div>
                 </div>
                 <div class="datagrid-item">
-                  <div class="datagrid-title">Status</div>
+                  <div class="datagrid-title">Paket</div>
+                  <div class="datagrid-content">{{ $invoice->package_detail->name ?? '-' }}</div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Harga Paket</div>
                   <div class="datagrid-content">
-                    <x-common.badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
-                  </div>
+                    Rp{{ number_format($invoice->package_detail->price ?? $invoice->amount, 0, ',', '.') }}</div>
                 </div>
                 <div class="datagrid-item">
-                  <div class="datagrid-title">Jumlah</div>
-                  <div class="datagrid-content">Rp{{ number_format($invoice->amount, 0, ',', '.') }}</div>
-                </div>
-                <div class="datagrid-item">
-                  <div class="datagrid-title">Dibuat Pada</div>
-                  <div class="datagrid-content">{{ $invoice->created_at->format('d/m/Y H:i') }}</div>
-                </div>
-                <div class="datagrid-item">
-                  <div class="datagrid-title">Dibayar Pada</div>
-                  <div class="datagrid-content">{{ $invoice->paid_at?->format('d/m/Y H:i') ?? '-' }}</div>
+                  <div class="datagrid-title">Terakhir Diperbarui</div>
+                  <div class="datagrid-content">{{ $invoice->updated_at->format('d/m/Y H:i') }}</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-12">
+        <div class="col-lg-4">
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Pelanggan</h3>
@@ -75,98 +134,135 @@
             <div class="card-body">
               <div class="datagrid">
                 <div class="datagrid-item">
-                  <div class="datagrid-title">ID Pelanggan</div>
-                  <div class="datagrid-content">{{ $invoice->customer->customer_id ?? '-' }}</div>
+                  <div class="datagrid-title">Nama</div>
+                  <div class="datagrid-content">{{ $invoice->customer_detail->name ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
-                  <div class="datagrid-title">Nama</div>
-                  <div class="datagrid-content">{{ $invoice->customer->name ?? '-' }}</div>
+                  <div class="datagrid-title">ID Pelanggan</div>
+                  <div class="datagrid-content">{{ $invoice->customer_detail->customer_id ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Email</div>
-                  <div class="datagrid-content">{{ $invoice->customer->email ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $invoice->customer_detail->email ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Telepon</div>
-                  <div class="datagrid-content">{{ $invoice->customer->phone ?? '-' }}</div>
-                </div>
-                <div class="datagrid-item">
-                  <div class="datagrid-title">Paket</div>
-                  <div class="datagrid-content">{{ $invoice->package->name ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $invoice->customer_detail->phone ?? '-' }}</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-12">
+        <div class="col-lg-4">
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Ringkasan Pembayaran</h3>
             </div>
             <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-vcenter card-table">
-                  <tbody>
-                    <tr>
-                      <td>Harga Paket</td>
-                      <td class="text-end">
-                        Rp{{ number_format($invoice->package->price ?? $invoice->amount, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                      <td>Total</td>
-                      <td class="text-end fw-bold">Rp{{ number_format($invoice->amount, 0, ',', '.') }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="datagrid">
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Harga Paket</div>
+                  <div class="datagrid-content">Rp{{ number_format($invoice->package_detail->price, 0, ',', '.') }}
+                  </div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Total</div>
+                  <div class="datagrid-content fw-bold fs-3">Rp{{ number_format($invoice->amount, 0, ',', '.') }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row row-deck row-cards mt-3">
+      <div class="row row-deck row-cards pt-3">
         <div class="col-12">
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Bukti Transfer</h3>
             </div>
-            <div class="card-body">
-              @if (isset($receipts) && count($receipts))
-                <div class="table-responsive">
-                  <table class="table table-vcenter card-table">
-                    <thead>
+
+            @if (isset($receipts) && count($receipts))
+              <div class="table-responsive">
+                <table class="table card-table table-vcenter">
+                  <thead>
+                    <tr>
+                      <th>Waktu</th>
+                      <th>Status</th>
+                      <th>File</th>
+                      <th>Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($receipts as $r)
                       <tr>
-                        <th>Waktu</th>
-                        <th>File</th>
-                        <th>Status</th>
-                        <th>Catatan</th>
+                        <td>{{ $r->created_at->format('d/m/Y H:i') }}</td>
+                        <td>
+                          <x-common.badge :label="$r->status->label()" :color="$r->status->color()" />
+                        </td>
+                        <td>
+                          <a href="{{ Storage::url($r->file_path) }}" target="_blank"
+                            rel="noopener">{{ $r->original_name ?? basename($r->file_path) }}</a>
+                        </td>
+                        <td class="text-secondary"
+                          style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          {{ $r->note ?? '-' }}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      @foreach ($receipts as $r)
-                        <tr>
-                          <td>{{ $r->created_at->format('d/m/Y H:i') }}</td>
-                          <td>
-                            <a href="{{ Storage::url($r->file_path) }}" target="_blank"
-                              rel="noopener">{{ $r->original_name ?? basename($r->file_path) }}</a>
-                          </td>
-                          <td>
-                            <x-common.badge :label="ucfirst($r->status)" :color="$r->status === 'approved' ? 'success' : ($r->status === 'rejected' ? 'danger' : 'warning')" />
-                          </td>
-                          <td>{{ $r->note ?? '-' }}</td>
-                        </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-              @else
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            @else
+              <div class="card-body">
                 <div class="text-secondary">Belum ada bukti transfer.</div>
-              @endif
-            </div>
+              </div>
+            @endif
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    (function() {
+      const byTarget = document.querySelectorAll('[data-copy-target]');
+      byTarget.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-copy-target');
+          const el = document.querySelector(target);
+          if (!el) return;
+          const text = el.value || el.textContent || '';
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="ti ti-check"></i> Disalin';
+            btn.classList.add('btn-success');
+            setTimeout(() => {
+              btn.innerHTML = original;
+              btn.classList.remove('btn-success');
+            }, 1500);
+          }).catch(() => {});
+        });
+      });
+      const byText = document.querySelectorAll('[data-copy-text]');
+      byText.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const text = btn.getAttribute('data-copy-text') || '';
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="ti ti-check"></i> Disalin';
+            btn.classList.add('btn-success');
+            setTimeout(() => {
+              btn.innerHTML = original;
+              btn.classList.remove('btn-success');
+            }, 1500);
+          }).catch(() => {});
+        });
+      });
+    })();
+  </script>
 </x-e-billing::layouts.panel>

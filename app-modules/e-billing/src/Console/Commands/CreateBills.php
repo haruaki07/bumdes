@@ -49,9 +49,9 @@ class CreateBills extends Command
                     $invoice = Invoice::create([
                         'invoice_number' => $invoiceNumber,
                         'customer_id' => $customer->id,
-                        'customer_detail' => $customer->toJson(),
+                        'customer_detail' => $customer,
                         'package_id' => $customer->package_id,
-                        'package_detail' => $customer->package->toJson(),
+                        'package_detail' => $customer->package,
                         'amount' => $customer->package->price,
                         'status' => InvoiceStatus::UNPAID,
                     ]);

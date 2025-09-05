@@ -3,6 +3,7 @@
 namespace Modules\EBilling\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\EBilling\Enums\TransferReceiptStatus;
 
 class TransferReceipt extends Model
 {
@@ -23,6 +24,7 @@ class TransferReceipt extends Model
 
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'status' => TransferReceiptStatus::class,
     ];
 
     public function invoice()
