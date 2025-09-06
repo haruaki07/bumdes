@@ -340,9 +340,7 @@
         // Minimal mapping; extend as needed
         const map = {
           'BCA_VIRTUAL_ACCOUNT': 'https://ibank.klikbca.com',
-          'BRI_VIRTUAL_ACCOUNT': 'https://ib.bri.co.id',
           'BNI_VIRTUAL_ACCOUNT': 'https://ibank.bni.co.id',
-          'MANDIRI_VIRTUAL_ACCOUNT': 'https://ibank.bankmandiri.co.id',
           'BSI_VIRTUAL_ACCOUNT': 'https://bsinet.bankbsi.co.id',
           'PERMATA_VIRTUAL_ACCOUNT': 'https://www.permatanet.com'
         };
