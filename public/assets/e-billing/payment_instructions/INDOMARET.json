@@ -1,0 +1,25 @@
+{
+  "instructions": [
+    {
+      "title": "Temukan Cabang Terdekat",
+      "steps": [
+        "Kunjungi gerai {{channelCode}} terdekat sebelum kode pembayaran kedaluwarsa",
+        "Informasikan ke Kasir untuk melakukan pembayaran ke produk/servis anda dengan memberikan nama Brand <strong>\"{{merchantName}}\"</strong>. (Jika nama Brand \"{{merchantName}}\" tidak ditemukan, gunakan nama Xendit)"
+      ]
+    },
+    {
+      "title": "Detail Pembayaran",
+      "steps": [
+        "Berikan informasi KODE PEMBAYARAN yang tertera kepada kasir. Jika anda memiliki barcode, dapat memberikan barcode tersebut ke kasir untuk di scan.",
+        "Pastikan jumlah pembayaran di tempat anda berbelanja sama dengan jumlah yang diberitahukan oleh kasir, lalu konfirmasi pembayaran"
+      ]
+    },
+    {
+      "title": "Transaksi Berhasil",
+      "steps": [
+        "Simpan bukti pembayaran dari Indomaret",
+        "Pembayaran Indomaret anda sudah selesai"
+      ]
+    }
+  ]
+}

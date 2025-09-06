@@ -1,0 +1,110 @@
+{
+  "instructions": {
+    "atm": [
+      {
+        "title": "Temukan ATM Terdekat",
+        "steps": ["Masukkan kartu ATM BSI anda", "Masukkan PIN"]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih menu \"Pembayaran/Pembelian\"",
+          "Pilih menu \"Institusi\"",
+          "Masukkan kode BSI VA Nomor Virtual Account <strong>{{fullPaymentCode}}</strong>",
+          "Detail yang ditampilkan: NIM, Nama, dan Total Tagihan",
+          "Konfirmasi detail transaksi anda"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "ibanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Buka situs <a href=\"{{iBankingSource}}\">{{iBankingSource}}</a>",
+          "Masukkan User ID dan Password"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih Menu \"Pembayaran\"",
+          "Pilih Nomor Rekening BSI Anda",
+          "Pilih menu \"Institusi\"",
+          "Masukkan nama institusi Xendit (kode 9347)",
+          "Masukkan Nomor Virtual Account <strong>{{paymentCode}}</strong>",
+          "Konfirmasi detail transaksi anda",
+          "Masukkan otentikasi transaksi/token"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "mbanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Buka aplikasi BSI Mobile",
+          "Pastikan akun BSI Mobile Anda telah teraktivasi"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih Menu \"Pembayaran\"",
+          "Pilih menu \"Institusi\"",
+          "Pilih Nomor Rekening BSI Anda",
+          "Masukkan nama institusi Xendit (kode 9347)",
+          "Masukkan Nomor Virtual Account <strong>{{paymentCode}}</strong>",
+          "Masukkan PIN",
+          "Konfirmasi detail transaksi anda"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "interbank": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Buka aplikasi Mobile bank Anda",
+          "Masukkan User ID dan Password"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih Menu \"Transfer\"",
+          "Pilih Menu \"Antar Bank\"",
+          "Masukkan BSI VA Code \"900\" + Nomor Virtual Account <strong>{{fullPaymentCode}}</strong> <br/> Catatan: Untuk transfer antar bank via ATM, Anda harus memasukkan Kode Bank BSI \"451\" sebelum Kode BSI VA \"900\"",
+          "Masukkan nominal yang ingin dibayarkan",
+          "Pilih tipe rekening",
+          "Konfirmasi detail transaksi Anda"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ]
+  }
+}

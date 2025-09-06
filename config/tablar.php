@@ -203,6 +203,37 @@ return [
             ],
         ],
 
+        [
+            'group' => 'e-billing',
+            'text' => 'Transaksi',
+            'url' => '#',
+            'icon' => 'ti ti-credit-card-pay',
+            'active' => ['e-billing/invoices/*'],
+            'submenu' => [
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Tagihan',
+                    'icon' => 'ti ti-file-invoice',
+                    'route' => 'e-billing.invoices.index',
+                ],
+            ],
+        ],
+
+        [
+            'group' => 'e-billing',
+            'text' => 'Pengaturan',
+            'url' => '#',
+            'icon' => 'ti ti-settings',
+            'active' => ['e-billing/settings/*'],
+            'submenu' => [
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Metode Pembayaran',
+                    'route' => 'e-billing.settings.payment-methods.index',
+                    'icon' => 'ti ti-credit-card',
+                ],
+            ],
+        ],
     ],
 
     /*

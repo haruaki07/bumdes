@@ -1,0 +1,29 @@
+.payment {
+  height: 2.5rem;
+  aspect-ratio: 1.66666;
+  display: inline-block;
+  background: no-repeat center / calc(100% - 8px) calc(100% - 8px);
+  vertical-align: bottom;
+  font-style: normal;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  text-align: center;
+}
+
+.payment-xs {
+  line-height: 1.25rem;
+  height: 1.25rem;
+}
+
+.qr-box {
+  width: 260px;
+  height: 260px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}

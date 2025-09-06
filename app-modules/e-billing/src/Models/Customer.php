@@ -3,6 +3,7 @@
 namespace Modules\EBilling\Models;
 
 use App\Traits\Datatable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,6 +33,12 @@ class Customer extends Model
         'site_id',
         'package_id',
         'device_id',
+        'bill_cycle',
+        'due_reminder_days',
+        'next_billing_date',
+        'invoice_number',
+        'payment_method_code',
+        'grace_period',
     ];
 
     protected $dataTableColumns = [
@@ -45,9 +52,23 @@ class Customer extends Model
 
     protected $casts = [
         'registration_date' => 'datetime',
-        'due' => 'integer',
+        'next_billing_date' => 'datetime',
         'status' => CustomerStatus::class,
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($customer) {
+            $customer->next_billing_date = Customer::getNextBillingDate($customer);
+        });
+    }
+
+    public static function getNextBillingDate(Customer $customer, ?Carbon $relative = null)
+    {
+        $relative = $relative ?? now();
+
+        return $relative->addMonth()->setDay($customer->due)->subDays($customer->due_reminder_days ?? 5);
+    }
 
     public function site()
     {

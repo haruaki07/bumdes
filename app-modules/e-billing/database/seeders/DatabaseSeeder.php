@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             DeviceSeeder::class,
             PackageSeeder::class,
             CustomerSeeder::class,
+
+            PaymentMethodSeeder::class,
         ]);
     }
 }

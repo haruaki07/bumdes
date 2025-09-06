@@ -1,0 +1,86 @@
+{
+  "instructions": {
+    "atm": [
+      {
+        "title": "Temukan ATM Terdekat",
+        "steps": [
+          "Masukkan kartu ATM anda",
+          "Pilih bahasa",
+          "Masukkan PIN ATM anda"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih \"Menu Lainnya\"",
+          "Pilih \"Transfer\"",
+          "Pilih jenis rekening yang akan anda gunakan (contoh: \"Dari Rekening Tabungan\")",
+          "Pilih \"Virtual Account Billing\"",
+          "Masukkan Nomor Virtual Account anda <strong>{{fullPaymentCode}}</strong>",
+          "Tagihan yang harus dibayarkan akan muncul pada layar konfirmasi",
+          "Konfirmasi, apabila telah sesuai, lanjutkan transaksi"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "ibanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Buka situs <a href=\"{{iBankingSource}}\">{{iBankingSource}}</a>",
+          "Masukkan User ID dan Password"
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih menu \"Transfer\"",
+          "Pilih menu \"Virtual Account Billing\"",
+          "Masukkan Nomor Virtual Account <strong>{{fullPaymentCode}}</strong>",
+          "Lalu pilih rekening debet yang akan digunakan. Kemudian tekan \"Lanjut\"",
+          "Tagihan yang harus dibayarkan akan muncul pada layar konfirmasi",
+          "Masukkan Kode Otentikasi Token"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ],
+    "mbanking": [
+      {
+        "title": "Masuk Ke Akun Anda",
+        "steps": [
+          "Akses BNI Mobile Banking melalui handphone",
+          "Masukkan User ID dan Password",
+          "Pilih menu \"Transfer\""
+        ]
+      },
+      {
+        "title": "Detail Pembayaran",
+        "steps": [
+          "Pilih menu \"Virtual Account Billing\", lalu pilih rekening debet",
+          "Masukkan Nomor Virtual Account anda <strong>{{fullPaymentCode}}</strong> pada menu \"Input Baru\"",
+          "Tagihan yang harus dibayarkan akan muncul pada layar konfirmasi",
+          "Konfirmasi transaksi dan masukkan Password Transaksi"
+        ]
+      },
+      {
+        "title": "Transaksi Berhasil",
+        "steps": [
+          "Transaksi Anda telah selesai",
+          "Setelah transaksi anda selesai, invoice ini akan diupdate secara otomatis. Proses ini mungkin memakan waktu hingga 5 menit"
+        ]
+      }
+    ]
+  }
+}
