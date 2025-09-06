@@ -205,9 +205,18 @@ return [
 
         [
             'group' => 'e-billing',
-            'text' => 'Tagihan',
-            'icon' => 'ti ti-file-invoice',
-            'route' => 'e-billing.invoices.index',
+            'text' => 'Transaksi',
+            'url' => '#',
+            'icon' => 'ti ti-credit-card-pay',
+            'active' => ['e-billing/invoices/*'],
+            'submenu' => [
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Tagihan',
+                    'icon' => 'ti ti-file-invoice',
+                    'route' => 'e-billing.invoices.index',
+                ],
+            ],
         ],
 
         [
