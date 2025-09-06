@@ -168,6 +168,11 @@
             animations: {
               enabled: false,
             },
+            events: {
+              click: function(event, chartContext, config) {
+                if (event.detail === 2) chartContext.resetSeries();
+              }
+            }
           },
           stroke: {
             width: 2,
@@ -219,7 +224,7 @@
           },
           legend: {
             show: false
-          }
+          },
         };
 
         if (revenueChart) {
@@ -300,7 +305,7 @@
           },
           legend: {
             show: false
-          }
+          },
         };
         if (packagesChart) {
           packagesChart.updateOptions({
