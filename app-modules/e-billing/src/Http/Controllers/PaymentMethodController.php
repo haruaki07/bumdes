@@ -39,6 +39,8 @@ class PaymentMethodController
             'type' => ['required', 'string', Rule::enum(PaymentMethodType::class)],
             'account_number' => 'required_if:type,'.PaymentMethodType::BANK_TRANSFER->value,
             'brand_logo' => 'file|mimes:jpg,png,svg|max:2048',
+            'fee_type' => 'nullable|in:NONE,PERCENT,FIXED',
+            'fee_amount' => 'nullable|numeric|min:0',
         ]);
 
         if ($request->hasFile('brand_logo')) {
@@ -52,10 +54,18 @@ class PaymentMethodController
             ));
         }
 
+        $feeType = $request->input('fee_type', 'NONE');
+        $feeAmount = 0;
+        if ($feeType === 'PERCENT' || $feeType === 'FIXED') {
+            $feeAmount = (float) $request->input('fee_amount', 0);
+        }
+
         $paymentMethod->update([
-            ...$request->except(['type', 'brand_logo', 'is_active']),
+            ...$request->except(['type', 'brand_logo', 'is_active', 'fee_amount', 'fee_type']),
             'is_active' => $request->boolean('is_active'),
             'brand_logo' => $request->hasFile('brand_logo') ? $brand_logo_url : $paymentMethod->brand_logo,
+            'fee_type' => $feeType,
+            'fee_amount' => $feeAmount,
         ]);
 
         return redirect()->route('e-billing.settings.payment-methods.index')->with('success', 'Metode pembayaran berhasil diperbarui.');

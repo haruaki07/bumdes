@@ -17,6 +17,12 @@ class PaymentService implements PaymentServiceInterface
         $xendit = new XenditConnector;
         $request = new CreatePaymentRequest;
 
+        // Calculate fee (if any) based on payment method configuration
+        $fee = method_exists($input->paymentMethod, 'calculateFee')
+            ? $input->paymentMethod->calculateFee($input->amount)
+            : 0;
+        $totalAmount = $input->amount + $fee;
+
         if ($input->paymentMethod->type === PaymentMethodType::RETAIL) {
             $channelProperties = ['payer_name' => $input->customer->name];
             if ($input->reusable && $input->reusableCode) {
@@ -31,36 +37,51 @@ class PaymentService implements PaymentServiceInterface
             }
         }
 
+        $items = [
+            [
+                'type' => 'DIGITAL_SERVICE',
+                'reference_id' => "$input->package->id",
+                'name' => $input->package->name,
+                'currency' => 'IDR',
+                'net_unit_amount' => (int) $input->package->price,
+                'quantity' => 1,
+                'category' => 'INTERNET_PACKAGE',
+            ],
+        ];
+
+        if ($fee > 0) {
+            $items[] = [
+                'type' => 'FEE',
+                'reference_id' => $input->referenceId,
+                'name' => 'FEE',
+                'currency' => 'IDR',
+                'net_unit_amount' => (int) $fee,
+                'quantity' => 1,
+                'category' => 'FEE',
+            ];
+        }
+
         $request->body()->set([
             'reference_id' => $input->referenceId,
             'type' => $input->reusable ? 'REUSABLE_PAYMENT_CODE' : 'PAY',
             'country' => 'ID',
             'currency' => 'IDR',
-            'request_amount' => $input->amount,
+            'request_amount' => $totalAmount,
             'channel_code' => $input->paymentMethod->code,
             'channel_properties' => [
                 'expires_at' => now()->addHour()->toISOString(),
                 ...$channelProperties ?? [],
             ],
-            'items' => [
-                [
-                    'type' => 'DIGITAL_SERVICE',
-                    'reference_id' => "$input->package->id",
-                    'name' => $input->package->name,
-                    'currency' => 'IDR',
-                    'net_unit_amount' => (int) $input->package->price,
-                    'quantity' => 1,
-                    'category' => 'INTERNET_PACKAGE',
-                ],
-            ],
+            'items' => $items,
             'metadata' => [
                 'payment_method_code' => $input->paymentMethod->code,
+                'fee' => $fee,
             ],
         ]);
 
-        // reusable qr payments doesn't support closed payment, so we had to remove request_amount
+        // reusable qr payments is disabled
         if ($input->reusable && $input->paymentMethod->type === PaymentMethodType::QR) {
-            $request->body()->remove('request_amount');
+            $request->body()->set('type', 'PAY');
         }
 
         $response = $xendit->send($request);

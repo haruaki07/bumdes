@@ -166,6 +166,13 @@
                   <div class="datagrid-content">Rp{{ number_format($invoice->package_detail->price, 0, ',', '.') }}
                   </div>
                 </div>
+                @if ($invoice->paymentMethod && $invoice->paymentMethod->calculateFee($invoice->amount) > 0)
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">Biaya Metode Pembayaran</div>
+                    <div class="datagrid-content">
+                      Rp{{ number_format($invoice->paymentMethod->calculateFee($invoice->amount), 0, ',', '.') }}</div>
+                  </div>
+                @endif
                 <div class="datagrid-item">
                   <div class="datagrid-title">Total</div>
                   <div class="datagrid-content fw-bold fs-3">Rp{{ number_format($invoice->amount, 0, ',', '.') }}

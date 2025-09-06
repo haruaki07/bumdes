@@ -189,9 +189,11 @@
 
 @section('tablar_js')
   <script id="sessionData" type="application/json">{!! json_encode(collect($session)->only(['expires_at', 'action', 'payment_method', 'reference_id', 'id'])) !!}</script>
+  <script id="sessionMeta" type="application/json">{!! json_encode(collect($session)->only(['amount','fee','total_amount'])) !!}</script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const session = JSON.parse(document.getElementById('sessionData').textContent);
+      const meta = JSON.parse(document.getElementById('sessionMeta').textContent || '{}');
       const action = session?.action || {};
       const {
         type,
@@ -585,6 +587,25 @@
         wrapper.textContent = message;
         document.querySelector('.card-body')?.appendChild(wrapper);
       }
+
+      // Inject fee & total summary if exists
+      (function renderFeeSummary() {
+        const container = document.querySelector('.card-body');
+        if (!container) return;
+        const fee = meta.fee || 0;
+        if (fee <= 0) return;
+        const base = meta.amount || 0;
+        const total = meta.total_amount || (base + fee);
+        const box = document.createElement('div');
+        box.className = 'alert alert-info mt-3';
+        box.innerHTML = `<div class="d-flex flex-column">
+            <div><strong>Rincian Pembayaran</strong></div>
+            <div class="small">Tagihan: <span class="fw-semibold">Rp${base.toLocaleString('id-ID')}</span></div>
+            <div class="small">Biaya Metode: <span class="fw-semibold">Rp${fee.toLocaleString('id-ID')}</span></div>
+            <div class="mt-1">Total Dibayar: <span class="fw-bold">Rp${total.toLocaleString('id-ID')}</span></div>
+        </div>`;
+        container.insertBefore(box, container.firstChild.nextSibling);
+      })();
     });
   </script>
 @endsection

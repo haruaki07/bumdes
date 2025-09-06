@@ -1,3 +1,8 @@
+@php
+  use Modules\EBilling\Enums\PaymentMethodType;
+  use Modules\EBilling\Enums\PaymentMethodFeeType;
+@endphp
+
 <x-e-billing::layouts.panel>
   <div class="page-header d-print-none">
     <div class="container-xl">
@@ -55,7 +60,7 @@
                         <input type="text" readonly class="form-control" value="{{ $paymentMethod->code }}">
                       </div>
 
-                      @if ($paymentMethod->type === \Modules\EBilling\Enums\PaymentMethodType::BANK_TRANSFER)
+                      @if ($paymentMethod->type === PaymentMethodType::BANK_TRANSFER)
                         <div class="col-md-6 mb-3">
                           <label class="form-label required">Nomor Rekening</label>
                           <input type="text" name="account_number"
@@ -116,6 +121,32 @@
                   </div>
                 </div>
 
+                <div class="col-4">
+                  <div class="mb-3">
+                    <label class="form-label">Biaya Admin (opsional)</label>
+                    <select name="fee_type" id="fee_type" class="form-select">
+                      @php $feeType = old('fee_type', $paymentMethod->fee_type ?? 'NONE'); @endphp
+                      @foreach (PaymentMethodFeeType::cases() as $type)
+                        <option value="{{ $type->value }}" {{ $feeType === $type ? 'selected' : '' }}>
+                          {{ $type->label() }}
+                        </option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="mb-3" id="feeAmountGroup">
+                    <label class="form-label">Nilai Biaya</label>
+                    <div class="input-group">
+                      <span class="input-group-text" id="feeAmountPrefix">Rp</span>
+                      <input type="number" step="0.01" min="0" name="fee_amount"
+                        value="{{ old('fee_amount', $paymentMethod->fee_amount) }}" class="form-control"
+                        placeholder="Masukkan nilai biaya">
+                      <span class="input-group-text d-none" id="feeAmountSuffix">%</span>
+                    </div>
+                    <small class="text-secondary" id="feeHelpText"></small>
+                  </div>
+                </div>
+
                 <div class="mb-3">
                   <label class="form-label">Deskripsi (opsional)</label>
                   <textarea name="description" class="form-control @error('description') is-invalid @enderror"
@@ -166,6 +197,34 @@
 
         this.classList.add('d-none');
       });
+
+      // Fee field logic
+      const feeTypeEl = document.getElementById('fee_type');
+      const feeAmountGroup = document.getElementById('feeAmountGroup');
+      const feeAmountPrefix = document.getElementById('feeAmountPrefix');
+      const feeAmountSuffix = document.getElementById('feeAmountSuffix');
+      const feeHelpText = document.getElementById('feeHelpText');
+
+      function syncFeeUI() {
+        if (!feeTypeEl) return;
+        const val = feeTypeEl.value;
+        if (val === 'NONE') {
+          feeAmountGroup.classList.add('d-none');
+        } else {
+          feeAmountGroup.classList.remove('d-none');
+          if (val === 'PERCENT') {
+            feeAmountPrefix.classList.add('d-none');
+            feeAmountSuffix.classList.remove('d-none');
+            feeHelpText.textContent = 'Masukkan persentase biaya contoh: 2.5 untuk 2,5%';
+          } else {
+            feeAmountPrefix.classList.remove('d-none');
+            feeAmountSuffix.classList.add('d-none');
+            feeHelpText.textContent = 'Masukkan nominal biaya dalam rupiah';
+          }
+        }
+      }
+      syncFeeUI();
+      feeTypeEl?.addEventListener('change', syncFeeUI);
     </script>
   @endpush
 </x-e-billing::layouts.panel>

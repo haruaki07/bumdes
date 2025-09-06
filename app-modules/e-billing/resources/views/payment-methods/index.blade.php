@@ -1,3 +1,7 @@
+@php
+  use Modules\EBilling\Enums\PaymentMethodFeeType;
+@endphp
+
 <x-e-billing::layouts.panel>
   <div class="page-header d-print-none">
     <div class="container-xl">
@@ -26,6 +30,7 @@
                 <x-sortable-header field="name" label="Nama" />
                 <x-sortable-header field="code" label="Kode" />
                 <x-sortable-header field="type" label="Jenis Pembayaran" />
+                <th>Biaya Admin</th>
                 <x-sortable-header field="is_active" label="Status" />
                 <th>Aksi</th>
               </tr>
@@ -46,6 +51,15 @@
                   </td>
                   <td>{{ $paymentMethod->code }}</td>
                   <td><x-common.badge :label="$paymentMethod->type->value" :color="$paymentMethod->type->color()" /></td>
+                  <td>
+                    @if ($paymentMethod->fee_type === PaymentMethodFeeType::FIXED)
+                      Rp{{ number_format($paymentMethod->fee_amount, 0, ',', '.') }}
+                    @elseif ($paymentMethod->fee_type === PaymentMethodFeeType::PERCENT)
+                      {{ rtrim(rtrim(number_format($paymentMethod->fee_amount, 2, '.', ''), '0'), '.') }}%
+                    @else
+                      -
+                    @endif
+                  </td>
                   <td>
                     <form method="POST"
                       action="{{ route('e-billing.settings.payment-methods.update-status', $paymentMethod) }}"

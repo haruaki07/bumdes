@@ -197,9 +197,21 @@
                 </td>
                 <td class="text-end">Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
               </tr>
-              <tr class="fs-3">
+              <tr class="fs-4">
                 <td colspan="4" class="text-end fw-semibold">Sub Total:</td>
                 <td class="text-end fw-semibold">Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
+              </tr>
+              @php $feeRow = ($invoice->paymentMethod?->calculateFee($invoice->amount ?? 0)) ?? 0; @endphp
+              @if ($feeRow > 0)
+                <tr class="fs-4">
+                  <td colspan="4" class="text-end">Biaya Admin:</td>
+                  <td class="text-end">Rp {{ number_format($feeRow, 0, ',', '.') }}</td>
+                </tr>
+              @endif
+              <tr class="fs-3">
+                <td colspan="4" class="text-end fw-bold">Total:</td>
+                <td class="text-end fw-bold">Rp {{ number_format(($invoice->amount ?? 0) + $feeRow, 0, ',', '.') }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -312,6 +324,14 @@
                                   <p class="text-center fw-semibold m-0" style="line-height:3rem;">
                                     {{ $method->name }}
                                   </p>
+                                @endif
+                                @php
+                                  $fee = $method->calculateFee($invoice->amount);
+                                @endphp
+                                @if ($fee > 0)
+                                  <div class="small text-center mt-2 text-secondary">
+                                    Biaya: <span class="fw-semibold">Rp{{ number_format($fee, 0, ',', '.') }}</span>
+                                  </div>
                                 @endif
                               </span>
                             </label>

@@ -76,7 +76,8 @@ class InvoiceController extends Controller
             ]);
         }
 
-        $paymentMethods = PaymentMethod::all();
+        $paymentMethods = PaymentMethod::active()->get();
+        $invoice->loadMissing('paymentMethod');
 
         // Resolve saved payment method (simple "remember me" for channels)
         $savedPaymentMethod = null;
@@ -135,6 +136,7 @@ class InvoiceController extends Controller
         // If this payment method needs manual confirmation (e.g., bank transfer),
         // we don't call the payment gateway. Present bank details to the customer instead.
         if ($paymentMethod->need_confirmation) {
+            $fee = method_exists($paymentMethod, 'calculateFee') ? $paymentMethod->calculateFee($invoice->amount) : 0;
             $expiresAt = now()->addDay()->toISOString();
             $payload = [
                 'id' => 'manual-'.Str::uuid()->toString(),
@@ -152,6 +154,8 @@ class InvoiceController extends Controller
                 'expires_at' => $expiresAt,
                 'reference_id' => $invoice->invoice_number,
                 'amount' => $invoice->amount,
+                'fee' => $fee,
+                'total_amount' => $invoice->amount + $fee,
                 'payment_method' => [
                     'id' => $paymentMethod->id,
                     'type' => method_exists($paymentMethod->type, 'value') ? $paymentMethod->type->value : $paymentMethod->type,
@@ -185,6 +189,7 @@ class InvoiceController extends Controller
         }
 
         try {
+            $fee = method_exists($paymentMethod, 'calculateFee') ? $paymentMethod->calculateFee($invoice->amount) : 0;
             $result = $this->paymentService->createPaymentRequest(
                 new CreatePaymentRequestIn(
                     referenceId: $invoice->invoice_number,
@@ -209,6 +214,8 @@ class InvoiceController extends Controller
                 'expires_at' => $expiresAt,
                 'reference_id' => $invoice->invoice_number,
                 'amount' => $invoice->amount,
+                'fee' => $fee,
+                'total_amount' => $invoice->amount + $fee,
                 'payment_method' => [
                     'id' => $paymentMethod->id,
                     'type' => method_exists($paymentMethod->type, 'value') ? $paymentMethod->type->value : $paymentMethod->type,
