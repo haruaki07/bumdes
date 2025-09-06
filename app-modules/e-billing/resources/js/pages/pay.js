@@ -71,24 +71,40 @@ async function pollStatus() {
 setTimeout(pollStatus, 5000);
 
 // QR Rendering
-if (type === "PRESENT_TO_CUSTOMER" && descriptor === "QR_STRING" && value) {
-  const qrEl = document.getElementById("qr");
-  if (qrEl && window.QRCode) {
-    QRCode.toCanvas(
-      value,
-      {
-        width: 236,
-        margin: 0,
-      },
-      (err, canvas) => {
-        if (!err) {
-          qrEl.innerHTML = "";
-          qrEl.appendChild(canvas);
+if (type === "PRESENT_TO_CUSTOMER" && value) {
+  if (descriptor === "QR_STRING") {
+    const qrEl = document.getElementById("qr");
+    if (qrEl && window.QRCode) {
+      QRCode.toCanvas(
+        value,
+        {
+          width: 250,
+          margin: 2,
+        },
+        (err, canvas) => {
+          if (!err) {
+            qrEl.innerHTML = "";
+            qrEl.appendChild(canvas);
+            document
+              .getElementById("btnDownloadQR")
+              .addEventListener("click", () => {
+                const link = document.createElement("a");
+                link.href = canvas.toDataURL("image/png");
+                link.download = "qris.png";
+                link.click();
+              });
+          }
         }
-      }
-    );
+      );
+    }
+    bindCopy("btnCopyQR", value);
+  } else if (descriptor === "PAYMENT_CODE") {
+    console.log(value);
+    JsBarcode("#barcode", value, {
+      format: "CODE128",
+      displayValue: true,
+    });
   }
-  bindCopy("btnCopyQR", value);
 }
 
 // Copy Code
@@ -228,17 +244,11 @@ function renderInstructionList(blocks, vars) {
   if (!steps.length) return;
 
   for (const block of steps) {
-    const card = document.createElement("div");
-    card.className = "card mb-3";
-    const cb = document.createElement("div");
-    cb.className = "card-body";
-    const h = document.createElement("h5");
-    h.className = "card-title";
+    const h = document.createElement("h4");
     h.textContent = block.title || "Langkah";
-    cb.appendChild(h);
+    container.appendChild(h);
 
     const ol = document.createElement("ol");
-    ol.className = "mb-0 ps-3";
     const stepsArr = Array.isArray(block.steps) ? block.steps : [];
     for (const s of stepsArr) {
       const li = document.createElement("li");
@@ -247,9 +257,7 @@ function renderInstructionList(blocks, vars) {
       li.innerHTML = sanitizeHtml(applied);
       ol.appendChild(li);
     }
-    cb.appendChild(ol);
-    card.appendChild(cb);
-    container.appendChild(card);
+    container.appendChild(ol);
   }
 
   tabsHost.innerHTML = "";
@@ -266,10 +274,10 @@ function renderInstructionsTabs(instructions, vars) {
   if (!categories.length) return;
 
   const nav = document.createElement("ul");
-  nav.className = "nav nav-tabs";
+  nav.className = "nav nav-underline gap-0 border-bottom";
 
   const content = document.createElement("div");
-  content.className = "tab-content border border-top-0 p-3 rounded-bottom";
+  content.className = "tab-content mt-3";
 
   const makeId = (k) =>
     `ins-${k.replace(/[^a-z0-9]/gi, "")}-${Math.random()
@@ -285,7 +293,7 @@ function renderInstructionsTabs(instructions, vars) {
     const li = document.createElement("li");
     li.className = "nav-item";
     const a = document.createElement("a");
-    a.className = "nav-link" + (first ? " active" : "");
+    a.className = "nav-link px-4" + (first ? " active" : "");
     a.dataset.bsToggle = "tab";
     a.href = `#${paneId}`;
     a.textContent = pretty;
@@ -305,28 +313,20 @@ function renderInstructionsTabs(instructions, vars) {
       pane.appendChild(empty);
     } else {
       for (const block of steps) {
-        const card = document.createElement("div");
-        card.className = "card mb-3";
-        const cb = document.createElement("div");
-        cb.className = "card-body";
-        const h = document.createElement("h5");
-        h.className = "card-title";
+        const h = document.createElement("h4");
         h.textContent = block.title || "Langkah";
-        cb.appendChild(h);
+        pane.appendChild(h);
 
         const ol = document.createElement("ol");
-        ol.className = "mb-0 ps-3";
         const stepsArr = Array.isArray(block.steps) ? block.steps : [];
         for (const s of stepsArr) {
           const li = document.createElement("li");
-          li.className = "mb-1";
+          li.className = "mb-1 fs-4";
           const applied = applyVars(String(s), vars);
           li.innerHTML = sanitizeHtml(applied);
           ol.appendChild(li);
         }
-        cb.appendChild(ol);
-        card.appendChild(cb);
-        pane.appendChild(card);
+        pane.appendChild(ol);
       }
     }
 
@@ -395,11 +395,15 @@ function bindCopy(btnId, text) {
 }
 
 function copyFeedback(btn) {
+  const tooltip = tabler.Tooltip.getInstance(btn);
   const originalHtml = btn.innerHTML;
-  btn.innerHTML = '<i class="icon ti ti-check"></i> Tersalin';
+  const originalTitle = btn.dataset.bsOriginalTitle || "Salin";
+  btn.innerHTML = '<i class="icon ti ti-check"></i>';
+  tooltip.setContent({ ".tooltip-inner": "Tersalin" });
   setTimeout(() => {
     btn.innerHTML = originalHtml;
-  }, 1500);
+    tooltip.setContent({ ".tooltip-inner": originalTitle });
+  }, 2500);
 }
 
 function disableButton(id) {

@@ -156,11 +156,13 @@ class InvoiceController extends Controller
                 'amount' => $invoice->amount,
                 'fee' => $fee,
                 'total_amount' => $invoice->amount + $fee,
+                'merchant_name' => 'E-Billing',
                 'payment_method' => [
                     'id' => $paymentMethod->id,
                     'type' => method_exists($paymentMethod->type, 'value') ? $paymentMethod->type->value : $paymentMethod->type,
                     'name' => $paymentMethod->name ?? $paymentMethod->code,
                     'code' => $paymentMethod->code,
+                    'image_url' => $paymentMethod->brand_logo,
                 ],
                 'customer' => [
                     'id' => $customer->id,
@@ -216,11 +218,13 @@ class InvoiceController extends Controller
                 'amount' => $invoice->amount,
                 'fee' => $fee,
                 'total_amount' => $invoice->amount + $fee,
+                'merchant_name' => 'E-Billing',
                 'payment_method' => [
                     'id' => $paymentMethod->id,
                     'type' => method_exists($paymentMethod->type, 'value') ? $paymentMethod->type->value : $paymentMethod->type,
                     'name' => $paymentMethod->name ?? $paymentMethod->code,
                     'code' => $paymentMethod->code,
+                    'image_url' => $paymentMethod->brand_logo,
                 ],
                 'customer' => [
                     'id' => $customer->id,
@@ -329,8 +333,12 @@ class InvoiceController extends Controller
             ]);
         }
 
+        $invoice = Invoice::where('invoice_number', $session['reference_id'])->first();
+        $package = $invoice->package_detail;
+
         return view('e-billing::invoices.customer.pay', [
             'session' => $session,
+            'packageDetail' => $package,
         ]);
     }
 

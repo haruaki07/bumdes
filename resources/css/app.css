@@ -5,6 +5,7 @@ html,
 body,
 body .page {
   height: 100%;
+  margin: 0 !important;
 }
 
 /* increase the default tabler icon size*/

@@ -331,7 +331,7 @@
                                 @if ($fee > 0)
                                   <div class="fs-6 text-center mt-2 text-secondary position-absolute"
                                     style="bottom:2.5px;left:0;right:0;">
-                                    Biaya: <span class="fw-semibold">Rp{{ number_format($fee, 0, ',', '.') }}</span>
+                                    +Rp{{ number_format($fee, 0, ',', '.') }}
                                   </div>
                                 @endif
                               </span>
@@ -418,7 +418,6 @@
 
         paymentMethodForm.addEventListener('submit', async (event) => {
           event.preventDefault();
-          console.log('abcd');
           const btnSubmit = paymentMethodForm.querySelector('button[type="submit"]');
           // Validate: either have hidden saved input or a selected radio
           const hasSavedInput = !!paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');

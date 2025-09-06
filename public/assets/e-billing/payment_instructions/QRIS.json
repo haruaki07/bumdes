@@ -1,0 +1,13 @@
+{
+  "instructions": [
+    {
+      "title": "Melalui Bank/E-Wallet",
+      "steps": [
+        "Buka aplikasi pembayaran QRIS yang mendukung.",
+        "Unduh atau pindai QRIS di monitor Anda.",
+        "Konfirmasi pembayaran di aplikasi.",
+        "Pembayaran selesai."
+      ]
+    }
+  ]
+}

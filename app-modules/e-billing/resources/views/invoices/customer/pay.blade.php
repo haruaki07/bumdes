@@ -1,36 +1,31 @@
 @section('title', 'Checkout Pembayaran')
 
 <x-e-billing::layouts.blank>
-  <div class="container container-narrow py-4 my-auto" style="max-width: 900px;">
-    <div class="card">
-      <div class="card-body p-4">
-        @if (!empty($error))
-          <div class="alert alert-danger" role="alert">{{ $error }}</div>
-        @else
-          @php
-            $s = $session;
-            $action = $s['action'] ?? [];
-            $actionType = $action['type'] ?? null;
-            $descriptor = $action['descriptor'] ?? null;
-            $value = $action['value'] ?? null;
-            $expiresAt = isset($s['expires_at']) ? \Carbon\CarbonImmutable::parse($s['expires_at']) : null;
+  @if (!empty($error))
+    <div class="alert alert-danger" role="alert">{{ $error }}</div>
+  @else
+    @php
+      $s = $session;
+      $action = $s['action'] ?? [];
+      $actionType = $action['type'] ?? null;
+      $descriptor = $action['descriptor'] ?? null;
+      $value = $action['value'] ?? null;
+      $expiresAt = isset($s['expires_at']) ? \Carbon\CarbonImmutable::parse($s['expires_at']) : null;
 
-            $referenceId = $s['reference_id'] ?? '-';
-            $amount = $s['amount'] ?? 0;
-            $amountFormatted = number_format($amount, 0, ',', '.');
-            $customerId = $s['customer']['customer_id'] ?? '';
-          @endphp
+      $referenceId = $s['reference_id'] ?? '-';
+      $amount = $s['amount'] ?? 0;
+      $fee = $s['fee'] ?? 0;
+      $totalAmount = $amount + $fee;
+      $amountFormatted = number_format($amount, 0, ',', '.');
+      $feeFormatted = number_format($fee, 0, ',', '.');
+      $totalAmountFormatted = number_format($totalAmount, 0, ',', '.');
+      $customerId = $s['customer']['customer_id'] ?? '';
+    @endphp
 
-          <div class="d-flex align-items-center mb-3">
-            <div class="me-auto">
-              <div class="text-secondary">Invoice</div>
-              <h3 class="mb-0">{{ $referenceId }}</h3>
-            </div>
-            <div class="text-end">
-              <div class="text-secondary">Jumlah</div>
-              <h3 class="mb-0">Rp {{ $amountFormatted }}</h3>
-            </div>
-          </div>
+    <div class="row g-0 h-100">
+      <div class="col-md-8 border-0 rounded-0 card">
+
+        <div class="container py-5" style="max-width: 720px;">
 
           <div class="alert alert-info d-flex gap-2" role="alert" id="countdownAlert"
             @if ($descriptor === 'BANK_TRANSFER_DETAILS') style="display:none" @endif>
@@ -42,7 +37,6 @@
             </div>
           </div>
 
-          {{-- Handle action types --}}
           @if ($actionType === 'PRESENT_TO_CUSTOMER')
             @if ($descriptor === 'BANK_TRANSFER_DETAILS')
               @php
@@ -51,87 +45,154 @@
                 $accName = $value['account_name'] ?? config('app.name');
                 $note = $value['note'] ?? '';
               @endphp
-              <div>
-                <div class="alert alert-secondary" role="alert">
-                  Silakan transfer sesuai detail berikut, lalu kirim bukti ke admin untuk konfirmasi.
-                </div>
-                <div class="row g-3">
-                  <div class="col-md-4">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <div class="text-secondary">Bank</div>
-                        <div class="h4 mb-2">{{ $bank }}</div>
-                        <div class="text-secondary">No. Rekening</div>
-                        <div class="h4 mono" id="codeBox">{{ $accNo }}</div>
-                        <button class="btn btn-outline-primary mt-2" id="btnCopyCode">
-                          <i class="icon ti ti-copy"></i> Salin No. Rekening
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-8">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <div class="row mb-2">
-                          <div class="col-6 text-secondary">Nama Pemilik</div>
-                          <div class="col-6 text-end">{{ $accName }}</div>
-                        </div>
-                        <div class="row mb-2">
-                          <div class="col-6 text-secondary">Nominal</div>
-                          <div class="col-6 text-end">Rp {{ $amountFormatted }}</div>
-                        </div>
-                        <div class="row">
-                          <div class="col-6 text-secondary">Berita/Referensi</div>
-                          <div class="col-6 text-end">{{ $referenceId }}</div>
+              <div class="alert alert-secondary" role="alert">
+                Silakan transfer sesuai detail berikut, lalu kirim bukti ke admin untuk konfirmasi.
+              </div>
+              <div class="card shadow-none rounded-0 p-5">
+                <div class="row gy-5 gy-sm-0">
+                  <div class="col-sm-6 order-sm-last">
+                    <div class="h-100 d-flex flex-shrink-0 justify-content-center align-items-center">
+                      <div class="text-center">
+                        @php
+                          $imageUrl = $session['payment_method']['image_url'];
+                        @endphp
+                        <div class="payment border-0 shadow-none"
+                          style="height: 120px;background-image:url('{{ asset($imageUrl) }}');">
                         </div>
                         @if ($note)
-                          <hr>
-                          <div class="small text-secondary">{{ $note }}</div>
+                          <div class="small text-secondary">
+                            Catatan:
+                            <p>{{ $note }}</p>
+                          </div>
                         @endif
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div class="card mt-3">
-                  <div class="card-body">
-                    <h4 class="card-title mb-3">Unggah Bukti Transfer</h4>
-                    <form id="receiptForm" class="row g-2">
-                      <div class="col-12 col-md-6">
-                        <input type="file" name="file" id="receiptFile" class="form-control" accept="image/*,.pdf"
-                          required>
-                        <div class="form-hint">JPG, PNG, atau PDF. Maks 4MB.</div>
+                  <div class="col-sm-6">
+                    <div class="datagrid fs-1">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nomor Rekening</div>
+                        <div class="datagrid-content">
+                          <span id="codeBox" class="mono">{{ $accNo }}</span>
+                          <button class="btn btn-icon" id="btnCopyCode" data-bs-toggle="tooltip" title="Salin">
+                            <i class="icon ti ti-copy"></i>
+                          </button>
+                        </div>
                       </div>
-                      <div class="col-12 col-md-6">
-                        <input type="text" name="note" class="form-control" placeholder="Catatan (opsional)">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nama Pemilik</div>
+                        <div class="datagrid-content">{{ $accName }}</div>
                       </div>
-                      <div class="col-12">
-                        <button type="submit" class="btn btn-primary" id="btnUploadReceipt">
-                          <i class="ti ti-upload"></i> Unggah Bukti
-                        </button>
-                        <span class="text-secondary small ms-2" id="uploadStatus"></span>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nominal Bayar</div>
+                        <div class="datagrid-content">Rp{{ $totalAmountFormatted }}</div>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
-            @elseif ($descriptor === 'QR_STRING')
-              <div class="text-center">
-                <p class="mb-3">Scan QR berikut di aplikasi pembayaran Anda:</p>
-                <div id="qr" class="qr-box d-inline-flex align-items-center justify-content-center"></div>
-                <p class="small text-secondary mt-2">
-                  Jika QR tidak muncul,
-                  <button id="btnCopyQR" class="btn btn-link p-0 align-baseline">salin string</button>
-                  lalu tempel di aplikasi pembayaran.
-                </p>
+
+              <div class="card mt-3" style="border-style: dashed;">
+                <div class="card-body">
+                  <h4 class="card-title mb-3">Unggah Bukti Transfer</h4>
+                  <form id="receiptForm" class="row g-2">
+                    <div class="col-12 col-md-6">
+                      <input type="file" name="file" id="receiptFile" class="form-control" accept="image/*,.pdf"
+                        required>
+                      <div class="form-hint">JPG, PNG, atau PDF. Maks 4MB.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <input type="text" name="note" class="form-control" placeholder="Catatan (opsional)">
+                    </div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-primary" id="btnUploadReceipt">
+                        <i class="ti ti-upload"></i> Unggah Bukti
+                      </button>
+                      <span class="text-secondary small ms-2" id="uploadStatus"></span>
+                    </div>
+                  </form>
+                </div>
               </div>
-            @elseif (in_array($descriptor, ['VIRTUAL_ACCOUNT_NUMBER', 'PAYMENT_CODE']))
-              <div class="text-center">
-                <p class="mb-2">Gunakan nomor berikut untuk membayar:</p>
-                <div class="h2 mono" id="codeBox">{{ $value }}</div>
-                <button class="btn btn-outline-primary mt-2" id="btnCopyCode">
-                  <i class="icon ti ti-copy"></i> Salin Nomor
+            @elseif ($descriptor === 'QR_STRING')
+              <div class="text-center d-flex flex-column align-items-center gap-2">
+                <p class="m-0">Scan QR berikut di aplikasi pembayaran Anda:</p>
+                <div id="qr" class="qr-box d-inline-flex align-items-center justify-content-center"></div>
+                <button class="btn d-inline-block" id="btnDownloadQR">
+                  <i class="ti ti-download icon"></i>
+                  Unduh
                 </button>
+              </div>
+            @elseif ($descriptor === 'VIRTUAL_ACCOUNT_NUMBER')
+              <div class="card shadow-none rounded-0 p-5">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="datagrid fs-1">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nomor Virtual Account</div>
+                        <div class="datagrid-content">
+                          <span id="codeBox" class="mono">{{ $value }}</span>
+                          <button class="btn btn-icon" id="btnCopyCode" data-bs-toggle="tooltip" title="Salin">
+                            <i class="icon ti ti-copy"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nama Virtual Account</div>
+                        <div class="datagrid-content">{{ $session['merchant_name'] }}</div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nominal Bayar</div>
+                        <div class="datagrid-content">Rp{{ $totalAmountFormatted }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="h-100 d-flex flex-shrink-0 justify-content-center align-items-center">
+                      <div class="text-center">
+                        @php
+                          $imageUrl = $session['payment_method']['image_url'];
+                        @endphp
+                        <div class="payment border-0 shadow-none"
+                          style="height: 120px;background-image:url('{{ asset($imageUrl) }}');">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            @elseif ($descriptor === 'PAYMENT_CODE')
+              <div class="card shadow-none rounded-0 p-5">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="datagrid fs-1">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Kode Pembayaran</div>
+                        <div class="datagrid-content">
+                          <span id="codeBox" class="mono">{{ $value }}</span>
+                          <button class="btn btn-icon" id="btnCopyCode" data-bs-toggle="tooltip" title="Salin">
+                            <i class="icon ti ti-copy"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Bayar ke Merchant</div>
+                        <div class="datagrid-content">{{ $session['merchant_name'] }}</div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nominal Bayar</div>
+                        <div class="datagrid-content">Rp{{ $totalAmountFormatted }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="h-100 d-flex flex-shrink-0 justify-content-center align-items-center">
+                      <div class="text-center">
+                        <div class="text-primary text-uppercase small">Tunjukkan ke kasir</div>
+                        <svg id="barcode" style="width: 240px; height: 120px"></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             @else
               <div class="alert alert-warning">Aksi tidak didukung: {{ $descriptor }}</div>
@@ -141,7 +202,8 @@
               <div class="text-center">
                 <p class="mb-2">Anda akan diarahkan ke halaman pembayaran dalam <span id="redirSec">5</span> detik…
                 </p>
-                <a class="btn btn-primary" id="btnGoNow" href="{{ $value }}" rel="noopener" target="_blank">
+                <a class="btn btn-primary" id="btnGoNow" href="{{ $value }}" rel="noopener"
+                  target="_blank">
                   Buka Sekarang
                 </a>
               </div>
@@ -157,16 +219,70 @@
             <div id="instructionsTabs"></div>
           </div>
 
-          <div class="mt-4">
-            <a href="{{ route('e-billing.invoice.customer-show', ['customer_id' => $customerId]) }}" class="btn"
-              id="btnBack">
-              Kembali ke Invoice
+          <div class="mt-5">
+            <a href="{{ route('e-billing.invoice.customer-show', ['customer_id' => $customerId]) }}"
+              class="btn btn-secondary" id="btnBack">
+              Kembali
             </a>
           </div>
-        @endif
+
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="container container-tight py-5 px-4">
+          <h2>Rincian Pembayaran</h2>
+          <p>Nomor Tagihan: {{ $referenceId }}</p>
+          <hr class="my-4" style="opacity:0.05" />
+          <div class="d-flex align-items-start">
+            <div class="me-auto">
+              <h4 class="mb-0">Paket Internet</h4>
+              <div class="text-secondary">{{ $packageDetail->name }}</div>
+            </div>
+            <div class="text-end" style="width:120px">
+              <h4 class="mb-0">{{ $amountFormatted }}</h4>
+            </div>
+          </div>
+          <hr class="my-4" style="opacity:0.05" />
+          <div class="d-flex align-items-start">
+            <div class="ms-auto">
+              <h4 class="mb-0">Subtotal</h4>
+            </div>
+            <div class="text-end" style="width:120px">
+              <h4 class="mb-0">{{ $amountFormatted }}</h4>
+            </div>
+          </div>
+          @if ($fee > 0)
+            <hr class="my-4" style="opacity:0.05" />
+            <div class="d-flex align-items-start mb-3">
+              <div class="ms-auto">
+                <div class="fs-4">Biaya Admin</div>
+              </div>
+              <div class="text-end" style="width:120px">
+                <div class="fs-4">{{ $feeFormatted }}</div>
+              </div>
+            </div>
+            <div class="d-flex align-items-start">
+              <div class="ms-auto">
+                <h4 class="mb-0">Total Biaya</h4>
+              </div>
+              <div class="text-end" style="width:120px">
+                <h4 class="mb-0">{{ $feeFormatted }}</h4>
+              </div>
+            </div>
+          @endif
+          <hr class="my-4" style="opacity:0.05" />
+          <div class="d-flex align-items-start">
+            <div class="ms-auto">
+              <h4 class="mb-0">Total</h4>
+            </div>
+            <div class="text-end" style="width:120px">
+              <div class="fs-3 fw-bold">Rp{{ $totalAmountFormatted }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  @endif
 
   @push('js')
     @php
