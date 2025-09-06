@@ -190,7 +190,7 @@
                 <td>Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
                 <td>
                   @if ($periodStart && $periodEnd)
-                    {{ $periodStart->translatedFormat('d F Y') }} - {{ $periodEnd->translatedFormat('d F Y') }}
+                    {{ $periodStart->translatedFormat('d F Y') }} s.d. {{ $periodEnd->translatedFormat('d F Y') }}
                   @else
                     -
                   @endif
