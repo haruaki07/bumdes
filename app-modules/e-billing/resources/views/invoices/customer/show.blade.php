@@ -315,7 +315,7 @@
                             <label class="form-imagecheck w-full bg-white">
                               <input name="payment_method" type="radio" value="{{ $method->id }}"
                                 class="form-imagecheck-input" />
-                              <span class="form-imagecheck-figure p-3">
+                              <span class="form-imagecheck-figure p-3 position-relative">
                                 @if ($method->brand_logo)
                                   <img src="{{ asset($method->brand_logo) }}" alt=""
                                     class="form-imagecheck-image mx-auto object-fit-contain"
@@ -329,7 +329,8 @@
                                   $fee = $method->calculateFee($invoice->amount);
                                 @endphp
                                 @if ($fee > 0)
-                                  <div class="small text-center mt-2 text-secondary">
+                                  <div class="fs-6 text-center mt-2 text-secondary position-absolute"
+                                    style="bottom:2.5px;left:0;right:0;">
                                     Biaya: <span class="fw-semibold">Rp{{ number_format($fee, 0, ',', '.') }}</span>
                                   </div>
                                 @endif
