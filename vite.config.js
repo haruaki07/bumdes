@@ -11,6 +11,7 @@ export default defineConfig({
         "resources/sass/tabler-icons.scss",
         "resources/js/leaflet.js",
         "app-modules/e-billing/resources/css/e-billing.css",
+        "app-modules/e-billing/resources/js/pages/pay.js",
       ],
       refresh: [
         "resources/views/**/*.blade.php",

@@ -1,25 +1,6 @@
-@extends('tablar::auth.layout')
-
 @section('title', 'Checkout Pembayaran')
 
-@section('tablar_css')
-  <style>
-    .qr-box {
-      width: 260px;
-      height: 260px;
-      padding: 12px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-  </style>
-@endsection
-
-@section('content')
+<x-e-billing::layouts.blank>
   <div class="container container-narrow py-4 my-auto" style="max-width: 900px;">
     <div class="card">
       <div class="card-body p-4">
@@ -158,7 +139,8 @@
           @elseif ($actionType === 'REDIRECT_CUSTOMER')
             @if ($descriptor === 'WEB_URL' && filter_var($value, FILTER_VALIDATE_URL))
               <div class="text-center">
-                <p class="mb-2">Anda akan diarahkan ke halaman pembayaran dalam <span id="redirSec">5</span> detik…</p>
+                <p class="mb-2">Anda akan diarahkan ke halaman pembayaran dalam <span id="redirSec">5</span> detik…
+                </p>
                 <a class="btn btn-primary" id="btnGoNow" href="{{ $value }}" rel="noopener" target="_blank">
                   Buka Sekarang
                 </a>
@@ -185,425 +167,41 @@
       </div>
     </div>
   </div>
-@endsection
 
-@section('tablar_js')
-  <script id="sessionData" type="application/json">{!! json_encode(collect($session)->only(['expires_at', 'action', 'payment_method', 'reference_id', 'id'])) !!}</script>
-  <script id="sessionMeta" type="application/json">{!! json_encode(collect($session)->only(['amount','fee','total_amount'])) !!}</script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const session = JSON.parse(document.getElementById('sessionData').textContent);
-      const meta = JSON.parse(document.getElementById('sessionMeta').textContent || '{}');
-      const action = session?.action || {};
-      const {
-        type,
-        descriptor,
-        value
-      } = action;
-
-      const expiresAt = session?.expires_at ? new Date(session.expires_at) : null;
-      const countdownEl = document.getElementById('countdown');
-      let timerId;
-
-      // Countdown
-      function updateCountdown() {
-        if (!expiresAt || !countdownEl) return;
-        const now = new Date();
-        const diff = Math.max(0, Math.floor((expiresAt - now) / 1000));
-        const m = Math.floor(diff / 60);
-        const s = diff % 60;
-        countdownEl.textContent = `(sisa ${m}m ${s}s)`;
-
-        if (diff <= 0) {
-          clearInterval(timerId);
-          countdownEl.textContent = '(kedaluwarsa)';
-          disableButton('btnGoNow');
-        }
-      }
-      if (!(type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS')) {
-        updateCountdown();
-        timerId = setInterval(updateCountdown, 1000);
-      }
-
-      // Polling status
-      const statusUrl = @json($session ? route('e-billing.invoice.pay.status', ['token' => request()->query('token')]) : null);
-      async function pollStatus() {
-        if (!statusUrl) return;
-        // Do not poll for manual bank transfer; admin will confirm manually
-        if (type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS') return;
-        try {
-          const res = await fetch(statusUrl, {
-            headers: {
-              'Accept': 'application/json'
-            }
-          });
-          if (!res.ok) return;
-          const data = await res.json();
-
-          if (['SUCCEEDED', 'AUTHORIZED'].includes(data.payment_status)) {
-            showAlert('success', 'Pembayaran berhasil. Anda dapat menutup halaman ini.');
-            document.getElementById('btnBack').href =
-              `{{ route('e-billing.invoice.customer-show', ['customer_id' => '_CUSTOMER_ID_']) }}`
-              .replace('_CUSTOMER_ID_', session?.reference_id ?? '');
-            clearInterval(timerId);
-            return;
-          }
-          if (data.payment_status === 'EXPIRED' || data.expired) {
-            showAlert('warning', 'Sesi pembayaran telah kedaluwarsa. Silakan buat permintaan baru.');
-            return;
-          }
-          setTimeout(pollStatus, 5000);
-        } catch {
-          setTimeout(pollStatus, 7000);
-        }
-      }
-      setTimeout(pollStatus, 5000);
-
-      // QR Rendering
-      if (type === 'PRESENT_TO_CUSTOMER' && descriptor === 'QR_STRING' && value) {
-        const qrEl = document.getElementById('qr');
-        if (qrEl && window.QRCode) {
-          QRCode.toCanvas(value, {
-            width: 236,
-            margin: 0
-          }, (err, canvas) => {
-            if (!err) {
-              qrEl.innerHTML = '';
-              qrEl.appendChild(canvas);
-            }
-          });
-        }
-        bindCopy('btnCopyQR', value);
-      }
-
-      // Copy Code
-      bindCopy('btnCopyCode', document.getElementById('codeBox')?.textContent?.trim());
-
-      // Redirect
-      if (type === 'REDIRECT_CUSTOMER' && descriptor === 'WEB_URL' && value) {
-        const redirEl = document.getElementById('redirSec');
-        const btnGo = document.getElementById('btnGoNow');
-        let left = 5;
-        const tick = () => {
-          if (redirEl) redirEl.textContent = left;
-          if (left <= 0) {
-            btnGo?.click();
-            return;
-          }
-          left--;
-          setTimeout(tick, 1000);
-        };
-        tick();
-      }
-
-      // Payment Instructions
-      (function loadPaymentInstructions() {
-        const methodCode = session?.payment_method?.code;
-        if (!methodCode) return;
-        const baseUrl = @json(asset('assets/e-billing/payment_instructions'));
-        const url = `${baseUrl}/${methodCode}.json`;
-
-        // Determine full payment code placeholder value
-        const fullPaymentCode = (descriptor === 'VIRTUAL_ACCOUNT_NUMBER' || descriptor === 'PAYMENT_CODE') ?
-          (value || document.getElementById('codeBox')?.textContent?.trim() || '') :
-          (document.getElementById('codeBox')?.textContent?.trim() || '');
-
-        const accountNumber = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.account_number || document
-          .getElementById('codeBox')?.textContent?.trim() || '') : '';
-        const accountName = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.account_name || '') : '';
-        const bankName = (descriptor === 'BANK_TRANSFER_DETAILS') ? (value?.bank || '') : '';
-
-        const vars = {
-          fullPaymentCode,
-          iBankingSource: getIbankingUrl(methodCode),
-          merchantName: "{{ 'E-Billing' }}", // for qris, should be using global config
-          accountNumber,
-          accountName,
-          bankName,
-          invoiceNumber: session?.reference_id || ''
-        };
-
-        fetch(url, {
-            headers: {
-              'Accept': 'application/json'
-            }
-          })
-          .then(res => res.ok ? res.json() : null)
-          .then(data => {
-            if (!data || !data.instructions) return;
-            renderInstructions(data.instructions, vars);
-          })
-          .catch(() => {});
-      })();
-
-      function getIbankingUrl(code) {
-        // Minimal mapping; extend as needed
-        const map = {
-          'BCA_VIRTUAL_ACCOUNT': 'https://ibank.klikbca.com',
-          'BNI_VIRTUAL_ACCOUNT': 'https://ibank.bni.co.id',
-          'BSI_VIRTUAL_ACCOUNT': 'https://bsinet.bankbsi.co.id',
-          'PERMATA_VIRTUAL_ACCOUNT': 'https://www.permatanet.com'
-        };
-        return map[code] || '#';
-      }
-
-      function applyVars(str, vars) {
-        if (typeof str !== 'string') return '';
-        return str.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (vars[k] ?? ''));
-      }
-
-      function sanitizeHtml(input) {
-        // allow only a, strong, em, br and text
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = input;
-        const allowed = new Set(['A', 'STRONG', 'EM', 'BR']);
-
-        (function walk(node) {
-          const children = Array.from(node.childNodes);
-          for (const child of children) {
-            if (child.nodeType === Node.TEXT_NODE) continue;
-            if (child.nodeType === Node.ELEMENT_NODE) {
-              if (!allowed.has(child.tagName)) {
-                // Replace disallowed element with its text content
-                const text = document.createTextNode(child.textContent || '');
-                node.replaceChild(text, child);
-                continue;
-              }
-              if (child.tagName === 'A') {
-                const href = child.getAttribute('href') || '';
-                if (!/^https?:\/\//i.test(href) && href !== '#') {
-                  child.removeAttribute('href');
-                }
-                child.setAttribute('rel', 'noopener');
-                child.setAttribute('target', '_blank');
-              }
-              walk(child);
-            } else {
-              node.removeChild(child);
-            }
-          }
-        })(wrapper);
-
-        return wrapper.innerHTML;
-      }
-
-      function renderInstructions(instructions, vars) {
-        // Support array-form (no categories) and object-form (with categories)
-        if (Array.isArray(instructions)) {
-          return renderInstructionList(instructions, vars);
-        }
-        return renderInstructionsTabs(instructions, vars);
-      }
-
-      function renderInstructionList(blocks, vars) {
-        const section = document.getElementById('instructionsSection');
-        const tabsHost = document.getElementById('instructionsTabs');
-        if (!section || !tabsHost) return;
-
-        const container = document.createElement('div');
-        const steps = Array.isArray(blocks) ? blocks : [];
-        if (!steps.length) return;
-
-        for (const block of steps) {
-          const card = document.createElement('div');
-          card.className = 'card mb-3';
-          const cb = document.createElement('div');
-          cb.className = 'card-body';
-          const h = document.createElement('h5');
-          h.className = 'card-title';
-          h.textContent = block.title || 'Langkah';
-          cb.appendChild(h);
-
-          const ol = document.createElement('ol');
-          ol.className = 'mb-0 ps-3';
-          const stepsArr = Array.isArray(block.steps) ? block.steps : [];
-          for (const s of stepsArr) {
-            const li = document.createElement('li');
-            li.className = 'mb-1';
-            const applied = applyVars(String(s), vars);
-            li.innerHTML = sanitizeHtml(applied);
-            ol.appendChild(li);
-          }
-          cb.appendChild(ol);
-          card.appendChild(cb);
-          container.appendChild(card);
-        }
-
-        tabsHost.innerHTML = '';
-        tabsHost.appendChild(container);
-        section.classList.remove('d-none');
-      }
-
-      function renderInstructionsTabs(instructions, vars) {
-        const section = document.getElementById('instructionsSection');
-        const tabsHost = document.getElementById('instructionsTabs');
-        if (!section || !tabsHost) return;
-
-        const categories = Object.keys(instructions || {});
-        if (!categories.length) return;
-
-        const nav = document.createElement('ul');
-        nav.className = 'nav nav-tabs';
-
-        const content = document.createElement('div');
-        content.className = 'tab-content border border-top-0 p-3 rounded-bottom';
-
-        const makeId = (k) => `ins-${k.replace(/[^a-z0-9]/gi, '')}-${Math.random().toString(36).slice(2, 7)}`;
-        let first = true;
-
-        for (const key of categories) {
-          const pretty = key.toUpperCase();
-          const paneId = makeId(key);
-
-          // Tab button
-          const li = document.createElement('li');
-          li.className = 'nav-item';
-          const a = document.createElement('a');
-          a.className = 'nav-link' + (first ? ' active' : '');
-          a.dataset.bsToggle = 'tab';
-          a.href = `#${paneId}`;
-          a.textContent = pretty;
-          li.appendChild(a);
-          nav.appendChild(li);
-
-          // Pane
-          const pane = document.createElement('div');
-          pane.className = 'tab-pane fade' + (first ? ' show active' : '');
-          pane.id = paneId;
-
-          const steps = Array.isArray(instructions[key]) ? instructions[key] : [];
-          if (!steps.length) {
-            const empty = document.createElement('div');
-            empty.className = 'text-secondary';
-            empty.textContent = 'Tidak ada petunjuk untuk kanal ini.';
-            pane.appendChild(empty);
-          } else {
-            for (const block of steps) {
-              const card = document.createElement('div');
-              card.className = 'card mb-3';
-              const cb = document.createElement('div');
-              cb.className = 'card-body';
-              const h = document.createElement('h5');
-              h.className = 'card-title';
-              h.textContent = block.title || 'Langkah';
-              cb.appendChild(h);
-
-              const ol = document.createElement('ol');
-              ol.className = 'mb-0 ps-3';
-              const stepsArr = Array.isArray(block.steps) ? block.steps : [];
-              for (const s of stepsArr) {
-                const li = document.createElement('li');
-                li.className = 'mb-1';
-                const applied = applyVars(String(s), vars);
-                li.innerHTML = sanitizeHtml(applied);
-                ol.appendChild(li);
-              }
-              cb.appendChild(ol);
-              card.appendChild(cb);
-              pane.appendChild(card);
-            }
-          }
-
-          content.appendChild(pane);
-          first = false;
-        }
-
-        tabsHost.innerHTML = '';
-        tabsHost.appendChild(nav);
-        tabsHost.appendChild(content);
-        section.classList.remove('d-none');
-      }
-
-      // Helpers
-      // Upload transfer receipt
-      (function bindUpload() {
-        if (!(type === 'PRESENT_TO_CUSTOMER' && descriptor === 'BANK_TRANSFER_DETAILS')) return;
-        const form = document.getElementById('receiptForm');
-        if (!form) return;
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const file = document.getElementById('receiptFile')?.files?.[0];
-          if (!file) return;
-          const btn = document.getElementById('btnUploadReceipt');
-          const statusEl = document.getElementById('uploadStatus');
-          const token = new URLSearchParams(window.location.search).get('token');
-          const requestUrl = @json(route('e-billing.invoice.transfer-receipts.store', ['invoice' => '__INVOICE_ID__']));
-          const url = requestUrl.replace('__INVOICE_ID__', session?.reference_id ?? '');
-          const formData = new FormData(form);
-          btn.setAttribute('disabled', 'disabled');
-          statusEl.textContent = 'Mengunggah…';
-          try {
-            const res = await fetch(url, {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: formData
-            });
-            const data = await res.json().catch(() => null);
-            if (!res.ok) throw new Error(data?.message || 'Gagal mengunggah');
-            statusEl.textContent = 'Bukti terkirim. Menunggu verifikasi admin.';
-          } catch (err) {
-            statusEl.textContent = (err?.message || 'Gagal mengunggah.');
-          } finally {
-            btn.removeAttribute('disabled');
-          }
-        });
-      })();
-
-      function bindCopy(btnId, text) {
-        const btn = document.getElementById(btnId);
-        if (btn && text && navigator.clipboard) {
-          btn.addEventListener('click', async () => {
-            try {
-              await navigator.clipboard.writeText(text);
-              copyFeedback(btn);
-            } catch (_) {
-              alert('Gagal menyalin.');
-            }
-          });
-        }
-      }
-
-      function copyFeedback(btn) {
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="icon ti ti-check"></i> Tersalin';
-        setTimeout(() => {
-          btn.innerHTML = originalHtml;
-        }, 1500);
-      }
-
-      function disableButton(id) {
-        const el = document.getElementById(id);
-        if (el) el.setAttribute('disabled', 'disabled');
-      }
-
-      function showAlert(type, message) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `alert alert-${type} mt-3`;
-        wrapper.textContent = message;
-        document.querySelector('.card-body')?.appendChild(wrapper);
-      }
-
-      // Inject fee & total summary if exists
-      (function renderFeeSummary() {
-        const container = document.querySelector('.card-body');
-        if (!container) return;
-        const fee = meta.fee || 0;
-        if (fee <= 0) return;
-        const base = meta.amount || 0;
-        const total = meta.total_amount || (base + fee);
-        const box = document.createElement('div');
-        box.className = 'alert alert-info mt-3';
-        box.innerHTML = `<div class="d-flex flex-column">
-            <div><strong>Rincian Pembayaran</strong></div>
-            <div class="small">Tagihan: <span class="fw-semibold">Rp${base.toLocaleString('id-ID')}</span></div>
-            <div class="small">Biaya Metode: <span class="fw-semibold">Rp${fee.toLocaleString('id-ID')}</span></div>
-            <div class="mt-1">Total Dibayar: <span class="fw-bold">Rp${total.toLocaleString('id-ID')}</span></div>
-        </div>`;
-        container.insertBefore(box, container.firstChild.nextSibling);
-      })();
-    });
-  </script>
-@endsection
+  @push('js')
+    @php
+      $sessionData = collect($session)->only(['expires_at', 'action', 'payment_method', 'reference_id', 'id']);
+      $sessionMeta = collect($session)
+          ->only(['amount', 'fee', 'total_amount'])
+          ->put(
+              'invoice_url',
+              $session ? route('e-billing.invoice.customer-show', ['customer_id' => $session['reference_id']]) : null,
+          )
+          ->put(
+              'customer_invoice_url',
+              $session
+                  ? route('e-billing.invoice.customer-show', ['customer_id' => $session['customer']['customer_id']])
+                  : null,
+          )
+          ->put(
+              'status_url',
+              $session ? route('e-billing.invoice.pay.status', ['token' => request()->query('token')]) : null,
+          )
+          ->put(
+              'instructions_url',
+              $session
+                  ? asset('assets/e-billing/payment_instructions') . "/{$sessionData['payment_method']['code']}.json"
+                  : null,
+          )
+          ->put(
+              'transfer_receipt_url',
+              $session
+                  ? route('e-billing.invoice.transfer-receipts.store', ['invoice' => $session['reference_id']])
+                  : null,
+          );
+    @endphp
+    <script id="sessionData" type="application/json">{!! json_encode($sessionData) !!}</script>
+    <script id="sessionMeta" type="application/json">{!! json_encode($sessionMeta) !!}</script>
+    @vite(['app-modules/e-billing/resources/js/pages/pay.js'])
+  @endpush
+</x-e-billing::layouts.blank>
