@@ -19,28 +19,15 @@ jobs:
       ARCHIVE_VENDOR: vendor.tar.xz
 
     steps:
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: "tag:ci"
-
-      - name: Get Machine IP
-        id: machine-ip
-        run: echo "machine-ip=$(tailscale ip -4 $DEPLOY_MACHINE)" >> $GITHUB_OUTPUT
-
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add SSH known hosts
-        env:
-          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
+          ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,21 +61,13 @@ jobs:
         run: tar -cJf ${{ env.ARCHIVE_ASSETS }} public/build
 
       - name: Copy files
-        env:
-          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
-          MACHINE_USER: ${{ secrets.MACHINE_USER }}
-          MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
         run: rsync
           -a "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
-          "$MACHINE_USER@$MACHINE_IP:$MACHINE_WORKDIR"
+          "$MACHINE_USER@$SSH_HOST:$MACHINE_WORKDIR"
 
       - name: Deploy
-        env:
-          MACHINE_IP: ${{ steps.machine-ip.outputs.machine-ip }}
-          MACHINE_USER: ${{ secrets.MACHINE_USER }}
-          MACHINE_WORKDIR: ${{ secrets.MACHINE_WORKDIR }}
         run: |
-          ssh "$MACHINE_USER@$MACHINE_IP" /bin/bash << EOF
+          ssh "$MACHINE_USER@$SSH_HOST" /bin/bash << EOF
             cd "$MACHINE_WORKDIR"
             git pull
             ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
