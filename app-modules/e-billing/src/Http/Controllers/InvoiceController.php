@@ -110,12 +110,11 @@ class InvoiceController extends Controller
             abort(404);
         }
 
-        // Prevent requesting payment for paid or expired invoices
-        $currentStatus = $invoice->status->value;
-        if (in_array($currentStatus, ['PAID', 'LUNAS'])) {
+        if ($invoice->status === InvoiceStatus::PAID) {
             return response()->json(['status' => 'error', 'message' => 'Tagihan sudah dibayar. Tidak dapat melakukan pembayaran ulang.'], 422);
         }
-        if (in_array($currentStatus, ['EXPIRED', 'KADALUARSA'])) {
+
+        if ($invoice->status === InvoiceStatus::EXPIRED) {
             return response()->json(['status' => 'error', 'message' => 'Tagihan telah kadaluarsa. Silakan hubungi admin untuk meminta tagihan baru.'], 422);
         }
 
@@ -384,7 +383,6 @@ class InvoiceController extends Controller
         }
         $invoice->status = InvoiceStatus::PAID;
         $invoice->paid_at = now();
-        $invoice->save();
 
         // Optionally mark latest receipt as approved
         $latestReceipt = TransferReceipt::where('invoice_id', $invoice->id)->latest()->first();
@@ -393,7 +391,10 @@ class InvoiceController extends Controller
             $latestReceipt->reviewed_by = $request->user()?->id;
             $latestReceipt->reviewed_at = now();
             $latestReceipt->save();
+            $invoice->payment_method_code = $latestReceipt->payment_method_code;
         }
+
+        $invoice->save();
 
         InvoicePaid::dispatch($invoice);
 

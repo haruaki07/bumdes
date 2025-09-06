@@ -53,6 +53,9 @@ class PaymentService implements PaymentServiceInterface
                     'category' => 'INTERNET_PACKAGE',
                 ],
             ],
+            'metadata' => [
+                'payment_method_code' => $input->paymentMethod->code,
+            ],
         ]);
 
         // reusable qr payments doesn't support closed payment, so we had to remove request_amount

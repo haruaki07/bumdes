@@ -23,6 +23,7 @@ class Invoice extends Model
         'amount',
         'status',
         'paid_at',
+        'payment_method_code',
     ];
 
     /**
@@ -57,6 +58,11 @@ class Invoice extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_code', 'code');
     }
 
     /**

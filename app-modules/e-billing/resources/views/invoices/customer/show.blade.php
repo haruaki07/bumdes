@@ -1,95 +1,76 @@
-@extends('tablar::auth.layout')
-
 @section('title', 'Invoice #' . $invoice->invoice_number)
 
-@section('tablar_css')
-  <style>
-    @media print {
-      .no-print {
-        display: none !important;
-      }
+<x-e-billing::layouts.blank>
+  @push('css')
+    <style>
+      @media print {
+        .no-print {
+          display: none !important;
+        }
 
-      a[href]:after {
-        content: none !important;
-      }
+        a[href]:after {
+          content: none !important;
+        }
 
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
 
-      .container {
-        padding: 0 !important;
+        .container {
+          padding: 0 !important;
+        }
+
+        .invoice-wrapper {
+          margin: 0 !important;
+        }
       }
 
       .invoice-wrapper {
-        margin: 0 !important;
+        max-width: 900px;
+        margin: 0 auto;
       }
-    }
 
-    .invoice-wrapper {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+      .table {
+        border-color: transparent;
+      }
 
-    .table {
-      border-color: transparent;
-    }
+      .table th,
+      .table td {
+        vertical-align: middle;
+      }
 
-    .table th,
-    .table td {
-      vertical-align: middle;
-    }
+      .table tr:not(:last-child) {
+        border-bottom: 1px solid var(--tblr-table-border-color);
+      }
 
-    .table tr:not(:last-child) {
-      border-bottom: 1px solid var(--tblr-table-border-color);
-    }
+      .meta-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    .meta-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      .meta-label {
+        color: var(--tblr-secondary);
+      }
 
-    .meta-label {
-      color: var(--tblr-secondary);
-    }
+      .meta-table td {
+        padding: .25rem 0 !important;
+      }
 
-    .meta-table td {
-      padding: .25rem 0 !important;
-    }
+      .meta-table tr:last-child td {
+        padding-bottom: 0 !important;
+      }
 
-    .meta-table tr:last-child td {
-      padding-bottom: 0 !important;
-    }
+      .accordion-button:not(.collapsed) .payment-method-previews {
+        display: none !important;
+      }
 
-    .payment {
-      height: 2.5rem;
-      aspect-ratio: 1.66666;
-      display: inline-block;
-      background: no-repeat center / calc(100% - 8px) calc(100% - 8px);
-      vertical-align: bottom;
-      font-style: normal;
-      box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1);
-      border-radius: 2px;
-      text-align: center;
-    }
+      .form-imagecheck-figure::before {
+        display: none !important;
+      }
+    </style>
+  @endpush
 
-    .payment-xs {
-      line-height: 1.25rem;
-      height: 1.25rem;
-    }
-
-    .accordion-button:not(.collapsed) .payment-method-previews {
-      display: none !important;
-    }
-
-    .form-imagecheck-figure::before {
-      display: none !important;
-    }
-  </style>
-@endsection
-
-@section('content')
   <div class="container container-tight py-4 invoice-wrapper my-auto">
     <div class="card card-md invoice-card">
       <div class="card-body p-4">
@@ -259,8 +240,8 @@
           <div id="paymentMethodAlert"></div>
           <input type="hidden" name="customer_id" value="{{ $customer->customer_id }}" />
           @if (!empty($savedPaymentMethod))
-            <div id="savedMethodPanel" class="card border mb-3">
-              <div class="card-body py-3 d-flex align-items-center">
+            <div id="savedMethodPanel" class="mb-3">
+              <div class="border rounded p-3 d-flex align-items-center">
                 <div class="me-3">
                   @if ($savedPaymentMethod->brand_logo)
                     <span class="payment"
@@ -270,13 +251,13 @@
                   @endif
                 </div>
                 <div class="flex-fill">
-                  <div class="fw-semibold">Metode pembayaran tersimpan</div>
-                  <div class="text-secondary small">{{ $savedPaymentMethod->name ?? $savedPaymentMethod->code }}</div>
+                  <div class="fw-semibold">{{ $savedPaymentMethod->name }}</div>
+                  <div class="text-secondary small">{{ $savedPaymentMethod->type->label() }}</div>
                 </div>
                 <div class="btn-list ms-auto">
-                  <button type="button" id="changeMethodBtn" class="btn btn-outline-secondary btn-sm">Ganti
-                    metode</button>
-                  <button type="button" id="removeSavedMethodBtn" class="btn btn-outline-danger btn-sm">Hapus</button>
+                  <button type="button" id="changeMethodBtn" class="btn btn-outline-primary">Ganti</button>
+                  <button type="button" id="removeSavedMethodBtn" class="btn btn-outline-danger btn-icon"><i
+                      class="ti ti-trash"></i></button>
                 </div>
               </div>
               <!-- Hidden input to use saved method by default -->
@@ -289,8 +270,8 @@
               @foreach ($paymentMethods->groupBy('type') as $type => $methods)
                 <div class="accordion-item">
                   <h2 class="accordion-header">
-                    <button class="accordion-button collapsed py-2 px-3 fs-4" type="button" data-bs-toggle="collapse"
-                      data-bs-target="#type-{{ Str::slug($type) }}" aria-expanded="false"
+                    <button class="accordion-button collapsed py-2 px-3 fs-4" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#type-{{ Str::slug($type) }}" aria-expanded="false"
                       aria-controls="type-{{ Str::slug($type) }}">
                       <div class="w-full d-flex align-items-center">
                         {{ \Modules\EBilling\Enums\PaymentMethodType::from($type)->label() }}
@@ -328,7 +309,8 @@
                                     class="form-imagecheck-image mx-auto object-fit-contain"
                                     style="height:3rem;opacity:1" />
                                 @else
-                                  <p class="text-center fw-semibold m-0" style="line-height:3rem;">{{ $method->name }}
+                                  <p class="text-center fw-semibold m-0" style="line-height:3rem;">
+                                    {{ $method->name }}
                                   </p>
                                 @endif
                               </span>
@@ -358,106 +340,107 @@
       </form>
     </div>
   </div>
-@endsection
 
-@section('tablar_js')
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const accordion = document.getElementById('paymentMethodsAccordion');
-      accordion.addEventListener('show.bs.collapse', event => {
-        event.target.parentElement.classList.add("bg-body");
-      });
-      accordion.addEventListener('hide.bs.collapse', event => {
-        event.target.parentElement.classList.remove("bg-body");
-      });
+  @push('js')
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const accordion = document.getElementById('paymentMethodsAccordion');
+        accordion.addEventListener('show.bs.collapse', event => {
+          event.target.parentElement.classList.add("bg-body");
+        });
+        accordion.addEventListener('hide.bs.collapse', event => {
+          event.target.parentElement.classList.remove("bg-body");
+        });
 
-      const setPaymentMethodAlert = (message, type = 'info') => {
-        const alertContainer = document.getElementById('paymentMethodAlert');
-        alertContainer.innerHTML = `
+        const setPaymentMethodAlert = (message, type = 'info') => {
+          const alertContainer = document.getElementById('paymentMethodAlert');
+          alertContainer.innerHTML = `
           <div class="alert alert-important alert-${type} alert-dismissible fade show" role="alert">
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         `;
-      };
+        };
 
-      const paymentMethodForm = document.getElementById('paymentMethodForm');
-      const savedMethodPanel = document.getElementById('savedMethodPanel');
-      const paymentMethodsBox = document.getElementById('paymentMethodsBox');
-      const changeMethodBtn = document.getElementById('changeMethodBtn');
-      const removeSavedMethodBtn = document.getElementById('removeSavedMethodBtn');
+        const paymentMethodForm = document.getElementById('paymentMethodForm');
+        const savedMethodPanel = document.getElementById('savedMethodPanel');
+        const paymentMethodsBox = document.getElementById('paymentMethodsBox');
+        const changeMethodBtn = document.getElementById('changeMethodBtn');
+        const removeSavedMethodBtn = document.getElementById('removeSavedMethodBtn');
 
-      const enableMethodList = () => {
-        if (savedMethodPanel) savedMethodPanel.classList.add('d-none');
-        if (paymentMethodsBox) paymentMethodsBox.classList.remove('d-none');
-        // Remove hidden saved input so radios are used
-        const hiddenSaved = paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
-        if (hiddenSaved) hiddenSaved.remove();
-      }
-
-      if (changeMethodBtn) {
-        changeMethodBtn.addEventListener('click', enableMethodList);
-      }
-
-      if (removeSavedMethodBtn) {
-        removeSavedMethodBtn.addEventListener('click', async () => {
-          const customerId = paymentMethodForm.querySelector('input[name="customer_id"]').value;
-          try {
-            const res = await axios.delete(`/e-billing/api/invoice/${customerId}/saved-payment-method`);
-            setPaymentMethodAlert(res?.data?.message || 'Metode tersimpan dihapus.', 'success');
-            enableMethodList();
-            const saveCheckbox = paymentMethodForm.querySelector('input[name="save"]');
-            if (saveCheckbox) saveCheckbox.checked = false;
-          } catch (err) {
-            setPaymentMethodAlert('Gagal menghapus metode tersimpan. Coba lagi.', 'danger');
-          }
-        });
-      }
-
-      paymentMethodForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const btnSubmit = paymentMethodForm.querySelector('button[type="submit"]');
-        // Validate: either have hidden saved input or a selected radio
-        const hasSavedInput = !!paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
-        const selectedRadio = paymentMethodForm.querySelector(
-          'input[name="payment_method"][type="radio"]:checked');
-        if (!hasSavedInput && !selectedRadio) {
-          setPaymentMethodAlert('Silakan pilih metode pembayaran!', 'warning');
-          return;
+        const enableMethodList = () => {
+          if (savedMethodPanel) savedMethodPanel.classList.add('d-none');
+          if (paymentMethodsBox) paymentMethodsBox.classList.remove('d-none');
+          // Remove hidden saved input so radios are used
+          const hiddenSaved = paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
+          if (hiddenSaved) hiddenSaved.remove();
         }
 
-        try {
-          btnSubmit._loadingButtonInstance.start();
-          const alertContainer = document.getElementById('paymentMethodAlert');
-          alertContainer.innerHTML = '';
+        if (changeMethodBtn) {
+          changeMethodBtn.addEventListener('click', enableMethodList);
+        }
 
-          const form = new FormData(paymentMethodForm);
-          const body = {}
-          form.forEach((value, key) => {
-            body[key] = value;
+        if (removeSavedMethodBtn) {
+          removeSavedMethodBtn.addEventListener('click', async () => {
+            const customerId = paymentMethodForm.querySelector('input[name="customer_id"]').value;
+            try {
+              const res = await axios.delete(`/e-billing/api/invoice/${customerId}/saved-payment-method`);
+              setPaymentMethodAlert(res?.data?.message || 'Metode tersimpan dihapus.', 'success');
+              enableMethodList();
+              const saveCheckbox = paymentMethodForm.querySelector('input[name="save"]');
+              if (saveCheckbox) saveCheckbox.checked = false;
+            } catch (err) {
+              setPaymentMethodAlert('Gagal menghapus metode tersimpan. Coba lagi.', 'danger');
+            }
           });
-          const res = await axios.post('/e-billing/api/invoice/' + body.customer_id + '/request-payment', body);
-          const data = res.data || {};
-          if (data.status === 'success' && data.redirect_url) {
-            window.location.href = data.redirect_url;
+        }
+
+        paymentMethodForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          console.log('abcd');
+          const btnSubmit = paymentMethodForm.querySelector('button[type="submit"]');
+          // Validate: either have hidden saved input or a selected radio
+          const hasSavedInput = !!paymentMethodForm.querySelector('input[name="payment_method"][type="hidden"]');
+          const selectedRadio = paymentMethodForm.querySelector(
+            'input[name="payment_method"][type="radio"]:checked');
+          if (!hasSavedInput && !selectedRadio) {
+            setPaymentMethodAlert('Silakan pilih metode pembayaran!', 'warning');
             return;
           }
-          // Show fallback messages
-          const msg = (data && data.message) ? data.message : 'Terjadi kesalahan saat memproses permintaan.';
-          setPaymentMethodAlert(msg, 'danger');
-        } catch (err) {
-          console.error(err);
-          // If server returned a JSON error, surface it
-          const resp = err?.response?.data;
-          if (resp?.message) {
-            setPaymentMethodAlert(resp.message, 'danger');
-          } else {
-            setPaymentMethodAlert('Terjadi kesalahan jaringan. Silakan coba lagi.', 'danger');
+
+          try {
+            btnSubmit._loadingButtonInstance.start();
+            const alertContainer = document.getElementById('paymentMethodAlert');
+            alertContainer.innerHTML = '';
+
+            const form = new FormData(paymentMethodForm);
+            const body = {}
+            form.forEach((value, key) => {
+              body[key] = value;
+            });
+            const res = await axios.post('/e-billing/api/invoice/' + body.customer_id + '/request-payment', body);
+            const data = res.data || {};
+            if (data.status === 'success' && data.redirect_url) {
+              window.location.href = data.redirect_url;
+              return;
+            }
+            // Show fallback messages
+            const msg = (data && data.message) ? data.message : 'Terjadi kesalahan saat memproses permintaan.';
+            setPaymentMethodAlert(msg, 'danger');
+          } catch (err) {
+            console.error(err);
+            // If server returned a JSON error, surface it
+            const resp = err?.response?.data;
+            if (resp?.message) {
+              setPaymentMethodAlert(resp.message, 'danger');
+            } else {
+              setPaymentMethodAlert('Terjadi kesalahan jaringan. Silakan coba lagi.', 'danger');
+            }
+          } finally {
+            btnSubmit._loadingButtonInstance.stop();
           }
-        } finally {
-          btnSubmit._loadingButtonInstance.stop();
-        }
+        });
       });
-    });
-  </script>
-@endsection
+    </script>
+  @endpush
+</x-e-billing::layouts.blank>

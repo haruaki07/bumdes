@@ -171,20 +171,32 @@
                   <div class="datagrid-content fw-bold fs-3">Rp{{ number_format($invoice->amount, 0, ',', '.') }}
                   </div>
                 </div>
+                @if ($invoice->payment_method_code)
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">Metode Pembayaran</div>
+                    <div class="datagrid-content text-capitalize">
+                      @if ($invoice->paymentMethod->brand_logo)
+                        <span class="payment payment-xs me-1"
+                          style="background-image:url('{{ asset($invoice->paymentMethod->brand_logo) }}');"></span>
+                      @endif
+                      {{ $invoice->paymentMethod->name ?? '-' }} -
+                      {{ $invoice->paymentMethod->type->label() }}
+                    </div>
+                  </div>
+                @endif
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row row-deck row-cards pt-3">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Bukti Transfer</h3>
-            </div>
-
-            @if (isset($receipts) && count($receipts))
+      @if (isset($receipts) && count($receipts))
+        <div class="row row-deck row-cards pt-3">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Bukti Transfer</h3>
+              </div>
               <div class="table-responsive">
                 <table class="table card-table table-vcenter">
                   <thead>
@@ -215,54 +227,10 @@
                   </tbody>
                 </table>
               </div>
-            @else
-              <div class="card-body">
-                <div class="text-secondary">Belum ada bukti transfer.</div>
-              </div>
-            @endif
+            </div>
           </div>
         </div>
-      </div>
+      @endif
     </div>
   </div>
-
-  <script>
-    (function() {
-      const byTarget = document.querySelectorAll('[data-copy-target]');
-      byTarget.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const target = btn.getAttribute('data-copy-target');
-          const el = document.querySelector(target);
-          if (!el) return;
-          const text = el.value || el.textContent || '';
-          if (!text) return;
-          navigator.clipboard.writeText(text).then(() => {
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="ti ti-check"></i> Disalin';
-            btn.classList.add('btn-success');
-            setTimeout(() => {
-              btn.innerHTML = original;
-              btn.classList.remove('btn-success');
-            }, 1500);
-          }).catch(() => {});
-        });
-      });
-      const byText = document.querySelectorAll('[data-copy-text]');
-      byText.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const text = btn.getAttribute('data-copy-text') || '';
-          if (!text) return;
-          navigator.clipboard.writeText(text).then(() => {
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="ti ti-check"></i> Disalin';
-            btn.classList.add('btn-success');
-            setTimeout(() => {
-              btn.innerHTML = original;
-              btn.classList.remove('btn-success');
-            }, 1500);
-          }).catch(() => {});
-        });
-      });
-    })();
-  </script>
 </x-e-billing::layouts.panel>

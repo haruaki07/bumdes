@@ -1,14 +1,16 @@
-@extends('tablar::page')
+@extends('tablar::auth.layout')
 
 @section('title', 'E-Billing')
-@section('logo')
-  <a href="{{ route('e-billing.dashboard') }}">E-Billing</a>
-@endsection
 
-@push('css')
+@section('tablar_css')
   @vite(['app-modules/e-billing/resources/css/e-billing.css'])
-@endpush
+  @stack('css')
+@endsection
 
 @section('content')
   {{ $slot }}
+@endsection
+
+@section('tablar_js')
+  @stack('js')
 @endsection

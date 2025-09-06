@@ -66,6 +66,7 @@ class WebhookController extends Controller
 
             if ($newStatus === InvoiceStatus::PAID) {
                 $invoice->paid_at = now();
+                $invoice->payment_method_code = $data['metadata']['payment_method_code'] ?? null;
             }
 
             $invoice->status = $newStatus;
