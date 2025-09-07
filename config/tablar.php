@@ -232,6 +232,12 @@ return [
                     'route' => 'e-billing.settings.payment-methods.index',
                     'icon' => 'ti ti-credit-card',
                 ],
+                [
+                    'group' => 'e-billing',
+                    'text' => 'Pengaturan Sistem',
+                    'route' => ['e-billing.settings.show', ['group' => 'account']],
+                    'icon' => 'ti ti-settings',
+                ],
             ],
         ],
     ],

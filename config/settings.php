@@ -1,5 +1,6 @@
 <?php
 
+use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
 use Modules\EBilling\Settings\EBillingXenditSettings;
 
 return [
@@ -10,6 +11,7 @@ return [
      */
     'settings' => [
         EBillingXenditSettings::class,
+        EBillingBusinessProfileSettings::class,
     ],
 
     /*
