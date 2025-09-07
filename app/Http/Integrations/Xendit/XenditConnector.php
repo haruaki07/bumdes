@@ -2,6 +2,7 @@
 
 namespace App\Http\Integrations\Xendit;
 
+use Modules\EBilling\Settings\EBillingXenditSettings;
 use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
@@ -10,11 +11,14 @@ class XenditConnector extends Connector
 {
     use AcceptsJson;
 
-    public function __construct(
-        protected ?string $secret = null
-    ) {
+    protected ?string $secret = null;
+
+    public function __construct()
+    {
+        $xenditSettings = app(EBillingXenditSettings::class);
+
         if (! $this->secret) {
-            $this->secret = config('services.xendit.secret');
+            $this->secret = $xenditSettings->secret;
         }
 
         if (! $this->secret) {

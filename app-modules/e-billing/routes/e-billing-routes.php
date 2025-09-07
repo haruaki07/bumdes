@@ -10,6 +10,7 @@ use Modules\EBilling\Http\Controllers\DeviceController;
 use Modules\EBilling\Http\Controllers\InvoiceController;
 use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
+use Modules\EBilling\Http\Controllers\SettingsController;
 use Modules\EBilling\Http\Controllers\SiteController;
 use Modules\EBilling\Http\Controllers\TransferReceiptController;
 use Modules\EBilling\Http\Controllers\WebhookController;
@@ -40,6 +41,10 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::resource('payment-methods', PaymentMethodController::class)->only(['index', 'show', 'update']);
                 Route::patch('payment-methods/{paymentMethod}/status', [PaymentMethodController::class, 'updateStatus'])
                     ->name('payment-methods.update-status');
+
+                Route::get('/', [SettingsController::class, 'index'])->name('index');
+                Route::get('/{group}', [SettingsController::class, 'show'])->name('show');
+                Route::put('/{group}', [SettingsController::class, 'update'])->name('update');
             });
         });
     });

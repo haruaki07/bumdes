@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Log;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Events\InvoicePaid;
 use Modules\EBilling\Models\Invoice;
+use Modules\EBilling\Settings\EBillingXenditSettings;
 
 class WebhookController extends Controller
 {
-    public function xendit(Request $request)
+    public function xendit(Request $request, EBillingXenditSettings $xenditSettings)
     {
         $tokenHeader = $request->header('x-callback-token');
-        $expected = config('services.xendit.webhook_token');
+        $expected = $xenditSettings->webhook_token;
         if (! empty($expected) && $tokenHeader !== $expected) {
             Log::warning('Xendit webhook token mismatch', [
                 'provided' => $tokenHeader ? 'present' : 'missing',
