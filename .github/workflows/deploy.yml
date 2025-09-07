@@ -27,7 +27,7 @@ jobs:
       - name: Add SSH known hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,12 +63,12 @@ jobs:
       - name: Copy files
         run: rsync
           -a "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
-          "$MACHINE_USER@$SSH_HOST:$MACHINE_WORKDIR"
+          "${{ secrets.MACHINE_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.MACHINE_WORKDIR }}"
 
       - name: Deploy
         run: |
-          ssh "$MACHINE_USER@$SSH_HOST" /bin/bash << EOF
-            cd "$MACHINE_WORKDIR"
+          ssh "${{ secrets.MACHINE_USER }}@${{ secrets.SSH_HOST }}" /bin/bash << EOF
+            cd "${{ secrets.MACHINE_WORKDIR }}"
             git pull
             ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
           EOF
