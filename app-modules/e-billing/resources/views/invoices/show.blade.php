@@ -168,7 +168,7 @@
                 </div>
                 @if ($invoice->paymentMethod && $invoice->paymentMethod->calculateFee($invoice->amount) > 0)
                   <div class="datagrid-item">
-                    <div class="datagrid-title">Biaya Metode Pembayaran</div>
+                    <div class="datagrid-title">Biaya Admin</div>
                     <div class="datagrid-content">
                       Rp{{ number_format($invoice->paymentMethod->calculateFee($invoice->amount), 0, ',', '.') }}</div>
                   </div>

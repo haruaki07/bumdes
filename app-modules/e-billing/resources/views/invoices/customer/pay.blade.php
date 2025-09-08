@@ -2,7 +2,15 @@
 
 <x-e-billing::layouts.blank>
   @if (!empty($error))
-    <div class="alert alert-danger" role="alert">{{ $error }}</div>
+    <div class="empty">
+      <div class="empty-img">
+        <img src="{{ asset('assets/images/misc/cat.webp') }}" width="180" alt="Cat" />
+      </div>
+      <p class="empty-title">{{ $title }}</p>
+      <p class="empty-subtitle text-secondary">
+        {{ $error }}
+      </p>
+    </div>
   @else
     @php
       $s = $session;

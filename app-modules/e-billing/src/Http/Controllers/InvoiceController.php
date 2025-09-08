@@ -44,6 +44,14 @@ class InvoiceController extends Controller
         // Check if the customerId is an invoice number
         if (str_starts_with($customerId, 'INV')) {
             $invoice = Invoice::where('invoice_number', $customerId)->first();
+            if (! $invoice) {
+                return view('e-billing::invoices.customer.not-found', [
+                    'title' => 'Tagihan tidak ditemukan',
+                    'message' => 'Tagihan mungkin telah diarsipkan atau tidak tersedia. Silakan coba lagi nanti atau hubungi admin.',
+                    'customerId' => $customerId,
+                ]);
+            }
+
             $customer = Customer::find($invoice->customer_id);
         } else {
             $customer = Customer::where('customer_id', $customerId)->first();
@@ -103,12 +111,12 @@ class InvoiceController extends Controller
 
         $customer = Customer::where('customer_id', $customerId)->first();
         if (! $customer) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'ID pelanggan tidak ditemukan'], 404);
         }
 
         $invoice = Invoice::where('invoice_number', $customer->invoice_number)->first();
         if (! $invoice) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'Tagihan tidak ditemukan'], 404);
         }
 
         if ($invoice->status === InvoiceStatus::PAID) {
@@ -121,7 +129,7 @@ class InvoiceController extends Controller
 
         $paymentMethod = PaymentMethod::find($request->input('payment_method'));
         if (! $paymentMethod) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'Metode pembayaran tidak valid'], 400);
         }
 
         $savePaymentMethod = $request->boolean('save');
@@ -308,7 +316,8 @@ class InvoiceController extends Controller
         $token = $request->query('token');
         if (! $token) {
             return view('e-billing::invoices.customer.pay', [
-                'error' => 'Sesi pembayaran tidak ditemukan atau sudah kedaluwarsa.',
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
+                'error' => 'Sesi pembayaran tidak ditemukan atau mungkin sudah kedaluwarsa.',
                 'session' => null,
             ]);
         }
@@ -316,7 +325,8 @@ class InvoiceController extends Controller
         $session = Cache::get('ebil:pay:'.$token);
         if (! $session) {
             return view('e-billing::invoices.customer.pay', [
-                'error' => 'Sesi pembayaran tidak ditemukan atau sudah kedaluwarsa.',
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
+                'error' => 'Sesi pembayaran tidak ditemukan atau mungikn sudah kedaluwarsa.',
                 'session' => null,
             ]);
         }
@@ -328,6 +338,7 @@ class InvoiceController extends Controller
             Cache::delete('ebil:pay:'.$token);
 
             return view('e-billing::invoices.customer.pay', [
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
                 'error' => 'Tagihan sudah dibayar.',
                 'session' => null,
             ]);
