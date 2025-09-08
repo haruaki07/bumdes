@@ -84,4 +84,24 @@ class Customer extends Model
     {
         return $this->belongsTo(Device::class);
     }
+
+    public function getDueDateAttribute(): \Carbon\Carbon
+    {
+        return now()->copy()->day($this->due);
+    }
+
+    public function getGracePeriodEndDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute()->copy()->addDays($this->grace_period);
+    }
+
+    public function getPeriodStartDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute()->copy()->subMonthNoOverflow()->day($this->due + 1);
+    }
+
+    public function getPeriodEndDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute();
+    }
 }

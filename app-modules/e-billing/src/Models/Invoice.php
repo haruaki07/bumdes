@@ -16,6 +16,10 @@ class Invoice extends Model
 
     protected $fillable = [
         'invoice_number',
+        'due_date',
+        'grace_period_end_date',
+        'period_start_date',
+        'period_end_date',
         'customer_id',
         'customer_detail',
         'package_id',
@@ -38,6 +42,10 @@ class Invoice extends Model
             'package_detail' => AsArrayObject::class,
             'status' => InvoiceStatus::class,
             'paid_at' => 'datetime',
+            'due_date' => 'datetime',
+            'grace_period_end_date' => 'datetime',
+            'period_start_date' => 'datetime',
+            'period_end_date' => 'datetime',
         ];
     }
 
@@ -49,6 +57,11 @@ class Invoice extends Model
         'status' => 'searchable|sortable',
         'paid_at' => 'sortable',
     ];
+
+    public static function generateInvoiceNumber($currentDate, $count = -1)
+    {
+        return 'INV'.$currentDate->format('Ym').str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+    }
 
     public function customer()
     {
@@ -63,6 +76,11 @@ class Invoice extends Model
     public function paymentMethod()
     {
         return $this->belongsTo(PaymentMethod::class, 'payment_method_code', 'code');
+    }
+
+    public function scopeUnpaid($query)
+    {
+        return $query->where('status', InvoiceStatus::UNPAID);
     }
 
     /**
