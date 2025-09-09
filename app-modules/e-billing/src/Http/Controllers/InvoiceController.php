@@ -25,6 +25,58 @@ class InvoiceController extends Controller
 {
     public function __construct(private PaymentServiceInterface $paymentService) {}
 
+    /**
+     * Create a manual invoice for an active customer for the current month ignoring next_billing_date.
+     */
+    public function createManual(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:ebil_customers,id',
+        ]);
+
+        $customer = Customer::with(['package'])->findOrFail($validated['customer_id']);
+
+        if ($customer->status !== \Modules\EBilling\Enums\CustomerStatus::ACTIVE) {
+            return back()->with('error', 'Pelanggan tidak aktif.');
+        }
+
+        // Prevent duplicate invoice for same period (month + customer)
+        $periodMonth = now()->format('Ym');
+        $already = Invoice::where('customer_id', $customer->id)
+            ->whereYear('period_end_date', now()->year)
+            ->whereMonth('period_end_date', now()->month)
+            ->exists();
+        if ($already) {
+            return back()->with('error', 'Invoice bulan ini sudah ada untuk pelanggan ini.');
+        }
+
+        $currentDate = now();
+        $count = Invoice::whereMonth('created_at', $currentDate->month)
+            ->whereYear('created_at', $currentDate->year)
+            ->count();
+        $invoiceNumber = Invoice::generateInvoiceNumber($currentDate->copy(), $count);
+
+        $invoice = Invoice::create([
+            'invoice_number' => $invoiceNumber,
+            'due_date' => $customer->due_date,
+            'grace_period_end_date' => $customer->grace_period_end_date,
+            'period_start_date' => $customer->period_start_date,
+            'period_end_date' => $customer->period_end_date,
+            'customer_id' => $customer->id,
+            'customer_detail' => $customer,
+            'package_id' => $customer->package_id,
+            'package_detail' => $customer->package,
+            'amount' => $customer->package?->price ?? 0,
+            'status' => InvoiceStatus::UNPAID,
+        ]);
+
+        // tie invoice to customer as active invoice if none set
+        $customer->invoice_number = $invoice->invoice_number;
+        $customer->save();
+
+        return redirect()->route('e-billing.invoices.show', $invoice)->with('success', 'Invoice berhasil dibuat.');
+    }
+
     public function index(Request $request)
     {
         $invoices = Invoice::with(['customer', 'package'])->orderBy('created_at', 'desc')->datatable();

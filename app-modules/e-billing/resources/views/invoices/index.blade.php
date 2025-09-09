@@ -6,6 +6,12 @@
           <div class="page-pretitle">Transaksi</div>
           <h2 class="page-title">Tagihan/Invoice</h2>
         </div>
+        <div class="col-auto ms-auto d-print-none">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualInvoiceModal">
+            <i class="ti ti-plus icon"></i>
+            Buat Invoice Manual
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -60,3 +66,37 @@
     </div>
   </div>
 </x-e-billing::layouts.panel>
+
+<!-- Manual Invoice Modal -->
+<div class="modal fade" id="manualInvoiceModal" tabindex="-1" aria-labelledby="manualInvoiceModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="manualInvoiceModalLabel">Buat Invoice Manual</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{{ route('e-billing.invoices.create-manual') }}">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Pilih Pelanggan Aktif</label>
+            <select name="customer_id" class="form-select" required>
+              <option value="" disabled selected>-- pilih --</option>
+              @php($activeCustomers = \Modules\EBilling\Models\Customer::where('status', \Modules\EBilling\Enums\CustomerStatus::ACTIVE)->orderBy('name')->get())
+              @foreach ($activeCustomers as $cust)
+                <option value="{{ $cust->id }}">{{ $cust->customer_id }} - {{ $cust->name }}
+                  ({{ $cust->package?->name ?? 'Paket ?' }})
+                </option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-link" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Buat Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
