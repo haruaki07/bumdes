@@ -19,6 +19,7 @@ use Modules\EBilling\Models\PaymentMethod;
 use Modules\EBilling\Models\TransferReceipt;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
 use Modules\EBilling\Services\DTOs\Payment\CreatePaymentRequestIn;
+use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
 
 class InvoiceController extends Controller
 {
@@ -100,7 +101,9 @@ class InvoiceController extends Controller
             }
         }
 
-        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods', 'savedPaymentMethod', 'savedPaymentCode'));
+        $businessProfileSettings = app(EBillingBusinessProfileSettings::class);
+
+        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods', 'savedPaymentMethod', 'savedPaymentCode', 'businessProfileSettings'));
     }
 
     public function requestPayment(Request $request, $customerId)

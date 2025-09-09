@@ -88,10 +88,10 @@
 
         <div class="d-flex align-items-end justify-content-between">
           <div class="d-flex align-items-end">
-            <img src="{{ 'https://placehold.co/400' }}" alt="Logo" style="height: 84px;" class="me-3">
+            <img src="{{ asset($businessProfileSettings->logo) }}" alt="Logo" style="height: 84px;" class="me-3">
             <div>
-              <h2 class="mb-1">EBilling</h2>
-              <p class="text-secondary mb-0">High Speed Home Internet</p>
+              <h2 class="mb-1">{{ $businessProfileSettings->name }}</h2>
+              <p class="text-secondary mb-0">{{ $businessProfileSettings->description }}</p>
             </div>
           </div>
           <div style="width: 35%">
