@@ -36,6 +36,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
 
             Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
             Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+            Route::post('/invoices/{invoice}/mark-unpaid', [InvoiceController::class, 'markUnpaid'])->name('invoices.mark-unpaid');
 
             Route::prefix('settings')->as('settings.')->group(function () {
                 Route::resource('payment-methods', PaymentMethodController::class)->only(['index', 'show', 'update']);
@@ -54,6 +55,8 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             ->name('invoice.request-payment');
         Route::get('/invoice/pay/status', [InvoiceController::class, 'payStatus'])
             ->name('invoice.pay.status');
+        Route::post('/invoice/pay/simulate', [InvoiceController::class, 'simulatePayment'])
+            ->name('invoice.pay.simulate');
         Route::delete('/invoice/{customer_id}/saved-payment-method', [InvoiceController::class, 'removeSavedPaymentMethod'])
             ->name('invoice.remove-saved-payment-method');
         Route::post('/invoice/{invoice}/transfer-receipts', [TransferReceiptController::class, 'store'])

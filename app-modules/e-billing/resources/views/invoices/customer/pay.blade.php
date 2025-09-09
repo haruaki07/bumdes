@@ -1,6 +1,12 @@
 @section('title', 'Checkout Pembayaran')
 
 <x-e-billing::layouts.blank>
+  @if (!empty($session) && config('app.env') !== 'production')
+    <div id="simulateBar"
+      style="position:sticky;top:0;left:0;z-index:999;background:#fff3cd;color:#856404;font-size:14px;cursor:pointer;padding:6px 12px;text-align:center;font-weight:500">
+      Simulasikan pembayaran
+    </div>
+  @endif
   @if (!empty($error))
     <div class="empty">
       <div class="empty-img">
@@ -323,6 +329,12 @@
                   ? route('e-billing.invoice.transfer-receipts.store', ['invoice' => $session['reference_id']])
                   : null,
           );
+      if (!empty($session)) {
+          $sessionMeta->put(
+              'simulate_url',
+              route('e-billing.invoice.pay.simulate', ['token' => request()->query('token')]),
+          );
+      }
     @endphp
     <script id="sessionData" type="application/json">{!! json_encode($sessionData) !!}</script>
     <script id="sessionMeta" type="application/json">{!! json_encode($sessionMeta) !!}</script>

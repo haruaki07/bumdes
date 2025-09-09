@@ -378,12 +378,24 @@ class InvoiceController extends Controller
         $paymentStatus = null;
         $pollError = null;
 
+        $invoice = Invoice::where('invoice_number', $session['reference_id'] ?? '')->first();
+
         // For manual confirmation channels, do not query gateway
         if (($session['action']['descriptor'] ?? null) !== 'BANK_TRANSFER_DETAILS') {
             try {
                 $res = $this->paymentService->getPaymentStatus($session['id'] ?? '');
                 $paymentStatus = $res->status; // e.g., SUCCEEDED, EXPIRED, FAILED, etc.
                 // If expired or finished, we can drop the cache soon
+
+                // need to wait webhook call
+                if ($paymentStatus === 'SUCCEEDED' || $paymentStatus === 'AUTHORIZED') {
+                    if ($invoice->status === InvoiceStatus::PAID) {
+                        $paymentStatus = 'SUCCEEDED';
+                    } else {
+                        $paymentStatus = 'PENDING';
+                    }
+                }
+
                 if (in_array($paymentStatus, ['SUCCEEDED', 'AUTHORIZED', 'EXPIRED', 'FAILED', 'CANCELED'])) {
                     Cache::delete('ebil:pay:'.$token);
                 }
@@ -393,6 +405,14 @@ class InvoiceController extends Controller
             }
         }
 
+        if ($paymentStatus === 'SUCCEEDED') {
+            return view('e-billing::invoices.customer.pay-success', compact('invoice'))->render();
+        }
+
+        if ($paymentStatus === 'EXPIRED' || $expired) {
+            return view('e-billing::invoices.customer.pay-expired', compact('invoice'))->render();
+        }
+
         return response()->json([
             'status' => 'ok',
             'expired' => $expired,
@@ -400,6 +420,62 @@ class InvoiceController extends Controller
             'poll_error' => $pollError,
             'session' => $session,
         ]);
+    }
+
+    public function simulatePayment(Request $request)
+    {
+        $token = $request->query('token');
+        if (! $token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token tidak ditemukan.',
+            ], 400);
+        }
+
+        $cached = Cache::get('ebil:pay:'.$token);
+        if (! $cached) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sesi pembayaran tidak ditemukan atau kedaluwarsa.',
+            ], 404);
+        }
+
+        $session = Crypt::decrypt($cached);
+        $paymentId = $session['id'] ?? null;
+        if (! $paymentId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment ID tidak tersedia.',
+            ], 400);
+        }
+
+        try {
+            $amount = (int) ($request->input('amount') ?: ($session['total_amount'] ?? $session['amount'] ?? null));
+            if ($session['payment_method']['type'] !== PaymentMethodType::BANK_TRANSFER) {
+                $result = $this->paymentService->simulatePayment($paymentId, $amount ?: null);
+
+                return response()->json([
+                    'status' => 'ok',
+                    'payment_status' => $result->status,
+                    'data' => $result ?? null,
+                ]);
+            } else {
+                $invoice = Invoice::where('invoice_number', $session['reference_id'])->first();
+                $invoice->status = InvoiceStatus::PAID;
+                $invoice->paid_at = now();
+                $invoice->payment_method_code = $session['payment_method']['code'] ?? null;
+                $invoice->save();
+
+                return view('e-billing::invoices.customer.pay-success', compact('invoice'))->render();
+            }
+        } catch (\Throwable $e) {
+            Log::error('Simulate payment error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mensimulasikan pembayaran.',
+            ], 500);
+        }
     }
 
     public function markPaid(Request $request, Invoice $invoice)
@@ -425,5 +501,20 @@ class InvoiceController extends Controller
         InvoicePaid::dispatch($invoice);
 
         return back()->with('success', 'Invoice ditandai lunas.');
+    }
+
+    public function markUnpaid(Invoice $invoice)
+    {
+        $invoice->status = InvoiceStatus::UNPAID;
+        $invoice->paid_at = null;
+        $invoice->payment_method_code = null;
+        $invoice->save();
+
+        $invoice->customer->invoice_number = $invoice->invoice_number;
+        $invoice->customer->save();
+
+        TransferReceipt::where('invoice_id', $invoice->id)->delete();
+
+        return back()->with('success', 'Invoice ditandai belum lunas.');
     }
 }

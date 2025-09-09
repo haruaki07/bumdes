@@ -229,7 +229,7 @@
         <div class="btn-list justify-content-end no-print">
           <button type="button" class="btn" onclick="window.print()">
             <i class="icon ti ti-printer"></i>
-            Print
+            Cetak
           </button>
           @if ($invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID)
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentMethodModal">

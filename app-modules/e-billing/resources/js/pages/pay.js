@@ -45,22 +45,10 @@ async function pollStatus() {
       },
     });
     if (!res.ok) return;
-    const data = await res.json();
-
-    if (["SUCCEEDED", "AUTHORIZED"].includes(data.payment_status)) {
-      showAlert(
-        "success",
-        "Pembayaran berhasil. Anda dapat menutup halaman ini."
-      );
-      document.getElementById("btnBack").href = meta?.invoice_url;
+    if (res.headers.get("Content-Type")?.includes("text/html")) {
+      const html = await res.text();
+      document.body.querySelector(".page").innerHTML = html;
       clearInterval(timerId);
-      return;
-    }
-    if (data.payment_status === "EXPIRED" || data.expired) {
-      showAlert(
-        "warning",
-        "Sesi pembayaran telah kedaluwarsa. Silakan buat permintaan baru."
-      );
       return;
     }
     setTimeout(pollStatus, 5000);
@@ -99,7 +87,6 @@ if (type === "PRESENT_TO_CUSTOMER" && value) {
     }
     bindCopy("btnCopyQR", value);
   } else if (descriptor === "PAYMENT_CODE") {
-    console.log(value);
     JsBarcode("#barcode", value, {
       format: "CODE128",
       displayValue: true,
@@ -411,13 +398,6 @@ function disableButton(id) {
   if (el) el.setAttribute("disabled", "disabled");
 }
 
-function showAlert(type, message) {
-  const wrapper = document.createElement("div");
-  wrapper.className = `alert alert-${type} mt-3`;
-  wrapper.textContent = message;
-  document.querySelector(".card-body")?.appendChild(wrapper);
-}
-
 // Inject fee & total summary if exists
 (function renderFeeSummary() {
   const container = document.querySelector(".card-body");
@@ -441,4 +421,54 @@ function showAlert(type, message) {
             )}</span></div>
         </div>`;
   container.insertBefore(box, container.firstChild.nextSibling);
+})();
+
+// Simulation (sandbox/test mode only)
+(function bindSimulation() {
+  const bar = document.getElementById("simulateBar");
+  if (!bar) return;
+  const url = meta?.simulate_url;
+  if (!url) return;
+  let busy = false;
+  bar.addEventListener("click", async () => {
+    if (busy) return;
+    busy = true;
+    const original = bar.textContent;
+    bar.textContent = "Memproses simulasi pembayaran…";
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: new URLSearchParams({}),
+      });
+      // handle tf bank
+      if (session.payment_method.type === "BANK_TRANSFER") {
+        const text = await res.text();
+        document.body.querySelector(".page").innerHTML = text;
+      } else {
+        const data = await res.json().catch(() => null);
+        if (!res.ok) throw new Error(data?.message || "Gagal!");
+        bar.style.background = "#d1e7dd";
+        bar.style.color = "#0f5132";
+        bar.textContent = `Status pembayaran sekarang: ${data.payment_status}`;
+      }
+    } catch (e) {
+      bar.style.background = "#f8d7da";
+      bar.style.color = "#842029";
+      bar.textContent = e?.message || "Gagal!";
+      setTimeout(
+        () => (
+          (bar.textContent = original),
+          (bar.style.background = "#fff3cd"),
+          (bar.style.color = "#856404")
+        ),
+        3000
+      );
+    } finally {
+      busy = false;
+    }
+  });
 })();

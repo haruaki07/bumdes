@@ -16,4 +16,9 @@ interface PaymentServiceInterface
      * Get the payment status
      */
     public function getPaymentStatus(string $paymentId): PaymentRequest;
+
+    /**
+     * Simulate a payment (for test/sandbox environment)
+     */
+    public function simulatePayment(string $paymentId, ?int $amount = null): PaymentRequest;
 }

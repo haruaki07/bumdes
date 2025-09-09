@@ -4,6 +4,7 @@ namespace Modules\EBilling\Services;
 
 use App\Http\Integrations\Xendit\Requests\Payment\CreatePaymentRequest;
 use App\Http\Integrations\Xendit\Requests\Payment\GetPaymentRequest;
+use App\Http\Integrations\Xendit\Requests\Payment\SimulatePaymentRequest;
 use App\Http\Integrations\Xendit\XenditConnector;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
@@ -117,6 +118,27 @@ class PaymentService implements PaymentServiceInterface
         return new PaymentRequest(
             paymentRequestId: $data['payment_request_id'],
             status: $data['status'],
+            action: isset($data['actions']) && count($data['actions']) > 0 ? $data['actions'][0] : null,
+            responseObject: $data,
+            expiresAt: $data['channel_properties']['expires_at'] ?? null,
+        );
+    }
+
+    public function simulatePayment(string $paymentId, ?int $amount = null): PaymentRequest
+    {
+        $xendit = new XenditConnector;
+        $request = new SimulatePaymentRequest($paymentId, $amount);
+
+        $response = $xendit->send($request);
+        if ($response->failed()) {
+            $response->throw();
+        }
+
+        $data = $response->json();
+
+        return new PaymentRequest(
+            paymentRequestId: $data['payment_request_id'] ?? $paymentId,
+            status: $data['status'] ?? 'UNKNOWN',
             action: isset($data['actions']) && count($data['actions']) > 0 ? $data['actions'][0] : null,
             responseObject: $data,
             expiresAt: $data['channel_properties']['expires_at'] ?? null,
