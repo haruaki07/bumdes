@@ -400,11 +400,10 @@ class InvoiceController extends Controller
         }
 
         $invoice = Invoice::where('invoice_number', $session['reference_id'])->first();
-        $package = $invoice->package_detail;
 
         return view('e-billing::invoices.customer.pay', [
             'session' => $session,
-            'packageDetail' => $package,
+            'invoice' => $invoice,
         ]);
     }
 

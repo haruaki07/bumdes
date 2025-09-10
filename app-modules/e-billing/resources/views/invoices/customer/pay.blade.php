@@ -249,15 +249,16 @@
           <hr class="my-4" style="opacity:0.05" />
           <div class="d-flex align-items-start">
             <div class="me-auto">
-              <h4 class="mb-0">Paket Internet</h4>
-              <div class="text-secondary">{{ $packageDetail->name }}</div>
+              <h4 class="mb-0">{{ $invoice->package_detail->name }}</h4>
+              <div class="text-secondary">{{ $invoice->period_start_date->locale('id')->format('d M Y') }} s.d.
+                {{ $invoice->period_end_date->locale('id')->format('d M Y') }}</div>
             </div>
             <div class="text-end" style="width:120px">
               <h4 class="mb-0">{{ $amountFormatted }}</h4>
             </div>
           </div>
           <hr class="my-4" style="opacity:0.05" />
-          <div class="d-flex align-items-start">
+          <div class="d-flex align-items-center">
             <div class="ms-auto">
               <h4 class="mb-0">Subtotal</h4>
             </div>
@@ -267,7 +268,7 @@
           </div>
           @if ($fee > 0)
             <hr class="my-4" style="opacity:0.05" />
-            <div class="d-flex align-items-start mb-3">
+            <div class="d-flex align-items-center mb-3">
               <div class="ms-auto">
                 <div class="fs-4">Biaya Admin</div>
               </div>
@@ -275,7 +276,7 @@
                 <div class="fs-4">{{ $feeFormatted }}</div>
               </div>
             </div>
-            <div class="d-flex align-items-start">
+            <div class="d-flex align-items-center">
               <div class="ms-auto">
                 <h4 class="mb-0">Total Biaya</h4>
               </div>
@@ -285,7 +286,7 @@
             </div>
           @endif
           <hr class="my-4" style="opacity:0.05" />
-          <div class="d-flex align-items-start">
+          <div class="d-flex align-items-center">
             <div class="ms-auto">
               <h4 class="mb-0">Total</h4>
             </div>

@@ -169,31 +169,24 @@
             <thead class="table-light">
               <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 30%;">Deskripsi</th>
-                <th style="width: 15%;">Tarif</th>
-                <th style="width: 33%;">Pemakaian</th>
-                <th style="width: 16%;" class="text-end">Total</th>
+                <th>Paket</th>
+                <th>Tarif</th>
+                <th>Bulan Pemakaian</th>
+                <th class="text-end">Total</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>1</td>
                 <td>
-                  Paket Internet
-                  @if (!empty($pkg))
-                    <div class="text-muted small">{{ $pkg['name'] ?? '' }} @if (!empty($pkg['bandwidth']))
-                        ({{ $pkg['bandwidth'] }} Mbps)
-                      @endif
-                    </div>
-                  @endif
+                  {{ $invoice->package_detail->name }}
+                  <div class="text-muted">
+                    {{ $periodStart->translatedFormat('d F Y') }} s.d. {{ $periodEnd->translatedFormat('d F Y') }}
+                  </div>
                 </td>
                 <td>Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
                 <td>
-                  @if ($periodStart && $periodEnd)
-                    {{ $periodStart->translatedFormat('d F Y') }} s.d. {{ $periodEnd->translatedFormat('d F Y') }}
-                  @else
-                    -
-                  @endif
+                  {{ $invoice->period_start_date->locale('id')->translatedFormat('F Y') }}
                 </td>
                 <td class="text-end">Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
               </tr>
