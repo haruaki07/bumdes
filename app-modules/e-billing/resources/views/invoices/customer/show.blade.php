@@ -1,5 +1,9 @@
 @section('title', 'Invoice #' . $invoice->invoice_number)
 
+@php
+  use Modules\EBilling\Enums\InvoiceStatus;
+@endphp
+
 <x-e-billing::layouts.blank>
   @push('css')
     <style>
@@ -76,14 +80,8 @@
       <div class="card-body p-4">
         @php
           $invDate = optional($invoice->created_at);
-          $dueDay = $customer->due ?? 1;
-          $periodStart = $invDate ? $invDate->copy()->locale('id')->setDay($dueDay)->subMonthNoOverflow() : null;
-          $periodEnd = $invDate ? $invDate->copy()->locale('id')->setDay($dueDay)->subDay() : null;
-          $periodLabel = $periodEnd ? $periodEnd->locale('id')->translatedFormat('F Y') : '-';
-          $pkg = (array) ($invoice->package_detail ?? []);
-
-          $isPaid = $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::PAID;
-          $isExpired = $invoice->status === \Modules\EBilling\Enums\InvoiceStatus::EXPIRED;
+          $isPaid = $invoice->status === InvoiceStatus::PAID;
+          $isExpired = $invoice->status === InvoiceStatus::EXPIRED;
         @endphp
 
         <div class="d-flex align-items-end justify-content-between">
@@ -134,7 +132,8 @@
 
           <div class="text-center fs-3">
             <div class="text-uppercase text-muted small">Periode</div>
-            <div class="fw-semibold">{{ strtoupper($periodLabel) }}</div>
+            <div class="fw-semibold">
+              {{ strtoupper($invoice->period_start_date->locale('id')->translatedFormat('F Y')) }}</div>
             <div class="fw-bold text-uppercase {{ $isPaid ? 'text-success' : ($isExpired ? 'text-danger' : '') }}">
               {{ $invoice->status->label() }}
             </div>
@@ -181,18 +180,19 @@
                 <td>
                   {{ $invoice->package_detail->name }}
                   <div class="text-muted">
-                    {{ $periodStart->translatedFormat('d F Y') }} s.d. {{ $periodEnd->translatedFormat('d F Y') }}
+                    {{ $invoice->period_start_date->locale('id')->translatedFormat('d F Y') }} s.d.
+                    {{ $invoice->period_end_date->locale('id')->translatedFormat('d F Y') }}
                   </div>
                 </td>
-                <td>Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
+                <td>Rp{{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
                 <td>
                   {{ $invoice->period_start_date->locale('id')->translatedFormat('F Y') }}
                 </td>
-                <td class="text-end">Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
+                <td class="text-end">Rp{{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
               </tr>
               <tr class="fs-4">
                 <td colspan="4" class="text-end fw-semibold">Sub Total:</td>
-                <td class="text-end fw-semibold">Rp {{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
+                <td class="text-end fw-semibold">Rp{{ number_format($invoice->amount ?? 0, 0, ',', '.') }}</td>
               </tr>
               @php $feeRow = ($invoice->paymentMethod?->calculateFee($invoice->amount ?? 0)) ?? 0; @endphp
               @if ($feeRow > 0)
@@ -224,7 +224,7 @@
             <i class="icon ti ti-printer"></i>
             Cetak
           </button>
-          @if ($invoice->status === \Modules\EBilling\Enums\InvoiceStatus::UNPAID)
+          @if ($invoice->status === InvoiceStatus::UNPAID)
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentMethodModal">
               Bayar
             </button>

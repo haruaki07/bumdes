@@ -250,8 +250,9 @@
           <div class="d-flex align-items-start">
             <div class="me-auto">
               <h4 class="mb-0">{{ $invoice->package_detail->name }}</h4>
-              <div class="text-secondary">{{ $invoice->period_start_date->locale('id')->format('d M Y') }} s.d.
-                {{ $invoice->period_end_date->locale('id')->format('d M Y') }}</div>
+              <div class="text-secondary">{{ $invoice->period_start_date->locale('id')->translatedFormat('d M Y') }}
+                s.d.
+                {{ $invoice->period_end_date->locale('id')->translatedFormat('d M Y') }}</div>
             </div>
             <div class="text-end" style="width:120px">
               <h4 class="mb-0">{{ $amountFormatted }}</h4>
