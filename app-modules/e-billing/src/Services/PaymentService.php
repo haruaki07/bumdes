@@ -82,7 +82,7 @@ class PaymentService implements PaymentServiceInterface
 
         // reusable qr payments is disabled
         if ($input->reusable && $input->paymentMethod->type === PaymentMethodType::QR) {
-            $request->body()->set('type', 'PAY');
+            $request->body()->add('type', 'PAY');
         }
 
         $response = $xendit->send($request);
