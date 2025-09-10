@@ -1,3 +1,7 @@
+@php
+  use Modules\EBilling\Enums\InvoiceStatus;
+@endphp
+
 <x-e-billing::layouts.panel>
   <div class="page-header d-print-none">
     <div class="container-xl">
@@ -16,11 +20,19 @@
           <a class="btn btn-outline-primary" href="{{ $invoice->public_url }}" target="_blank">
             <i class="ti ti-external-link icon"></i> Halaman Publik
           </a>
-          @if ($invoice->status->value !== \Modules\EBilling\Enums\InvoiceStatus::PAID->value)
+          @if ($invoice->status !== InvoiceStatus::PAID)
             <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">
               @csrf
               <button class="btn btn-success">
-                <i class="ti ti-cash icon"></i> Tandai Lunas
+                <i class="ti ti-check icon"></i> Tandai Lunas
+              </button>
+            </form>
+          @endif
+          @if ($invoice->status === InvoiceStatus::PAID)
+            <form method="POST" action="{{ route('e-billing.invoices.mark-unpaid', $invoice) }}" class="d-inline">
+              @csrf
+              <button class="btn btn-outline-danger">
+                <i class="ti ti-x icon"></i> Tandai Belum Lunas
               </button>
             </form>
           @endif
@@ -168,7 +180,7 @@
                 </div>
                 @if ($invoice->paymentMethod && $invoice->paymentMethod->calculateFee($invoice->amount) > 0)
                   <div class="datagrid-item">
-                    <div class="datagrid-title">Biaya Metode Pembayaran</div>
+                    <div class="datagrid-title">Biaya Admin</div>
                     <div class="datagrid-content">
                       Rp{{ number_format($invoice->paymentMethod->calculateFee($invoice->amount), 0, ',', '.') }}</div>
                   </div>

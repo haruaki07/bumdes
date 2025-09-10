@@ -19,10 +19,63 @@ use Modules\EBilling\Models\PaymentMethod;
 use Modules\EBilling\Models\TransferReceipt;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
 use Modules\EBilling\Services\DTOs\Payment\CreatePaymentRequestIn;
+use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
 
 class InvoiceController extends Controller
 {
     public function __construct(private PaymentServiceInterface $paymentService) {}
+
+    /**
+     * Create a manual invoice for an active customer for the current month ignoring next_billing_date.
+     */
+    public function createManual(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:ebil_customers,id',
+        ]);
+
+        $customer = Customer::with(['package'])->findOrFail($validated['customer_id']);
+
+        if ($customer->status !== \Modules\EBilling\Enums\CustomerStatus::ACTIVE) {
+            return back()->with('error', 'Pelanggan tidak aktif.');
+        }
+
+        // Prevent duplicate invoice for same period (month + customer)
+        $periodMonth = now()->format('Ym');
+        $already = Invoice::where('customer_id', $customer->id)
+            ->whereYear('period_end_date', now()->year)
+            ->whereMonth('period_end_date', now()->month)
+            ->exists();
+        if ($already) {
+            return back()->with('error', 'Invoice bulan ini sudah ada untuk pelanggan ini.');
+        }
+
+        $currentDate = now();
+        $count = Invoice::whereMonth('created_at', $currentDate->month)
+            ->whereYear('created_at', $currentDate->year)
+            ->count();
+        $invoiceNumber = Invoice::generateInvoiceNumber($currentDate->copy(), $count);
+
+        $invoice = Invoice::create([
+            'invoice_number' => $invoiceNumber,
+            'due_date' => $customer->due_date,
+            'grace_period_end_date' => $customer->grace_period_end_date,
+            'period_start_date' => $customer->period_start_date,
+            'period_end_date' => $customer->period_end_date,
+            'customer_id' => $customer->id,
+            'customer_detail' => $customer,
+            'package_id' => $customer->package_id,
+            'package_detail' => $customer->package,
+            'amount' => $customer->package?->price ?? 0,
+            'status' => InvoiceStatus::UNPAID,
+        ]);
+
+        // tie invoice to customer as active invoice if none set
+        $customer->invoice_number = $invoice->invoice_number;
+        $customer->save();
+
+        return redirect()->route('e-billing.invoices.show', $invoice)->with('success', 'Invoice berhasil dibuat.');
+    }
 
     public function index(Request $request)
     {
@@ -44,6 +97,14 @@ class InvoiceController extends Controller
         // Check if the customerId is an invoice number
         if (str_starts_with($customerId, 'INV')) {
             $invoice = Invoice::where('invoice_number', $customerId)->first();
+            if (! $invoice) {
+                return view('e-billing::invoices.customer.not-found', [
+                    'title' => 'Tagihan tidak ditemukan',
+                    'message' => 'Tagihan mungkin telah diarsipkan atau tidak tersedia. Silakan coba lagi nanti atau hubungi admin.',
+                    'customerId' => $customerId,
+                ]);
+            }
+
             $customer = Customer::find($invoice->customer_id);
         } else {
             $customer = Customer::where('customer_id', $customerId)->first();
@@ -92,7 +153,9 @@ class InvoiceController extends Controller
             }
         }
 
-        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods', 'savedPaymentMethod', 'savedPaymentCode'));
+        $businessProfileSettings = app(EBillingBusinessProfileSettings::class);
+
+        return view('e-billing::invoices.customer.show', compact('customer', 'invoice', 'paymentMethods', 'savedPaymentMethod', 'savedPaymentCode', 'businessProfileSettings'));
     }
 
     public function requestPayment(Request $request, $customerId)
@@ -103,12 +166,12 @@ class InvoiceController extends Controller
 
         $customer = Customer::where('customer_id', $customerId)->first();
         if (! $customer) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'ID pelanggan tidak ditemukan'], 404);
         }
 
         $invoice = Invoice::where('invoice_number', $customer->invoice_number)->first();
         if (! $invoice) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'Tagihan tidak ditemukan'], 404);
         }
 
         if ($invoice->status === InvoiceStatus::PAID) {
@@ -121,7 +184,7 @@ class InvoiceController extends Controller
 
         $paymentMethod = PaymentMethod::find($request->input('payment_method'));
         if (! $paymentMethod) {
-            abort(404);
+            return response()->json(['status' => 'error', 'message' => 'Metode pembayaran tidak valid'], 400);
         }
 
         $savePaymentMethod = $request->boolean('save');
@@ -308,7 +371,8 @@ class InvoiceController extends Controller
         $token = $request->query('token');
         if (! $token) {
             return view('e-billing::invoices.customer.pay', [
-                'error' => 'Sesi pembayaran tidak ditemukan atau sudah kedaluwarsa.',
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
+                'error' => 'Sesi pembayaran tidak ditemukan atau mungkin sudah kedaluwarsa.',
                 'session' => null,
             ]);
         }
@@ -316,7 +380,8 @@ class InvoiceController extends Controller
         $session = Cache::get('ebil:pay:'.$token);
         if (! $session) {
             return view('e-billing::invoices.customer.pay', [
-                'error' => 'Sesi pembayaran tidak ditemukan atau sudah kedaluwarsa.',
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
+                'error' => 'Sesi pembayaran tidak ditemukan atau mungikn sudah kedaluwarsa.',
                 'session' => null,
             ]);
         }
@@ -328,17 +393,17 @@ class InvoiceController extends Controller
             Cache::delete('ebil:pay:'.$token);
 
             return view('e-billing::invoices.customer.pay', [
+                'title' => 'Sesi Pembayaran Tidak Ditemukan!',
                 'error' => 'Tagihan sudah dibayar.',
                 'session' => null,
             ]);
         }
 
         $invoice = Invoice::where('invoice_number', $session['reference_id'])->first();
-        $package = $invoice->package_detail;
 
         return view('e-billing::invoices.customer.pay', [
             'session' => $session,
-            'packageDetail' => $package,
+            'invoice' => $invoice,
         ]);
     }
 
@@ -367,12 +432,24 @@ class InvoiceController extends Controller
         $paymentStatus = null;
         $pollError = null;
 
+        $invoice = Invoice::where('invoice_number', $session['reference_id'] ?? '')->first();
+
         // For manual confirmation channels, do not query gateway
         if (($session['action']['descriptor'] ?? null) !== 'BANK_TRANSFER_DETAILS') {
             try {
                 $res = $this->paymentService->getPaymentStatus($session['id'] ?? '');
                 $paymentStatus = $res->status; // e.g., SUCCEEDED, EXPIRED, FAILED, etc.
                 // If expired or finished, we can drop the cache soon
+
+                // need to wait webhook call
+                if ($paymentStatus === 'SUCCEEDED' || $paymentStatus === 'AUTHORIZED') {
+                    if ($invoice->status === InvoiceStatus::PAID) {
+                        $paymentStatus = 'SUCCEEDED';
+                    } else {
+                        $paymentStatus = 'PENDING';
+                    }
+                }
+
                 if (in_array($paymentStatus, ['SUCCEEDED', 'AUTHORIZED', 'EXPIRED', 'FAILED', 'CANCELED'])) {
                     Cache::delete('ebil:pay:'.$token);
                 }
@@ -382,6 +459,14 @@ class InvoiceController extends Controller
             }
         }
 
+        if ($paymentStatus === 'SUCCEEDED') {
+            return view('e-billing::invoices.customer.pay-success', compact('invoice'))->render();
+        }
+
+        if ($paymentStatus === 'EXPIRED' || $expired) {
+            return view('e-billing::invoices.customer.pay-expired', compact('invoice'))->render();
+        }
+
         return response()->json([
             'status' => 'ok',
             'expired' => $expired,
@@ -389,6 +474,62 @@ class InvoiceController extends Controller
             'poll_error' => $pollError,
             'session' => $session,
         ]);
+    }
+
+    public function simulatePayment(Request $request)
+    {
+        $token = $request->query('token');
+        if (! $token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token tidak ditemukan.',
+            ], 400);
+        }
+
+        $cached = Cache::get('ebil:pay:'.$token);
+        if (! $cached) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sesi pembayaran tidak ditemukan atau kedaluwarsa.',
+            ], 404);
+        }
+
+        $session = Crypt::decrypt($cached);
+        $paymentId = $session['id'] ?? null;
+        if (! $paymentId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment ID tidak tersedia.',
+            ], 400);
+        }
+
+        try {
+            $amount = (int) ($request->input('amount') ?: ($session['total_amount'] ?? $session['amount'] ?? null));
+            if ($session['payment_method']['type'] !== PaymentMethodType::BANK_TRANSFER) {
+                $result = $this->paymentService->simulatePayment($paymentId, $amount ?: null);
+
+                return response()->json([
+                    'status' => 'ok',
+                    'payment_status' => $result->status,
+                    'data' => $result ?? null,
+                ]);
+            } else {
+                $invoice = Invoice::where('invoice_number', $session['reference_id'])->first();
+                $invoice->status = InvoiceStatus::PAID;
+                $invoice->paid_at = now();
+                $invoice->payment_method_code = $session['payment_method']['code'] ?? null;
+                $invoice->save();
+
+                return view('e-billing::invoices.customer.pay-success', compact('invoice'))->render();
+            }
+        } catch (\Throwable $e) {
+            Log::error('Simulate payment error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mensimulasikan pembayaran.',
+            ], 500);
+        }
     }
 
     public function markPaid(Request $request, Invoice $invoice)
@@ -414,5 +555,20 @@ class InvoiceController extends Controller
         InvoicePaid::dispatch($invoice);
 
         return back()->with('success', 'Invoice ditandai lunas.');
+    }
+
+    public function markUnpaid(Invoice $invoice)
+    {
+        $invoice->status = InvoiceStatus::UNPAID;
+        $invoice->paid_at = null;
+        $invoice->payment_method_code = null;
+        $invoice->save();
+
+        $invoice->customer->invoice_number = $invoice->invoice_number;
+        $invoice->customer->save();
+
+        TransferReceipt::where('invoice_id', $invoice->id)->delete();
+
+        return back()->with('success', 'Invoice ditandai belum lunas.');
     }
 }

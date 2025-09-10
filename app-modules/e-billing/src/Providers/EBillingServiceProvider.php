@@ -12,6 +12,4 @@ class EBillingServiceProvider extends ServiceProvider
     {
         $this->app->bind(PaymentServiceInterface::class, PaymentService::class);
     }
-
-    public function boot(): void {}
 }

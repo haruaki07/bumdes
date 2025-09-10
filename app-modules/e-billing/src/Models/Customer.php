@@ -67,7 +67,7 @@ class Customer extends Model
     {
         $relative = $relative ?? now();
 
-        return $relative->addMonth()->setDay($customer->due)->subDays($customer->due_reminder_days ?? 5);
+        return $relative->addMonth()->setDay((int) $customer->due)->subDays((int) $customer->due_reminder_days ?? 5);
     }
 
     public function site()
@@ -83,5 +83,25 @@ class Customer extends Model
     public function device()
     {
         return $this->belongsTo(Device::class);
+    }
+
+    public function getDueDateAttribute(): \Carbon\Carbon
+    {
+        return now()->copy()->day($this->due);
+    }
+
+    public function getGracePeriodEndDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute()->copy()->addDays($this->grace_period);
+    }
+
+    public function getPeriodStartDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute()->copy()->subMonthNoOverflow()->day($this->due + 1);
+    }
+
+    public function getPeriodEndDateAttribute(): \Carbon\Carbon
+    {
+        return $this->getDueDateAttribute();
     }
 }

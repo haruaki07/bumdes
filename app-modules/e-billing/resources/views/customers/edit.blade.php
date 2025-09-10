@@ -140,7 +140,8 @@
                       @foreach ($packages as $package)
                         <option value="{{ $package->id }}"
                           data-price="Rp{{ number_format($package->price, 0, ',', '.') }}"
-                          data-bandwidth="{{ $package->bandwidth }}" data-due="{{ $package->due }}"
+                          data-raw-price="{{ $package->price }}" data-bandwidth="{{ $package->bandwidth }}"
+                          data-due="{{ $package->due }}"
                           {{ old('package_id') ?? $customer->package_id == $package->id ? 'selected' : '' }}>
                           {{ $package->name }}
                         </option>
@@ -165,13 +166,71 @@
                     <label class="form-label required">Tanggal jatuh tempo</label>
                     <input type="number" name="due" id="dueInput"
                       class="form-control @error('due') is-invalid @enderror" required
-                      value="{{ old('due') ?? $customer->due }}">
+                      value="{{ old('due') ?? $customer->due }}" min="1" max="31">
                     <div class="form-text">
                       Tanggal jatuh tempo dapat diubah jika diperlukan. Isi dengan angka 1-31.
                     </div>
                     @error('due')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label required">Hari Pengingat Sebelum Jatuh Tempo</label>
+                    <div class="input-group">
+                      <input type="number" name="due_reminder_days" id="dueReminderInput"
+                        class="form-control @error('due_reminder_days') is-invalid @enderror" required
+                        value="{{ old('due_reminder_days', $customer->due_reminder_days ?? 5) }}" min="0"
+                        max="30">
+                      <span class="input-group-text">Hari</span>
+                    </div>
+                    <div class="form-text">Berapa hari sebelum jatuh tempo sistem mengirimkan pengingat pertama
+                      (default 5).</div>
+                    @error('due_reminder_days')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label required">Batas Waktu Pembayaran</label>
+                    <div class="input-group">
+                      <input type="number" name="grace_period" id="gracePeriodInput"
+                        class="form-control @error('grace_period') is-invalid @enderror" required
+                        value="{{ old('grace_period', $customer->grace_period ?? 3) }}" min="0"
+                        max="31">
+                      <span class="input-group-text">Hari</span>
+                    </div>
+                    <div class="form-text">Jumlah hari setelah jatuh tempo sebelum pelanggan diisolir / dinonaktifkan.
+                    </div>
+                    @error('grace_period')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <h4>Siklus Tagihan</h4>
+                  <p class="text-muted mb-2">Simulasi 6 bulan ke depan berdasarkan tanggal jatuh tempo, batas waktu
+                    pembayaran,
+                    dan paket. "Tanggal Isolir" adalah estimasi layanan dinonaktifkan jika belum bayar.</p>
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="billingPreviewTable">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>Bulan</th>
+                          <th>Masa Aktif</th>
+                          <th>Tanggal Jatuh Tempo</th>
+                          <th>Tanggal Isolir</th>
+                          <th>Periode (Range)</th>
+                          <th>Nominal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td colspan="6" class="text-muted text-center">Memuat...</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -276,27 +335,79 @@
 
       const pkgSelect = document.getElementById('packageSelect');
 
+      function formatDate(d) {
+        return d.toLocaleDateString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
+
+      function generateBillingPreview() {
+        const dueInput = document.getElementById('dueInput');
+        const graceInput = document.getElementById('gracePeriodInput');
+        const tableBody = document.querySelector('#billingPreviewTable tbody');
+        const opt = pkgSelect.options[pkgSelect.selectedIndex];
+        const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
+        const dueDay = parseInt(dueInput.value, 10);
+        const grace = parseInt(graceInput.value, 10) || 0;
+        if (!dueDay) {
+          tableBody.innerHTML =
+            '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
+          return;
+        }
+        const today = new Date();
+        let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+        if (today.getDate() > dueDay) {
+          firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
+        }
+        const rows = [];
+        for (let i = 0; i < 6; i++) {
+          const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
+          const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + grace);
+          const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
+          const bulanLabel = dueDate.toLocaleDateString('id-ID', {
+            month: 'long',
+            year: 'numeric'
+          });
+          rows.push(`<tr>
+            <td>${bulanLabel}</td>
+            <td>1 Bulan</td>
+            <td>${formatDate(dueDate)}</td>
+            <td>${formatDate(isolirDate)}</td>
+            <td>${formatDate(periodStart)} - ${formatDate(dueDate)}</td>
+            <td>${formatRupiah(rawPrice)}</td>
+          </tr>`);
+        }
+        tableBody.innerHTML = rows.join('');
+      }
+
       const updatePackageInfo = () => {
         const dueInput = document.getElementById('dueInput');
         const bandwidthInput = document.getElementById('bandwidthInput');
         const priceInput = document.getElementById('priceInput');
-
         const opt = pkgSelect.options[pkgSelect.selectedIndex];
         if (!opt?.value || !opt.dataset) {
-          dueInput.value = '';
           bandwidthInput.value = '';
           priceInput.value = '';
+          generateBillingPreview();
           return;
         }
-
         const price = opt.dataset.price;
         const bandwidth = opt.dataset.bandwidth;
         const due = opt.dataset.due;
-
-        dueInput.value = due || '-';
-        bandwidthInput.value = bandwidth + " Mbps" || '-';
+        if (!dueInput.value) dueInput.value = due || '';
+        bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
         priceInput.value = price || '-';
+        generateBillingPreview();
       }
+
+      ['dueInput', 'dueReminderInput', 'gracePeriodInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', generateBillingPreview);
+        }
+      });
 
       pkgSelect.addEventListener('change', updatePackageInfo);
       updatePackageInfo();

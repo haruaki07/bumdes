@@ -97,6 +97,16 @@
                 </div>
 
                 <div class="datagrid-item">
+                  <div class="datagrid-title">Pengingat Sebelum Jatuh Tempo</div>
+                  <div class="datagrid-content">{{ $customer->due_reminder_days ?? '-' }} Hari</div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Batas Waktu Pembayaran</div>
+                  <div class="datagrid-content">{{ $customer->grace_period ?? '-' }} Hari</div>
+                </div>
+
+                <div class="datagrid-item">
                   <div class="datagrid-title">Tanggal Registrasi</div>
                   <div class="datagrid-content">{{ $customer->registration_date->format('d/m/Y') }}</div>
                 </div>
@@ -138,6 +148,38 @@
                       label="Rp{{ number_format($customer->package->price, 0, ',', '.') }}" />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Siklus Tagihan</h3>
+            </div>
+            <div class="card-body">
+              <p class="text-muted mb-2">
+                Simulasi 6 bulan ke depan berdasarkan tanggal jatuh tempo, batas waktu
+                pembayaran, dan paket. "Tanggal Isolir" adalah estimasi layanan dinonaktifkan jika belum bayar.
+              </p>
+              <div class="table-responsive">
+                <table class="table table-bordered" id="billingPreviewTable">
+                  <thead>
+                    <tr>
+                      <th>Bulan</th>
+                      <th>Masa Aktif</th>
+                      <th>Tanggal Jatuh Tempo</th>
+                      <th>Tanggal Isolir</th>
+                      <th>Periode (Range)</th>
+                      <th>Nominal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="6" class="text-muted text-center">Memuat...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -199,7 +241,60 @@
             </div>
           </div>
         </div>
+
+
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tableBody = document.querySelector('#billingPreviewTable tbody');
+      if (!tableBody) return;
+
+      function formatDate(d) {
+        return d.toLocaleDateString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
+
+      const dueDay = {{ (int) ($customer->due ?? 0) }};
+      const grace = {{ (int) ($customer->grace_period ?? 0) }};
+      const rawPrice = {{ (int) ($customer->package->price ?? 0) }};
+
+      if (!dueDay) {
+        tableBody.innerHTML =
+          '<tr><td colspan="6" class="text-muted text-center">Tanggal jatuh tempo tidak tersedia.</td></tr>';
+        return;
+      }
+
+      const today = new Date();
+      let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+      if (today.getDate() > dueDay) {
+        firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
+      }
+
+      const rows = [];
+      for (let i = 0; i < 6; i++) {
+        const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
+        const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + (isNaN(grace) ? 0 : grace));
+        const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
+        const bulanLabel = dueDate.toLocaleDateString('id-ID', {
+          month: 'long',
+          year: 'numeric'
+        });
+        rows.push(`<tr>
+          <td>${bulanLabel}</td>
+          <td>1 Bulan</td>
+          <td>${formatDate(dueDate)}</td>
+          <td>${formatDate(isolirDate)}</td>
+          <td>${formatDate(periodStart)} - ${formatDate(dueDate)}</td>
+          <td>${formatRupiah(rawPrice)}</td>
+        </tr>`);
+      }
+      tableBody.innerHTML = rows.join('');
+    });
+  </script>
 </x-e-billing::layouts.panel>

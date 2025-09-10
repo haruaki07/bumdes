@@ -1,8 +1,22 @@
 @section('title', 'Checkout Pembayaran')
 
 <x-e-billing::layouts.blank>
+  @if (!empty($session) && config('app.env') !== 'production')
+    <div id="simulateBar"
+      style="position:sticky;top:0;left:0;z-index:999;background:#fff3cd;color:#856404;font-size:14px;cursor:pointer;padding:6px 12px;text-align:center;font-weight:500">
+      Simulasikan pembayaran
+    </div>
+  @endif
   @if (!empty($error))
-    <div class="alert alert-danger" role="alert">{{ $error }}</div>
+    <div class="empty">
+      <div class="empty-img">
+        <img src="{{ asset('assets/images/misc/cat.webp') }}" width="180" alt="Cat" />
+      </div>
+      <p class="empty-title">{{ $title }}</p>
+      <p class="empty-subtitle text-secondary">
+        {{ $error }}
+      </p>
+    </div>
   @else
     @php
       $s = $session;
@@ -235,15 +249,17 @@
           <hr class="my-4" style="opacity:0.05" />
           <div class="d-flex align-items-start">
             <div class="me-auto">
-              <h4 class="mb-0">Paket Internet</h4>
-              <div class="text-secondary">{{ $packageDetail->name }}</div>
+              <h4 class="mb-0">{{ $invoice->package_detail->name }}</h4>
+              <div class="text-secondary">{{ $invoice->period_start_date->locale('id')->translatedFormat('d M Y') }}
+                s.d.
+                {{ $invoice->period_end_date->locale('id')->translatedFormat('d M Y') }}</div>
             </div>
             <div class="text-end" style="width:120px">
               <h4 class="mb-0">{{ $amountFormatted }}</h4>
             </div>
           </div>
           <hr class="my-4" style="opacity:0.05" />
-          <div class="d-flex align-items-start">
+          <div class="d-flex align-items-center">
             <div class="ms-auto">
               <h4 class="mb-0">Subtotal</h4>
             </div>
@@ -253,7 +269,7 @@
           </div>
           @if ($fee > 0)
             <hr class="my-4" style="opacity:0.05" />
-            <div class="d-flex align-items-start mb-3">
+            <div class="d-flex align-items-center mb-3">
               <div class="ms-auto">
                 <div class="fs-4">Biaya Admin</div>
               </div>
@@ -261,7 +277,7 @@
                 <div class="fs-4">{{ $feeFormatted }}</div>
               </div>
             </div>
-            <div class="d-flex align-items-start">
+            <div class="d-flex align-items-center">
               <div class="ms-auto">
                 <h4 class="mb-0">Total Biaya</h4>
               </div>
@@ -271,7 +287,7 @@
             </div>
           @endif
           <hr class="my-4" style="opacity:0.05" />
-          <div class="d-flex align-items-start">
+          <div class="d-flex align-items-center">
             <div class="ms-auto">
               <h4 class="mb-0">Total</h4>
             </div>
@@ -315,6 +331,12 @@
                   ? route('e-billing.invoice.transfer-receipts.store', ['invoice' => $session['reference_id']])
                   : null,
           );
+      if (!empty($session)) {
+          $sessionMeta->put(
+              'simulate_url',
+              route('e-billing.invoice.pay.simulate', ['token' => request()->query('token')]),
+          );
+      }
     @endphp
     <script id="sessionData" type="application/json">{!! json_encode($sessionData) !!}</script>
     <script id="sessionMeta" type="application/json">{!! json_encode($sessionMeta) !!}</script>

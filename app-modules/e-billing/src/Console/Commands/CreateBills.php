@@ -37,17 +37,29 @@ class CreateBills extends Command
             ->whereStatus(CustomerStatus::ACTIVE)
             ->each(function (Customer $customer) use ($currentDate) {
                 try {
-                    $this->info("Creating bill for customer ID {$customer->customer_id}...");
                     DB::beginTransaction();
 
                     $count = Invoice::whereMonth('created_at', $currentDate->month)
                         ->whereYear('created_at', $currentDate->year)
                         ->count();
 
-                    $invoiceNumber = 'INV'.$currentDate->format('Ym').str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+                    $invoiceNumber = Invoice::generateInvoiceNumber($currentDate->copy(), $count);
 
+                    if ($currentDate > $customer->grace_period_end_date) {
+                        $this->warn("Customer ID {$customer->customer_id} is past the grace period. Deactivating customer...");
+                        $customer->update(['status' => CustomerStatus::INACTIVE]);
+                        DB::commit();
+
+                        return;
+                    }
+
+                    $this->info("Creating bill for customer ID {$customer->customer_id}...");
                     $invoice = Invoice::create([
                         'invoice_number' => $invoiceNumber,
+                        'due_date' => $customer->due_date,
+                        'grace_period_end_date' => $customer->grace_period_end_date,
+                        'period_start_date' => $customer->period_start_date,
+                        'period_end_date' => $customer->period_end_date,
                         'customer_id' => $customer->id,
                         'customer_detail' => $customer,
                         'package_id' => $customer->package_id,
