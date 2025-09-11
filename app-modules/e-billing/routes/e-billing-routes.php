@@ -21,6 +21,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
         Route::post('/login', [LoginController::class, 'login'])->name('login.post');
         Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+        Route::get('/invoice', [InvoiceController::class, 'customerSearch'])->name('invoice.customer-search');
         Route::get('/invoice/pay', [InvoiceController::class, 'pay'])->name('invoice.pay');
         Route::get('/invoice/{customer_id}', [InvoiceController::class, 'customerShow'])->name('invoice.customer-show');
 

@@ -92,6 +92,11 @@ class InvoiceController extends Controller
         return view('e-billing::invoices.show', compact('invoice', 'receipts'));
     }
 
+    public function customerSearch()
+    {
+        return view('e-billing::invoices.customer.index');
+    }
+
     public function customerShow(Request $request, $customerId)
     {
         // Check if the customerId is an invoice number
