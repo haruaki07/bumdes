@@ -2,6 +2,7 @@
 
 namespace Modules\EBilling\Models;
 
+use App\Traits\Datatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -9,7 +10,7 @@ use Modules\EBilling\Enums\UserRole;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use Datatable, HasFactory, Notifiable;
 
     protected $table = 'ebil_users';
 
@@ -23,6 +24,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $dataTableColumns = [
+        'name' => 'searchable|sortable',
+        'email' => 'searchable|sortable',
+        'role' => 'searchable|sortable',
     ];
 
     protected function casts(): array

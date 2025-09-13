@@ -15,6 +15,14 @@ enum UserRole: string
         };
     }
 
+    public function color(): string
+    {
+        return match ($this) {
+            self::ADMIN => 'success',
+            self::OPERATOR => 'info',
+        };
+    }
+
     public static function fromString(string $status): self
     {
         return match ($status) {

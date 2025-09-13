@@ -228,6 +228,12 @@ return [
             'submenu' => [
                 [
                     'group' => 'e-billing',
+                    'text' => 'Manajemen User',
+                    'route' => 'e-billing.settings.users.index',
+                    'icon' => 'ti ti-users',
+                ],
+                [
+                    'group' => 'e-billing',
                     'text' => 'Metode Pembayaran',
                     'route' => 'e-billing.settings.payment-methods.index',
                     'icon' => 'ti ti-credit-card',
