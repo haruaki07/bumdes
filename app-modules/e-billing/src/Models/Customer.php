@@ -104,4 +104,9 @@ class Customer extends Model
     {
         return $this->getDueDateAttribute();
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

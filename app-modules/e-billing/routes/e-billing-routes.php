@@ -12,6 +12,7 @@ use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
 use Modules\EBilling\Http\Controllers\SettingsController;
 use Modules\EBilling\Http\Controllers\SiteController;
+use Modules\EBilling\Http\Controllers\TicketController;
 use Modules\EBilling\Http\Controllers\TransferReceiptController;
 use Modules\EBilling\Http\Controllers\WebhookController;
 
@@ -34,6 +35,10 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::resource('packages', PackageController::class);
                 Route::resource('customers', CustomerController::class);
             });
+
+            // Tickets
+            Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store', 'show', 'update', 'destroy']);
+            Route::post('tickets/{ticket}/messages', [TicketController::class, 'addMessage'])->name('tickets.messages.store');
 
             Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
             // Manual invoice creation (admin triggered)

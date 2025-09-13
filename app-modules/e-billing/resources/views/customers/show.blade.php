@@ -242,6 +242,51 @@
           </div>
         </div>
 
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Tiket Pelanggan</h3>
+              <div class="card-actions">
+                <a href="{{ route('e-billing.tickets.create', ['customer_id' => $customer->id]) }}"
+                  class="btn btn-sm btn-primary">Buat Tiket</a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Kode</th>
+                      <th>Subjek</th>
+                      <th>Prioritas</th>
+                      <th>Status</th>
+                      <th>Aktivitas Terakhir</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @forelse ($customer->tickets()->latest('last_activity_at')->limit(10)->get() as $t)
+                      <tr>
+                        <td class="fw-medium">{{ $t->code }}</td>
+                        <td>{{ $t->subject }}</td>
+                        <td><x-common.badge :color="$t->priority->color()" :label="$t->priority->label()" /></td>
+                        <td><x-common.badge :color="$t->status->color()" :label="$t->status->label()" /></td>
+                        <td>{{ $t->last_activity_at?->diffForHumans() }}</td>
+                        <td class="text-end"><a href="{{ route('e-billing.tickets.show', $t) }}"
+                            class="btn btn-sm btn-primary">Detail</a></td>
+                      </tr>
+                    @empty
+                      <tr>
+                        <td colspan="6" class="text-center text-muted">Belum ada tiket.</td>
+                      </tr>
+                    @endforelse
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
       </div>
     </div>
