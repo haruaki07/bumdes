@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Modules\EBilling\Enums\SettingsGroup;
 use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
+use Modules\EBilling\Settings\EBillingWhatsappSettings;
 use Modules\EBilling\Settings\EBillingXenditSettings;
 
 class SettingsController
@@ -26,6 +27,7 @@ class SettingsController
         $settings = match ($group) {
             SettingsGroup::BUSINESS_PROFILE => app(EBillingBusinessProfileSettings::class),
             SettingsGroup::PAYMENT_GATEWAY => app(EBillingXenditSettings::class),
+            SettingsGroup::WHATSAPP => app(EBillingWhatsappSettings::class),
             default => null
         };
 
@@ -75,6 +77,16 @@ class SettingsController
             $settings->secret = $data['secret'];
             $settings->webhook_token = $data['webhook_token'];
             $settings->save();
+        } elseif ($group === SettingsGroup::WHATSAPP) {
+            $settings = app(EBillingWhatsappSettings::class);
+            $settings->enabled = (bool) ($data['enabled'] ?? false);
+            $settings->provider = $data['provider'];
+            $settings->phoneNumber = $data['phoneNumber'] ?? '';
+            // WAHA
+            $settings->waha_base_url = $data['waha_base_url'] ?? null;
+            $settings->waha_api_key = $data['waha_api_key'] ?? null;
+            $settings->waha_session = $data['waha_session'] ?? 'default';
+            $settings->save();
         }
 
         return redirect()->route('e-billing.settings.show', ['group' => $group->value])
@@ -104,6 +116,11 @@ class SettingsController
                 return [
                     'secret' => 'required|string',
                     'webhook_token' => 'required|string',
+                ];
+            case SettingsGroup::WHATSAPP:
+                return [
+                    'enabled' => 'nullable|boolean',
+                    'provider' => 'required|in:waha',
                 ];
             default:
                 return [];

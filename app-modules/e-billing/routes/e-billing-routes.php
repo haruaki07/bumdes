@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use Modules\EBilling\Http\Controllers\API\WhatsappWahaController;
 use Modules\EBilling\Http\Controllers\CustomerController;
 use Modules\EBilling\Http\Controllers\DashboardController;
 use Modules\EBilling\Http\Controllers\DeviceController;
@@ -74,5 +75,12 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             ->name('invoice.transfer-receipts.store');
         Route::post('/webhooks/xendit', [WebhookController::class, 'xendit'])
             ->name('webhooks.xendit');
+
+        Route::prefix('whatsapp/waha')->as('whatsapp.waha.')->group(function () {
+            Route::get('/status', [WhatsappWahaController::class, 'status'])->name('status');
+            Route::post('/logout', [WhatsappWahaController::class, 'logout'])->name('logout');
+            Route::get('/qr', [WhatsappWahaController::class, 'qr'])->name('qr');
+            Route::post('/request-code', [WhatsappWahaController::class, 'requestCode'])->name('request-code');
+        });
     });
 });

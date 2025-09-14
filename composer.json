@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "chengkangzai/laravel-waha-saloon-sdk": "^0.0.9",
         "fedeisas/laravel-mail-css-inliner": "^5.4",
         "internachi/modular": "^2.3",
         "laravel/framework": "^12.0",
