@@ -22,7 +22,7 @@
             <!-- START MAIN CONTENT AREA -->
             <tr>
               <td class="wrapper">
-                <h2>Pengingat Tagihan</h2>
+                <h2>Informasi Tagihan</h2>
                 <p>Halo {{ $customer->name }},</p>
                 <p>
                   Ini adalah pengingat bahwa tagihan Anda dengan nomor <strong>{{ $invoice->invoice_number }}</strong>

@@ -44,6 +44,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
 
             Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
             // Manual invoice creation (admin triggered)
+            Route::post('/invoices/{invoice}/send-notification', [InvoiceController::class, 'sendNotification'])->name('invoices.send-notification');
             Route::post('/invoices/create-manual', [InvoiceController::class, 'createManual'])->name('invoices.create-manual');
             Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
             Route::post('/invoices/{invoice}/mark-unpaid', [InvoiceController::class, 'markUnpaid'])->name('invoices.mark-unpaid');
