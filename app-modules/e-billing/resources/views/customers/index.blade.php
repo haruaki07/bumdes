@@ -35,6 +35,7 @@
               <tr>
                 <th>#</th>
                 <x-sortable-header field="customer_id" label="ID Pelanggan" />
+                <th>Tagihan</th>
                 <x-sortable-header field="name" label="Nama Pelanggan" />
                 <x-sortable-header field="email" label="Email" />
                 <x-sortable-header field="phone" label="Telepon" />
@@ -47,9 +48,20 @@
 
             <x-slot:tbody>
               @forelse ($customers as $customer)
-                <tr>
+                @php
+                  $hasInvoice = $customer->invoice_number != null;
+                @endphp
+                <tr class="{{ $hasInvoice ? 'table-warning' : '' }}">
                   <td>{{ $loop->iteration + $customers->firstItem() - 1 }}</td>
                   <td class="fw-medium">{{ $customer->customer_id }}</td>
+                  <td class="text-center">
+                    @if ($hasInvoice)
+                      <a href="{{ route('e-billing.invoices.show', $customer->invoice_number) }}"
+                        class="btn btn-link">#{{ $customer->invoice_number }}</a>
+                    @else
+                      -
+                    @endif
+                  </td>
                   <td>{{ $customer->name }}</td>
                   <td>{{ $customer->email }}</td>
                   <td>{{ $customer->phone }}</td>

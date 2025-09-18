@@ -84,9 +84,13 @@ class InvoiceController extends Controller
         return view('e-billing::invoices.index', compact('invoices'));
     }
 
-    public function show(Request $request, Invoice $invoice)
+    public function show(Request $request, string $id)
     {
-        $invoice->loadMissing(['customer', 'package']);
+        $invoice = Invoice::with(['customer', 'package'])->where('id', $id)->orWhere('invoice_number', $id)->first();
+        if (! $invoice) {
+            return abort(404, 'Invoice tidak ditemukan.');
+        }
+
         $receipts = TransferReceipt::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->get();
 
         return view('e-billing::invoices.show', compact('invoice', 'receipts'));
@@ -556,6 +560,9 @@ class InvoiceController extends Controller
         }
 
         $invoice->save();
+
+        $invoice->customer->invoice_number = null; // clear active invoice number
+        $invoice->customer->save();
 
         InvoicePaid::dispatch($invoice);
 
