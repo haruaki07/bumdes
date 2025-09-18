@@ -21,6 +21,13 @@
             <i class="ti ti-external-link icon"></i> Halaman Publik
           </a>
           @if ($invoice->status !== InvoiceStatus::PAID)
+            <form method="POST" action="{{ route('e-billing.invoices.send-notification', $invoice) }}"
+              class="d-inline">
+              @csrf
+              <button class="btn btn-outline-success">
+                <i class="ti ti-send icon"></i> Kirim Email
+              </button>
+            </form>
             <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">
               @csrf
               <button class="btn btn-success">

@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Events\InvoicePaid;
+use Modules\EBilling\Jobs\SendInvoiceReminderJob;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Invoice;
 use Modules\EBilling\Models\PaymentCode;
@@ -84,9 +85,13 @@ class InvoiceController extends Controller
         return view('e-billing::invoices.index', compact('invoices'));
     }
 
-    public function show(Request $request, Invoice $invoice)
+    public function show(Request $request, string $id)
     {
-        $invoice->loadMissing(['customer', 'package']);
+        $invoice = Invoice::with(['customer', 'package'])->where('id', $id)->orWhere('invoice_number', $id)->first();
+        if (! $invoice) {
+            return abort(404, 'Invoice tidak ditemukan.');
+        }
+
         $receipts = TransferReceipt::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->get();
 
         return view('e-billing::invoices.show', compact('invoice', 'receipts'));
@@ -557,6 +562,9 @@ class InvoiceController extends Controller
 
         $invoice->save();
 
+        $invoice->customer->invoice_number = null; // clear active invoice number
+        $invoice->customer->save();
+
         InvoicePaid::dispatch($invoice);
 
         return back()->with('success', 'Invoice ditandai lunas.');
@@ -575,5 +583,18 @@ class InvoiceController extends Controller
         TransferReceipt::where('invoice_id', $invoice->id)->delete();
 
         return back()->with('success', 'Invoice ditandai belum lunas.');
+    }
+
+    public function sendNotification(Request $request, Invoice $invoice)
+    {
+        try {
+            SendInvoiceReminderJob::dispatch($invoice->id);
+        } catch (\Throwable $e) {
+            Log::error('Send payment notification error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return back()->with('error', 'Gagal mengirim notifikasi. '.$e->getMessage());
+        }
+
+        return back()->with('success', 'Notifikasi pengingat pembayaran telah dikirim.');
     }
 }

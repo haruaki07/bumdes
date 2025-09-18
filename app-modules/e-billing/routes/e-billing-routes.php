@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use Modules\EBilling\Http\Controllers\API\WhatsappWahaController;
 use Modules\EBilling\Http\Controllers\CustomerController;
 use Modules\EBilling\Http\Controllers\DashboardController;
 use Modules\EBilling\Http\Controllers\DeviceController;
@@ -12,7 +13,9 @@ use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
 use Modules\EBilling\Http\Controllers\SettingsController;
 use Modules\EBilling\Http\Controllers\SiteController;
+use Modules\EBilling\Http\Controllers\TicketController;
 use Modules\EBilling\Http\Controllers\TransferReceiptController;
+use Modules\EBilling\Http\Controllers\UserController;
 use Modules\EBilling\Http\Controllers\WebhookController;
 
 Route::prefix('e-billing')->as('e-billing.')->group(function () {
@@ -35,13 +38,20 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::resource('customers', CustomerController::class);
             });
 
+            // Tickets
+            Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store', 'show', 'update', 'destroy']);
+            Route::post('tickets/{ticket}/messages', [TicketController::class, 'addMessage'])->name('tickets.messages.store');
+
             Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
             // Manual invoice creation (admin triggered)
+            Route::post('/invoices/{invoice}/send-notification', [InvoiceController::class, 'sendNotification'])->name('invoices.send-notification');
             Route::post('/invoices/create-manual', [InvoiceController::class, 'createManual'])->name('invoices.create-manual');
             Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
             Route::post('/invoices/{invoice}/mark-unpaid', [InvoiceController::class, 'markUnpaid'])->name('invoices.mark-unpaid');
 
             Route::prefix('settings')->as('settings.')->group(function () {
+                Route::resource('users', UserController::class);
+
                 Route::resource('payment-methods', PaymentMethodController::class)->only(['index', 'show', 'update']);
                 Route::patch('payment-methods/{paymentMethod}/status', [PaymentMethodController::class, 'updateStatus'])
                     ->name('payment-methods.update-status');
@@ -66,5 +76,12 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             ->name('invoice.transfer-receipts.store');
         Route::post('/webhooks/xendit', [WebhookController::class, 'xendit'])
             ->name('webhooks.xendit');
+
+        Route::prefix('whatsapp/waha')->as('whatsapp.waha.')->group(function () {
+            Route::get('/status', [WhatsappWahaController::class, 'status'])->name('status');
+            Route::post('/logout', [WhatsappWahaController::class, 'logout'])->name('logout');
+            Route::get('/qr', [WhatsappWahaController::class, 'qr'])->name('qr');
+            Route::post('/request-code', [WhatsappWahaController::class, 'requestCode'])->name('request-code');
+        });
     });
 });

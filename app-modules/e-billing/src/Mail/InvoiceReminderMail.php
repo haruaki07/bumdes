@@ -14,7 +14,7 @@ class InvoiceReminderMail extends Mailable
 
     public function __construct(public Invoice $invoice)
     {
-        $this->subject('Pengingat Tagihan: '.$invoice->invoice_number);
+        $this->subject('Informasi Tagihan Wifi Anda');
     }
 
     public function build(EBillingBusinessProfileSettings $settings): self
