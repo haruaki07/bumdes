@@ -27,7 +27,9 @@
   </div>
 
   <div class="card-body border-bottom py-3">
-    <div class="d-flex">
+    {{ $cardheader ?? '' }}
+
+    <div class="d-flex align-items-center flex-wrap gap-3">
       @if ($limit)
         <div class="text-muted">
           Tampilkan
@@ -50,12 +52,15 @@
       @endif
 
       @if ($search)
-        <div class="ms-auto text-muted">
-          Cari:
-          <div class="ms-2 d-inline-block">
-            <input type="text" class="form-control form-control-sm"
-              value="{{ $currentSearch ?? (request()->search ?? '') }}" aria-label="{{ $searchPlaceholder }}"
-              placeholder="{{ $searchPlaceholder }}" data-datatable-search="{{ $tableId }}">
+        <div class="ms-auto d-flex align-items-center flex-wrap gap-3">
+          {{ $headerRight ?? '' }}
+          <div class="text-muted">
+            Cari:
+            <div class="ms-2 d-inline-block">
+              <input type="text" class="form-control form-control-sm"
+                value="{{ $currentSearch ?? (request()->search ?? '') }}" aria-label="{{ $searchPlaceholder }}"
+                placeholder="{{ $searchPlaceholder }}" data-datatable-search="{{ $tableId }}">
+            </div>
           </div>
         </div>
       @endif

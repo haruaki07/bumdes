@@ -42,8 +42,8 @@
                   <div class="datagrid-content">{{ $user->email }}</div>
                 </div>
                 <div class="datagrid-item">
-                  <div class="datagrid-title">Peran</div>
-                  <div class="datagrid-content"><x-common.badge :color="$user->role->color()" label="{{ $user->role->label() }}" />
+                  <div class="datagrid-title">Role</div>
+                  <div class="datagrid-content"><x-common.badge :label="$user->getRoleNames()->first()" randomize light />
                   </div>
                 </div>
               </div>

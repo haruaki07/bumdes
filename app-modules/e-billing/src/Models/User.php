@@ -6,7 +6,6 @@ use App\Traits\Datatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Modules\EBilling\Enums\UserRole;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -19,7 +18,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
     ];
 
     protected $hidden = [
@@ -30,14 +28,12 @@ class User extends Authenticatable
     protected $dataTableColumns = [
         'name' => 'searchable|sortable',
         'email' => 'searchable|sortable',
-        'role' => 'searchable|sortable',
     ];
 
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
-            'role' => UserRole::class,
         ];
     }
 }

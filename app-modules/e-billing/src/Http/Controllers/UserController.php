@@ -2,6 +2,7 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,11 +15,18 @@ class UserController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::datatable();
+        $roles = Role::guardName('ebil')->get();
+        $users = User::query();
 
-        return view('e-billing::users.index', compact('users'));
+        if ($request->filled('role')) {
+            $users->role($request->role);
+        }
+
+        $users = $users->datatable();
+
+        return view('e-billing::users.index', compact('users', 'roles'));
     }
 
     /**
@@ -26,7 +34,9 @@ class UserController
      */
     public function create()
     {
-        return view('e-billing::users.create');
+        $roles = Role::guardName('ebil')->get();
+
+        return view('e-billing::users.create', compact('roles'));
     }
 
     /**
@@ -37,19 +47,20 @@ class UserController
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:ebil_users,email'],
-            'role' => ['required', Rule::enum(UserRole::class)],
+            'role' => ['required', 'exists:roles,name'],
             'password' => ['required', 'string', 'min:8'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
 
+        $user->assignRole($request->role);
+
         return redirect()->route('e-billing.settings.users.index')
-            ->with('success', 'User berhasil ditambahkan.');
+            ->with('success', 'User berhasil ditambahkan!');
     }
 
     /**
@@ -65,7 +76,9 @@ class UserController
      */
     public function edit(User $user)
     {
-        return view('e-billing::users.edit', compact('user'));
+        $roles = Role::guardName('ebil')->get();
+
+        return view('e-billing::users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -76,14 +89,26 @@ class UserController
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('ebil_users', 'email')->ignore($user->id)],
-            'role' => ['required', Rule::enum(UserRole::class)],
+            'role' => ['required', 'exists:roles,name'],
             'password' => ['nullable', 'string', 'min:8'],
         ]);
 
-        if ($user->role === UserRole::ADMIN && ($data['role'] ?? $user->role) !== UserRole::ADMIN->value) {
-            $adminCount = User::where('role', UserRole::ADMIN->value)->count();
+        $authUserRole = $request->user('ebil')->getRoleNames()->first();
+
+        if ($user->getRoleNames()->first() === 'admin' && $data['role'] !== 'admin') {
+            if ($authUserRole !== 'admin') {
+                return redirect()->route('e-billing.settings.users.index')
+                    ->with('error', 'Hanya admin yang dapat mengubah peran admin.');
+            }
+
+            $adminCount = User::role('admin')->count();
             if ($adminCount <= 1) {
                 return redirect()->back()->withInput()->with('error', 'Tidak dapat menurunkan role admin terakhir.');
+            }
+        } elseif ($user->getRoleNames()->first() !== 'admin' && $data['role'] === 'admin') {
+            if ($authUserRole !== 'admin') {
+                return redirect()->route('e-billing.settings.users.index')
+                    ->with('error', 'Hanya admin yang dapat mengubah peran menjadi admin.');
             }
         }
 
@@ -94,9 +119,10 @@ class UserController
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'role' => $data['role'],
             'password' => isset($data['password']) ? Hash::make($data['password']) : $user->password,
         ]);
+
+        $user->syncRoles($data['role']);
 
         return redirect()->route('e-billing.settings.users.index')
             ->with('success', 'User berhasil diperbarui.');
