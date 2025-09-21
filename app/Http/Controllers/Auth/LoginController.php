@@ -44,10 +44,11 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
         if (request()->routeIs('e-billing.*')) {
+            $this->middleware('guest:ebil')->except('logout');
             $this->middleware('auth:ebil')->only('logout');
         } else {
+            $this->middleware('guest')->except('logout');
             $this->middleware('auth')->only('logout');
         }
     }
@@ -89,7 +90,7 @@ class LoginController extends Controller
             return new JsonResponse([], 204);
         }
 
-        return $request->routeIs('e-billing.*')
+        return request()->routeIs('e-billing.*')
             ? redirect()->route('e-billing.login')
             : redirect()->route('login');
     }

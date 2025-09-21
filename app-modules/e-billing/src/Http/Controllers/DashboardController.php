@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Modules\EBilling\Enums\CustomerStatus;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Models\Customer;
+use Modules\EBilling\Models\Device;
 use Modules\EBilling\Models\Invoice;
+use Modules\EBilling\Models\Package;
+use Modules\EBilling\Models\Site;
 
 class DashboardController extends Controller
 {
@@ -86,7 +89,6 @@ class DashboardController extends Controller
             ->where('status', CustomerStatus::ACTIVE)
             ->count();
 
-        // === Chart Query (daily/monthly in one go) ===
         $chartQuery = Invoice::query()
             ->selectRaw(
                 $type === 'monthly'
@@ -105,16 +107,21 @@ class DashboardController extends Controller
         if ($type === 'monthly') {
             for ($d = 1; $d <= $start->daysInMonth; $d++) {
                 $date = $start->copy()->setDay($d)->toDateString();
-                $labels[] = Carbon::parse($date)->format('d M');
+                $labels[] = Carbon::parse($date);
                 $seriesIncome[] = (int) ($chartQuery[$date] ?? 0);
             }
         } else {
             for ($m = 1; $m <= 12; $m++) {
                 $date = $start->copy()->setMonth($m)->format('Y-m');
-                $labels[] = Carbon::parse($date.'-01')->format('M Y');
+                $labels[] = Carbon::parse($date.'-01');
                 $seriesIncome[] = (int) ($chartQuery[$date] ?? 0);
             }
         }
+
+        $revenueChart = collect($labels)->map(fn ($val, $idx) => [
+            $val->toIso8601String(),
+            $seriesIncome[$idx],
+        ])->values();
 
         $topPackages = Invoice::query()
             ->select('package_id', DB::raw('COALESCE(SUM(amount),0) as total'))
@@ -129,6 +136,11 @@ class DashboardController extends Controller
                 'name' => $row->package->name ?? 'Tanpa Paket',
                 'total' => (int) $row->total,
             ])->values();
+
+        $siteCount = Site::count();
+        $deviceCount = Device::count();
+        $packageCount = Package::count();
+        $customerCount = Customer::count();
 
         return response()->json([
             'type' => $type,
@@ -147,11 +159,14 @@ class DashboardController extends Controller
                 'activeCustomers' => $activeCustomers,
             ],
             'charts' => [
-                'revenue' => [
-                    'labels' => $labels,
-                    'data' => $seriesIncome,
-                ],
+                'revenue' => $revenueChart,
                 'packages' => $topPackages,
+            ],
+            'counts' => [
+                'sites' => $siteCount,
+                'devices' => $deviceCount,
+                'packages' => $packageCount,
+                'customers' => $customerCount,
             ],
         ]);
     }

@@ -28,83 +28,161 @@
     <div class="container-xl">
       @include('tablar::common.alert')
 
-      <!-- KPIs -->
-      <div class="row row-deck row-cards" id="kpiRow">
-        <div class="col-sm-6 col-lg-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center">
-                <div class="subheader">Pendapatan</div>
-                <div class="ms-auto lh-1">
-                  <span id="incomeGrowth" class="badge" title="Perubahan dibanding periode sebelumnya">0%</span>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+          <div class="row row-deck row-cards" id="kpiRow">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Pendapatan</div>
+                    <div class="ms-auto lh-1">
+                      <span id="incomeGrowth" class="badge" title="Perubahan dibanding periode sebelumnya">0%</span>
+                    </div>
+                  </div>
+                  <div class="h1 mb-3" id="income">Rp0</div>
+                  <div class="d-flex mb-2">
+                    <div>Periode</div>
+                    <div class="ms-auto" id="periodRange">-</div>
+                  </div>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-primary" id="incomeProgress" style="width: 0%" role="progressbar"
+                      aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
                 </div>
               </div>
-              <div class="h1 mb-3" id="income">Rp0</div>
-              <div class="d-flex mb-2">
-                <div>Periode</div>
-                <div class="ms-auto" id="periodRange">-</div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Tagihan Lunas</div>
+                  </div>
+                  <div class="h1 mb-3" id="paidCount">0</div>
+                  <div class="text-muted">Terbit & dibayar pada periode saat ini</div>
+                </div>
               </div>
-              <div class="progress progress-sm">
-                <div class="progress-bar bg-primary" id="incomeProgress" style="width: 0%" role="progressbar"
-                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Tagihan Belum Lunas</div>
+                  </div>
+                  <div class="h1 mb-3" id="unpaidCount">0</div>
+                  <div class="text-muted">Total belum dibayar: <span id="unpaidTotal">Rp0</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Pelanggan Aktif</div>
+                  </div>
+                  <div class="h1 mb-3" id="activeCustomers">0</div>
+                  <div class="text-muted">Total pelanggan aktif saat ini</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center">
-                <div class="subheader">Invoice Lunas</div>
-              </div>
-              <div class="h1 mb-3" id="paidCount">0</div>
-              <div class="text-muted">Terbit & dibayar pada periode</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center">
-                <div class="subheader">Invoice Belum Lunas</div>
-              </div>
-              <div class="h1 mb-3" id="unpaidCount">0</div>
-              <div class="text-muted">Total belum dibayar: <span id="unpaidTotal">Rp0</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center">
-                <div class="subheader">Pelanggan Aktif</div>
-              </div>
-              <div class="h1 mb-3" id="activeCustomers">0</div>
-              <div class="text-muted">Total pelanggan aktif saat ini</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Charts -->
-      <div class="row row-deck row-cards mt-2">
-        <div class="col-12 col-lg-8">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Grafik Pendapatan</h3>
+        <div class="col-12">
+          <div class="row row-cards">
+            <div class="col-sm-6 col-lg-3">
+              <a class="card card-sm" href="{{ route('e-billing.master-data.sites.index') }}">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <span class="bg-blue text-white avatar">
+                        <i class="ti ti-world-pin"></i>
+                      </span>
+                    </div>
+                    <div class="col">
+                      <div class="font-weight-medium" id="siteCount">-</div>
+                      <div class="text-secondary">Site/Wilayah</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
             </div>
-            <div class="card-body">
-              <div id="revenueChart"></div>
+            <div class="col-sm-6 col-lg-3">
+              <a class="card card-sm" href="{{ route('e-billing.master-data.devices.index') }}">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <span class="bg-green text-white avatar">
+                        <i class="ti ti-router"></i>
+                      </span>
+                    </div>
+                    <div class="col">
+                      <div class="font-weight-medium" id="deviceCount">-</div>
+                      <div class="text-secondary">Perangkat</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <a class="card card-sm" href="{{ route('e-billing.master-data.packages.index') }}">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <span class="bg-orange text-white avatar">
+                        <i class="ti ti-package"></i>
+                      </span>
+                    </div>
+                    <div class="col">
+                      <div class="font-weight-medium" id="packageCount">-</div>
+                      <div class="text-secondary">Paket Internet</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <a class="card card-sm" href="{{ route('e-billing.master-data.customers.index') }}">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <span class="bg-yellow text-white avatar">
+                        <i class="ti ti-users"></i>
+                      </span>
+                    </div>
+                    <div class="col">
+                      <div class="font-weight-medium" id="customerCount">-</div>
+                      <div class="text-secondary">Pelanggan</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
             </div>
           </div>
         </div>
-        <div class="col-12 col-lg-4">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Paket Terlaris (Pendapatan)</h3>
+
+        <div class="col-12">
+          <!-- Charts -->
+          <div class="row row-deck row-cards">
+            <div class="col-12 col-lg-7">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Grafik Pendapatan</h3>
+                </div>
+                <div class="card-body">
+                  <div id="revenueChart"></div>
+                </div>
+              </div>
             </div>
-            <div class="card-body">
-              <div id="packagesChart"></div>
+            <div class="col-12 col-lg-5">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Paket Terlaris (Pendapatan)</h3>
+                </div>
+                <div class="card-body">
+                  <div id="packagesChart"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -115,12 +193,6 @@
   @push('js')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1"></script>
     <script>
-      const rupiah = (v) => new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0
-      }).format(v || 0);
-
       const els = {
         income: document.getElementById('income'),
         incomeGrowth: document.getElementById('incomeGrowth'),
@@ -136,7 +208,6 @@
         periodAnnual: document.getElementById('periodAnnual'),
       };
 
-      // Initialize pickers with current period
       const now = new Date();
       els.monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       els.yearPicker.value = now.getFullYear();
@@ -153,9 +224,7 @@
       let revenueChart, packagesChart;
 
       function renderCharts(data) {
-        const revLabels = data.charts.revenue.labels;
-        const revData = data.charts.revenue.data;
-
+        const isAnnual = els.periodAnnual.checked;
         const lineOpts = {
           chart: {
             type: "line",
@@ -181,13 +250,23 @@
           },
           series: [{
             name: 'Pendapatan',
-            data: revData
+            data: data.charts.revenue,
           }],
           xaxis: {
-            categories: revLabels,
-            type: 'category',
+            type: 'datetime',
             labels: {
-              padding: 0
+              formatter: (v) => {
+                const d = new Date(v);
+                return isAnnual ?
+                  d.toLocaleDateString('id-ID', {
+                    month: 'short',
+                    year: '2-digit'
+                  }) :
+                  d.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short'
+                  });
+              }
             },
             tooltip: {
               enabled: false
@@ -196,8 +275,8 @@
           yaxis: {
             labels: {
               padding: 4,
-              formatter: (v) => rupiah(v).replace('Rp', '')
-            }
+              formatter: (v) => formatRupiah(v)
+            },
           },
           colors: ['color-mix(in srgb, transparent, var(--tblr-primary) 100%)'],
           fill: {
@@ -209,8 +288,23 @@
           },
           tooltip: {
             theme: 'dark',
+            x: {
+              formatter: (v) => {
+                const d = new Date(v);
+                return isAnnual ?
+                  d.toLocaleDateString('id-ID', {
+                    month: 'long',
+                    year: 'numeric'
+                  }) :
+                  d.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  });
+              }
+            },
             y: {
-              formatter: (val) => rupiah(val)
+              formatter: (val) => formatRupiah(val)
             }
           },
           grid: {
@@ -228,15 +322,7 @@
         };
 
         if (revenueChart) {
-          revenueChart.updateOptions({
-            xaxis: {
-              categories: revLabels
-            }
-          });
-          revenueChart.updateSeries([{
-            name: 'Pendapatan',
-            data: revData
-          }], true);
+          revenueChart.updateOptions(lineOpts);
         } else {
           revenueChart = new ApexCharts(document.querySelector('#revenueChart'), lineOpts);
           revenueChart.render();
@@ -273,15 +359,16 @@
             categories: pkgLabels,
             labels: {
               padding: 0,
-              formatter: (v) => rupiah(v).replace('Rp', '')
+              formatter: (v) => formatRupiah(v),
             },
+            tickAmount: 3,
             tooltip: {
               enabled: false
             }
           },
           yaxis: {
             labels: {
-              padding: 4
+              offsetX: 4
             }
           },
           colors: ['var(--tblr-green)'],
@@ -291,7 +378,7 @@
           tooltip: {
             theme: 'dark',
             y: {
-              formatter: (val) => rupiah(val)
+              formatter: (val) => formatRupiah(val)
             }
           },
           grid: {
@@ -301,7 +388,12 @@
               left: -4,
               bottom: -4
             },
-            strokeDashArray: 4
+            strokeDashArray: 4,
+            xaxis: {
+              lines: {
+                show: true
+              }
+            }
           },
           legend: {
             show: false
@@ -324,7 +416,7 @@
       }
 
       function paintKpis(k) {
-        els.income.textContent = rupiah(k.income);
+        els.income.textContent = formatRupiah(k.income);
         const g = k.incomeGrowthPct;
         els.incomeGrowth.textContent = (g === null ? 'N/A' : `${g > 0 ? '+' : ''}${g}%`);
         els.incomeGrowth.className = 'badge ' + (g === null ? 'bg-lt-secondary' : (g >= 0 ? 'bg-lt-green' : 'bg-lt-red'));
@@ -334,7 +426,7 @@
 
         els.paidCount.textContent = k.paidCount;
         els.unpaidCount.textContent = k.unpaidCount;
-        els.unpaidTotal.textContent = rupiah(k.unpaidTotal);
+        els.unpaidTotal.textContent = formatRupiah(k.unpaidTotal);
         els.activeCustomers.textContent = k.activeCustomers;
       }
 
@@ -347,6 +439,13 @@
           year: 'numeric'
         });
         els.periodRange.textContent = `${fmt(start)} - ${fmt(end)}`;
+      }
+
+      function paintCounts(counts) {
+        document.getElementById('siteCount').textContent = counts.sites;
+        document.getElementById('deviceCount').textContent = counts.devices;
+        document.getElementById('packageCount').textContent = counts.packages;
+        document.getElementById('customerCount').textContent = counts.customers;
       }
 
       async function loadData() {
@@ -370,6 +469,7 @@
             range: data.range
           });
           renderCharts(data);
+          paintCounts(data.counts);
         } catch (e) {
           console.error(e);
           alert('Gagal memuat data dashboard');

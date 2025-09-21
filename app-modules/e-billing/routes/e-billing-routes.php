@@ -11,6 +11,7 @@ use Modules\EBilling\Http\Controllers\DeviceController;
 use Modules\EBilling\Http\Controllers\InvoiceController;
 use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
+use Modules\EBilling\Http\Controllers\RoleController;
 use Modules\EBilling\Http\Controllers\SettingsController;
 use Modules\EBilling\Http\Controllers\SiteController;
 use Modules\EBilling\Http\Controllers\TicketController;
@@ -50,6 +51,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             Route::post('/invoices/{invoice}/mark-unpaid', [InvoiceController::class, 'markUnpaid'])->name('invoices.mark-unpaid');
 
             Route::prefix('settings')->as('settings.')->group(function () {
+                Route::resource('roles', RoleController::class)->except('show');
                 Route::resource('users', UserController::class);
 
                 Route::resource('payment-methods', PaymentMethodController::class)->only(['index', 'show', 'update']);

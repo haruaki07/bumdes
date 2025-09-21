@@ -18,6 +18,7 @@
         "modules/e-billing": "*",
         "saloonphp/laravel-plugin": "^3.0",
         "saloonphp/saloon": "^3.0",
+        "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.4",
         "takielias/tablar": "^12",
         "takielias/tablar-kit": "^12"

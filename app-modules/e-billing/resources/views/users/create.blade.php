@@ -33,7 +33,7 @@
                   <div class="col-md-6 mb-3">
                     <label class="form-label required">Nama</label>
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                      value="{{ old('name') }}" required>
+                      value="{{ old('name') }}" required placeholder="Nama lengkap">
                     @error('name')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -41,7 +41,7 @@
                   <div class="col-md-6 mb-3">
                     <label class="form-label required">Email</label>
                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                      value="{{ old('email') }}" required>
+                      value="{{ old('email') }}" required placeholder="email@example.com">
                     @error('email')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -50,12 +50,13 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label required">Role</label>
-                    <select name="role" class="form-select @error('role') is-invalid @enderror" required>
-                      <option value="">Pilih role</option>
-
-                      @foreach (\Modules\EBilling\Enums\UserRole::cases() as $role)
-                        <option value="{{ $role->value }}" {{ old('role') == $role->value ? 'selected' : '' }}>
-                          {{ $role->label() }}</option>
+                    <select name="role" class="form-select @error('role') is-invalid @enderror" required
+                      data-tom-select>
+                      <option value="">Pilih Role</option>
+                      @foreach ($roles as $role)
+                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                          {{ $role->name }}
+                        </option>
                       @endforeach
                     </select>
                     @error('role')
@@ -66,7 +67,7 @@
                     <label class="form-label required">Password</label>
                     <div class="input-group">
                       <input type="text" name="password" class="form-control @error('password') is-invalid @enderror"
-                        required id="password">
+                        required id="password" placeholder="Password minimal 8 karakter">
                       <button type="button" class="btn btn-outline-secondary"
                         onclick="document.getElementById('password').value = Math.random().toString(36).slice(2, 10)">
                         Acak
@@ -85,4 +86,14 @@
       </div>
     </div>
   </div>
+
+  @push('js')
+    <script type="module">
+      document.querySelectorAll('[data-tom-select]').forEach(select => {
+        new TomSelect(select, {
+          maxItems: 1
+        });
+      });
+    </script>
+  @endpush
 </x-e-billing::layouts.panel>
