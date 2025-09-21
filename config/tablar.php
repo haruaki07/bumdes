@@ -228,6 +228,12 @@ return [
             'submenu' => [
                 [
                     'group' => 'e-billing',
+                    'text' => 'Manajemen Role',
+                    'route' => 'e-billing.settings.roles.index',
+                    'icon' => 'ti ti-lock',
+                ],
+                [
+                    'group' => 'e-billing',
                     'text' => 'Manajemen User',
                     'route' => 'e-billing.settings.users.index',
                     'icon' => 'ti ti-users',
