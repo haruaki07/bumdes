@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Events\InvoicePaid;
-use Modules\EBilling\Jobs\SendInvoiceReminderJob;
+use Modules\EBilling\Jobs\InvoiceReminderJob;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Invoice;
 use Modules\EBilling\Models\PaymentCode;
@@ -588,7 +588,7 @@ class InvoiceController extends Controller
     public function sendNotification(Request $request, Invoice $invoice)
     {
         try {
-            SendInvoiceReminderJob::dispatch($invoice->id);
+            InvoiceReminderJob::dispatch($invoice->id);
         } catch (\Throwable $e) {
             Log::error('Send payment notification error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

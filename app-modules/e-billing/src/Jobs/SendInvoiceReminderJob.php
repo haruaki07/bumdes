@@ -16,14 +16,11 @@ class SendInvoiceReminderJob implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public int $invoiceId) {}
+    public function __construct(public Invoice $invoice) {}
 
     public function handle(): void
     {
-        $invoice = Invoice::with(['customer', 'package'])->find($this->invoiceId);
-        if (! $invoice || ! $invoice->customer || empty($invoice->customer->email)) {
-            return; // Nothing to do
-        }
+        $invoice = $this->invoice;
 
         Mail::to($invoice->customer->email)->send(new InvoiceReminderMail($invoice));
     }

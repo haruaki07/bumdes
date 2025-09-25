@@ -43,7 +43,7 @@ class WhatsappService implements WhatsappServiceInterface
             chatId: $recipient,
             text: $message,
             replyTo: null,
-            linkPreview: null,
+            linkPreview: false,
             linkPreviewHighQuality: null
         );
 
