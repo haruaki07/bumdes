@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Middleware\RateLimited;
 use Modules\EBilling\Mail\InvoiceReminderMail;
 use Modules\EBilling\Models\Invoice;
 use Modules\EBilling\Notifications\Channels\WhatsappChannel;
@@ -64,6 +65,19 @@ class InvoiceReminder extends Notification implements ShouldQueue
         ];
 
         return strtr($template, $replacements);
+    }
+
+    /**
+     * Get the middleware the notification job should pass through.
+     *
+     * @return array<int, object>
+     */
+    public function middleware(object $notifiable, string $channel)
+    {
+        return match ($channel) {
+            WhatsappChannel::class => [new RateLimited('whatsapp')],
+            default => [],
+        };
     }
 
     /**
