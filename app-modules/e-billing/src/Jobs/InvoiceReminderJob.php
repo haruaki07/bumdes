@@ -8,7 +8,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Invoice;
+use Modules\EBilling\Notifications\InvoiceReminder;
 
 class InvoiceReminderJob implements ShouldQueue
 {
@@ -17,7 +19,7 @@ class InvoiceReminderJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public string $invoiceId)
+    public function __construct(protected Customer $customer, protected Invoice $invoices)
     {
         //
     }
@@ -27,12 +29,6 @@ class InvoiceReminderJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $invoice = Invoice::with(['customer', 'package'])->find($this->invoiceId);
-        if (! $invoice || ! $invoice->customer || empty($invoice->customer->phone)) {
-            return; // Nothing to do
-        }
-
-        SendWAInvoiceReminderJob::dispatch($invoice);
-        SendInvoiceReminderJob::dispatch($invoice);
+        $this->customer->notify(new InvoiceReminder($this->invoices));
     }
 }
