@@ -60,13 +60,11 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $url = route('login');
-
         if (request()->routeIs('e-billing.*')) {
-            $url = route('e-billing.login');
+            return view('e-billing::auth.login');
         }
 
-        return view('auth.login', compact('url'));
+        return view('auth.login');
     }
 
     /**
