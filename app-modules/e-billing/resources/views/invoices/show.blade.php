@@ -24,8 +24,9 @@
             <form method="POST" action="{{ route('e-billing.invoices.send-notification', $invoice) }}"
               class="d-inline">
               @csrf
-              <button class="btn btn-outline-success">
-                <i class="ti ti-send icon"></i> Kirim Email
+              <button class="btn btn-outline-success" data-bs-toggle="tooltip" title="Email dan WhatsApp"
+                data-bs-placement="top">
+                <i class="ti ti-send icon"></i> Kirim Notifikasi
               </button>
             </form>
             <form method="POST" action="{{ route('e-billing.invoices.mark-paid', $invoice) }}" class="d-inline">

@@ -7,12 +7,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Modules\EBilling\Enums\CustomerStatus;
 
 class Customer extends Model
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use Datatable, HasFactory, SoftDeletes;
+    use Datatable, HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'ebil_customers';
 

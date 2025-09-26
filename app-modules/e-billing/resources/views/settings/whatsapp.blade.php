@@ -80,6 +80,79 @@
                     </button>
                   </div>
                 </div>
+
+                <hr class="my-4" />
+                <h3 class="card-title">Template Pesan Pengingat Invoice</h3>
+                <p class="card-subtitle">Atur format pesan WhatsApp yang dikirim ke pelanggan saat pengingat tagihan.
+                  Gunakan placeholder di bawah ini. Hindari informasi sensitif.</p>
+
+                <div class="row g-3">
+                  <div class="col-md-7">
+                    <label class="form-label required">Template</label>
+                    <textarea name="invoice_reminder_template" rows="6" class="form-control font-monospace" placeholder="Ketik..."
+                      required>{{ old('invoice_reminder_template', $settings->invoice_reminder_template ?? '') }}</textarea>
+                    <small class="text-muted">Maks 500 karakter.</small>
+                    @error('invoice_reminder_template')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+
+                    <label class="form-label mt-3">Placeholder Tersedia</label>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>Placeholder</th>
+                            <th>Deskripsi</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><code>{customer_name}</code></td>
+                            <td>Nama pelanggan</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_number}</code></td>
+                            <td>Nomor tagihan</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_amount}</code></td>
+                            <td>Jumlah (Rp100.000)</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_due_date}</code></td>
+                            <td>Tanggal jatuh tempo</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_grace_period_end_date}</code></td>
+                            <td>Akhir masa tenggang</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_status}</code></td>
+                            <td>Status tagihan</td>
+                          </tr>
+                          <tr>
+                            <td><code>{invoice_public_url}</code></td>
+                            <td>Link pembayaran tagihan</td>
+                          </tr>
+                          <tr>
+                            <td><code>{package_name}</code></td>
+                            <td>Nama paket</td>
+                          </tr>
+                          <tr>
+                            <td><code>{business_name}</code></td>
+                            <td>Nama perusahaan</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Preview</label>
+                    <div id="waTemplatePreview" class="border rounded p-2 bg-success-lt small"
+                      style="white-space:pre-wrap; min-height:36px; font-family: system-ui, sans-serif;">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="card-footer bg-transparent mt-auto">
@@ -221,6 +294,35 @@
       const phoneNumberInput = document.getElementById('phoneNumberInput');
       const authCodeWrapper = document.getElementById('authCodeWrapper');
       const authCode = document.getElementById('authCode');
+      const templateTextarea = document.querySelector('textarea[name="invoice_reminder_template"]');
+      const previewBox = document.getElementById('waTemplatePreview');
+
+      const sampleData = {
+        '{customer_name}': 'Budi',
+        '{invoice_number}': 'INV2025090001',
+        '{invoice_amount}': 'Rp150.000',
+        '{invoice_due_date}': '10 Sep 2025',
+        '{invoice_grace_period_end_date}': '15 Sep 2025',
+        '{invoice_status}': 'UNPAID',
+        '{invoice_public_url}': 'https://contoh.test/invoice/INV2025090001',
+        '{package_name}': 'Paket 10Mbps',
+        '{business_name}': 'BUMDes Internet'
+      };
+
+      function renderPreview() {
+        if (!templateTextarea || !previewBox) return;
+        let text = templateTextarea.value || '';
+        Object.entries(sampleData).forEach(([k, v]) => {
+          text = text.split(k).join(v);
+        });
+        if (!text.trim()) {
+          previewBox.innerHTML = '';
+        } else {
+          previewBox.textContent = text;
+        }
+      }
+      templateTextarea?.addEventListener('input', renderPreview);
+      renderPreview();
 
       function toggle() {
         const p = providerSelect.value;

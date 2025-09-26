@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 
 class RoleController
 {
-    protected $actions = ['create', 'read', 'update', 'delete'];
+    protected $actions = ['read', 'create', 'update', 'delete'];
 
     protected $groupOrder = ['master_data', 'transactions', 'settings'];
 

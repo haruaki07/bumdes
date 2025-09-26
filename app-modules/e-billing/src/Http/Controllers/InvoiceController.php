@@ -12,12 +12,12 @@ use Illuminate\Support\Str;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Events\InvoicePaid;
-use Modules\EBilling\Jobs\SendInvoiceReminderJob;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Invoice;
 use Modules\EBilling\Models\PaymentCode;
 use Modules\EBilling\Models\PaymentMethod;
 use Modules\EBilling\Models\TransferReceipt;
+use Modules\EBilling\Notifications\InvoiceReminder;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
 use Modules\EBilling\Services\DTOs\Payment\CreatePaymentRequestIn;
 use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
@@ -588,9 +588,9 @@ class InvoiceController extends Controller
     public function sendNotification(Request $request, Invoice $invoice)
     {
         try {
-            SendInvoiceReminderJob::dispatch($invoice->id);
+            $invoice->customer->notify(new InvoiceReminder($invoice));
         } catch (\Throwable $e) {
-            Log::error('Send payment notification error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Send notification error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return back()->with('error', 'Gagal mengirim notifikasi. '.$e->getMessage());
         }

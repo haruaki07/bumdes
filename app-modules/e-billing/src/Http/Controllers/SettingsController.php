@@ -86,6 +86,9 @@ class SettingsController
             $settings->waha_base_url = $data['waha_base_url'] ?? null;
             $settings->waha_api_key = $data['waha_api_key'] ?? null;
             $settings->waha_session = $data['waha_session'] ?? 'default';
+            if (isset($data['invoice_reminder_template'])) {
+                $settings->invoice_reminder_template = $data['invoice_reminder_template'];
+            }
             $settings->save();
         }
 
@@ -121,6 +124,7 @@ class SettingsController
                 return [
                     'enabled' => 'nullable|boolean',
                     'provider' => 'required|in:waha',
+                    'invoice_reminder_template' => 'required|string|max:500',
                 ];
             default:
                 return [];

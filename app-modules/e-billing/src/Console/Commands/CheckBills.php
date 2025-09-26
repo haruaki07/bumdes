@@ -4,7 +4,7 @@ namespace Modules\EBilling\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
-use Modules\EBilling\Jobs\SendInvoiceReminderJob;
+use Modules\EBilling\Jobs\InvoiceReminderJob;
 use Modules\EBilling\Models\Invoice;
 
 class CheckBills extends Command
@@ -63,7 +63,7 @@ class CheckBills extends Command
 
                 continue;
             }
-            $jobs[] = new SendInvoiceReminderJob($invoice->id);
+            $jobs[] = new InvoiceReminderJob($invoice->customer, $invoice);
         }
 
         if (empty($jobs)) {
