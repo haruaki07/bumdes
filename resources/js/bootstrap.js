@@ -4,7 +4,13 @@ import * as QRCode from "qrcode";
 import JsBarcode from "jsbarcode";
 
 import { tabler, TomSelect } from "./tabler-init";
-import { Datatable, Dropzone, AddressModal, LoadingButton } from "./components";
+import {
+  Datatable,
+  Dropzone,
+  AddressModal,
+  LoadingButton,
+  Toast,
+} from "./components";
 
 window.axios = axios;
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
@@ -21,3 +27,4 @@ window.Dropzone = Dropzone;
 window.TomSelect = TomSelect;
 window.AddressModal = AddressModal;
 window.LoadingButton = LoadingButton;
+window.Toast = Toast;

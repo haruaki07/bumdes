@@ -3,7 +3,10 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Modules\EBilling\Jobs\ImportCustomersJob;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Device;
 use Modules\EBilling\Models\Package;
@@ -116,5 +119,76 @@ class CustomerController
         $customer->delete();
 
         return redirect()->route('e-billing.master-data.customers.index')->with('success', 'Pelanggan berhasil dihapus.');
+    }
+
+    /**
+     * Handle customer import upload (AJAX, returns token to subscribe via SSE)
+     */
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('imports');
+
+        $token = uniqid('cust-imp-', true);
+        $cacheKey = self::importCacheKey($token);
+        Cache::put($cacheKey, [
+            'status' => 'queued',
+            'progress' => 0,
+            'total' => null,
+            'processed' => 0,
+            'errors' => [],
+            'started_at' => now()->toISOString(),
+        ], now()->addHour());
+
+        ImportCustomersJob::dispatch($path, $token)->onQueue('default');
+
+        return response()->json([
+            'token' => $token,
+            'stream_url' => route('e-billing.master-data.customers.import.stream', $token),
+        ]);
+    }
+
+    /**
+     * SSE endpoint to push import progress events.
+     */
+    public function importStream(string $token)
+    {
+        $cacheKey = self::importCacheKey($token);
+
+        if (! Cache::has($cacheKey)) {
+            abort(404);
+        }
+
+        return response()->stream(function () use ($cacheKey) {
+            // Keep connection open until finished
+            while (true) {
+                $state = Cache::get($cacheKey);
+                if (! $state) {
+                    break; // aborted
+                }
+                echo "event: progress\n";
+                echo 'data: '.json_encode($state)."\n\n";
+                @ob_flush();
+                flush();
+                if (in_array($state['status'], ['finished', 'failed'])) {
+                    break;
+                }
+                // Sleep briefly to avoid high CPU; SSE not polling from client
+                usleep(500000); // 0.5s
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    public static function importCacheKey(string $token): string
+    {
+        return 'customer-import:'.$token;
     }
 }
