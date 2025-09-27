@@ -1,5 +1,5 @@
 <header
-  class="navbar navbar-expand-md d-none d-lg-flex d-print-none{{ config('tablar.sticky_top_nav_bar') ? ' sticky-top' : '' }}">
+  class="topbar navbar navbar-expand-md d-none d-lg-flex d-print-none{{ config('tablar.sticky_top_nav_bar') ? ' sticky-top' : '' }}">
   <div class="container-xl">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
       aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">

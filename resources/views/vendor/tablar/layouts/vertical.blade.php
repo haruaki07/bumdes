@@ -1,5 +1,5 @@
 @php
-  $layoutData['cssClasses'] = 'navbar navbar-vertical navbar-expand-lg overflow-auto';
+  $layoutData['cssClasses'] = 'navbar navbar-vertical navbar-expand-lg';
 @endphp
 @section('body')
 
