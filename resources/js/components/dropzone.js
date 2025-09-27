@@ -37,7 +37,8 @@ class Dropzone {
     }
     dropzoneElement.innerHTML = `
       <div class="dropzone-area" tabindex="0" role="button">
-        <span>Drag and drop files here or click to select</span>
+        <span><i class="icon ti ti-upload me-2"></i></span>
+        <span>Seret dan lepas file di sini atau klik untuk memilih</span>
       </div>
       <ul class="dropzone-file-list"></ul>
     `;
@@ -94,10 +95,13 @@ class Dropzone {
 
     Array.from(files).forEach((file) => {
       if (file.size > this.options.maxFileSize) {
-        alert(
-          `File size exceeds the maximum limit of ${humanBytes(
-            this.options.maxFileSize
-          )}.`
+        const vars = {
+          filename: file.name,
+          max: humanBytes(this.options.maxFileSize),
+        };
+        this.#toast(
+          `Ukuran file ${vars.filename} terlalu besar! Silakan pilih file dengan maksimal ukuran ${vars.max}`,
+          "danger"
         );
         // remove the invalid file from the input element
         const inputFiles = Array.from(this.inputElement.files || []).filter(
@@ -140,6 +144,16 @@ class Dropzone {
 
   getFiles() {
     return this.files;
+  }
+
+  #toast(msg, type = null, options = {}) {
+    new Toast({
+      body: msg,
+      className: type ? `border-0 bg-${type} text-white` : "",
+      btnCloseWhite: !!type,
+      placement: "top-right",
+      ...options,
+    }).show();
   }
 }
 

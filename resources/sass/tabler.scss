@@ -12,6 +12,18 @@
 // Tabler Vendor Styles.
 // ENABLE the following line for Vendor style support.
 @import "../../node_modules/@tabler/core/scss/vendor/apexcharts";
+@import "../../node_modules/@tabler/core/scss/vendor/wysiwyg";
+
+.tox .tox-toolbar-overlord,
+.tox:not(.tox-hugerte-inline) .tox-editor-header {
+    background-color: var(--tblr-bg-surface) !important;
+}
+
+.tox-edit-area {
+    &::before {
+        border: 2px solid #2d6adf !important;
+    }
+}
 
 // Tabler Flags Styles.
 // ENABLE the following line for Flags Icon style support.

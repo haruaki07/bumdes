@@ -8,7 +8,7 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <a href="{{ route('e-billing.tickets.create') }}" class="btn btn-primary">
-            <i class="ti ti-plus"></i>
+            <i class="ti ti-plus icon"></i>
             Buat Tiket
           </a>
         </div>
@@ -19,23 +19,23 @@
   <div class="page-body">
     <div class="container-xl">
       @include('tablar::common.alert')
-
-      <div class="card">
-        <div class="table-responsive">
-          <table class="table table-vcenter card-table">
-            <thead>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+          <x-datatable tableId="ticketsTable" title="Daftar Tiket" :data="$tickets">
+            <x-slot:thead>
               <tr>
                 <th>#</th>
-                <th>Kode</th>
-                <th>Subjek</th>
-                <th>Pelanggan</th>
-                <th>Prioritas</th>
-                <th>Status</th>
-                <th>Dibuat</th>
-                <th></th>
+                <x-sortable-header field="code" label="Kode" />
+                <x-sortable-header field="subject" label="Subjek" />
+                <x-sortable-header field="status" label="Pelanggan" />
+                <x-sortable-header field="priority" label="Prioritas" />
+                <x-sortable-header field="customer.name" label="Status" />
+                <th>Tanggal dibuat</th>
+                <th>Aksi</th>
               </tr>
-            </thead>
-            <tbody>
+            </x-slot>
+
+            <x-slot:tbody>
               @forelse ($tickets as $ticket)
                 <tr>
                   <td>{{ $loop->iteration + $tickets->firstItem() - 1 }}</td>
@@ -45,22 +45,20 @@
                   <td><x-common.badge :color="$ticket->priority->color()" :label="$ticket->priority->label()" /></td>
                   <td><x-common.badge :color="$ticket->status->color()" :label="$ticket->status->label()" /></td>
                   <td>{{ $ticket->created_at->format('d/m/Y H:i') }}</td>
-                  <td class="text-end">
-                    <a href="{{ route('e-billing.tickets.show', $ticket) }}" class="btn btn-sm btn-primary">
-                      Detail
+                  <td>
+                    <a href="{{ route('e-billing.tickets.show', $ticket) }}" class="btn btn-icon btn-primary"
+                      data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
+                      <i class="ti ti-eye"></i>
                     </a>
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="8" class="text-center text-muted">Belum ada tiket.</td>
+                  <td colspan="7" class="text-center">Belum ada tiket.</td>
                 </tr>
               @endforelse
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer">
-          {{ $tickets->links() }}
+            </x-slot>
+          </x-datatable>
         </div>
       </div>
     </div>
