@@ -96,7 +96,7 @@ class TicketController
     public function addMessage(Request $request, Ticket $ticket)
     {
         $data = $request->validate([
-            'message' => ['required', 'string'],
+            'message' => 'required|string',
         ]);
 
         TicketMessage::create([

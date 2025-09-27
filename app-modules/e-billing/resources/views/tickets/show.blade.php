@@ -25,35 +25,42 @@
             <div class="card-header">
               <h3 class="card-title">Percakapan</h3>
             </div>
-            <div class="card-body">
-              <div class="timeline">
-                @forelse ($ticket->messages as $msg)
-                  <div class="timeline-item">
-                    <div class="row">
-                      <div class="col-auto">
-                        <div class="timeline-item-icon bg-primary"></div>
-                      </div>
-                      <div class="col">
-                        <div class="timeline-item-description">
-                          <strong>{{ $msg->user?->name ?? ($msg->author_name ?? 'Pengguna') }}</strong>
-                          <span class="text-muted"> • {{ $msg->created_at->format('d/m/Y H:i') }}</span>
-                        </div>
-                        <div class="timeline-item-content">
-                          <p class="mb-0">{{ $msg->message }}</p>
+            <div class="card-body scrollable">
+              <div class="chat">
+                <div class="chat-bubbles">
+                  @forelse ($ticket->messages as $msg)
+                    <div class="chat-item">
+                      <div class="row align-items-end">
+                        <div class="col">
+                          <div class="chat-bubble {{ $msg->user->id === auth('ebil')->id() ? 'chat-bubble-me' : '' }}">
+                            <div class="chat-bubble-title">
+                              <div class="row">
+                                <div class="col chat-bubble-author">
+                                  {{ $msg->user?->name ?? ($msg->author_name ?? 'Pengguna') }}</div>
+                                <div class="col-auto chat-bubble-date">
+                                  {{ $msg->created_at->copy()->locale('id')->translatedFormat('d F Y \p\u\k\u\l H.i \W\I\B') }}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="chat-bubble-body">{!! $msg->message !!}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                @empty
-                  <div class="text-muted">Belum ada pesan.</div>
-                @endforelse
+                  @empty
+                    <div class="text-muted">Belum ada pesan.</div>
+                  @endforelse
+                </div>
               </div>
             </div>
             <div class="card-footer">
-              <form action="{{ route('e-billing.tickets.messages.store', $ticket) }}" method="POST">
+              <form action="{{ route('e-billing.tickets.messages.store', $ticket) }}" name="replyForm" method="POST">
                 @csrf
-                <div class="mb-2">
-                  <textarea name="message" rows="3" class="form-control" placeholder="Tulis balasan..." required></textarea>
+                <div class="mb-3">
+                  <textarea id="messageInput" name="message" rows="3" class="form-control" placeholder="Tulis balasan...">{{ old('message') }}</textarea>
+                  @error('message')
+                    <div class="text-danger mb-3">{{ $message }}</div>
+                  @enderror
                 </div>
                 <button class="btn btn-primary">Kirim</button>
               </form>
@@ -95,12 +102,12 @@
             </div>
           </div>
 
-          <div class="card">
+          <div class="card mt-3">
             <div class="card-header">
               <h3 class="card-title">Ubah Status</h3>
             </div>
             <div class="card-body">
-              <form action="{{ route('e-billing.tickets.update', $ticket) }}" method="POST" class="row g-2">
+              <form action="{{ route('e-billing.tickets.update', $ticket) }}" method="POST" class="row g-3">
                 @csrf
                 @method('PUT')
                 <div class="col-12">
@@ -143,4 +150,29 @@
       </div>
     </div>
   </div>
+
+  @push('js')
+    <script type="module">
+      let options = {
+        selector: '#messageInput',
+        placeholder: 'Tulis balasan...',
+        language: 'id',
+        language_url: '{{ asset('assets/js/tinymce/langs/id.js') }}',
+        height: 300,
+        menubar: false,
+        statusbar: false,
+        plugins: 'lists autosave',
+        skin_url: 'default',
+        content_css: 'default',
+        toolbar: 'undo redo | bold italic backcolor | alignleft aligncenter | alignright alignjustify | bullist numlist outdent indent | removeformat restoredraft',
+        setup: function(editor) {
+          editor.on('change', function() {
+            hugerte.triggerSave();
+          });
+        }
+      }
+
+      hugerte.init(options);
+    </script>
+  @endpush
 </x-e-billing::layouts.panel>
