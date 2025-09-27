@@ -29,3 +29,10 @@ i.ti-xxs {
   padding-right: 24px !important;
   background-position: right 4px center !important;
 }
+
+@media (min-width: 992px) {
+  .topbar,
+  .page-wrapper {
+    margin-left: 15rem;
+  }
+}
