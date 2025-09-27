@@ -3,6 +3,7 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\EBilling\Enums\TicketPriority;
 use Modules\EBilling\Enums\TicketStatus;
@@ -10,6 +11,7 @@ use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Ticket;
 use Modules\EBilling\Models\TicketMessage;
 use Modules\EBilling\Models\User;
+use Plank\Mediable\Facades\MediaUploader;
 
 class TicketController
 {
@@ -58,7 +60,7 @@ class TicketController
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['customer', 'assignee', 'messages.user']);
+        $ticket->load(['customer', 'assignee', 'messages.user', 'messages.media']);
         $users = User::orderBy('name')->get(['id', 'name']);
 
         return view('e-billing::tickets.show', compact('ticket', 'users'));
@@ -97,16 +99,34 @@ class TicketController
     {
         $data = $request->validate([
             'message' => 'required|string',
+            'attachments.*' => 'file|max:5120|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar',
         ]);
 
-        TicketMessage::create([
-            'ticket_id' => $ticket->id,
-            'user_id' => auth('ebil')->id() ?? null,
-            'message' => $data['message'],
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $ticket->last_activity_at = now();
-        $ticket->save();
+            $message = TicketMessage::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => auth('ebil')->id() ?? null,
+                'message' => $data['message'],
+            ]);
+
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $media = MediaUploader::fromSource($file)->upload();
+                    $message->attachMedia($media, 'attachments');
+                }
+            }
+
+            $ticket->last_activity_at = now();
+            $ticket->save();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.');
+        }
 
         return back()->with('success', 'Pesan ditambahkan.');
     }

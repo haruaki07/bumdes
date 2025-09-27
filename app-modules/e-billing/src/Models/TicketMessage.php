@@ -4,10 +4,12 @@ namespace Modules\EBilling\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Plank\Mediable\Mediable;
+use Plank\Mediable\MediableInterface;
 
-class TicketMessage extends Model
+class TicketMessage extends Model implements MediableInterface
 {
-    use HasFactory;
+    use HasFactory, Mediable;
 
     protected $table = 'ebil_ticket_messages';
 
