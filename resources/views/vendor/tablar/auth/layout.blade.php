@@ -12,6 +12,11 @@
   <link rel="manifest" href="/site.webmanifest">
   <title>@yield('title')</title>
 
+  <!-- Fonts -->
+  <style>
+    @import url("https://rsms.me/inter/inter.css");
+  </style>
+
   <!-- CSS/JS files -->
   @if (config('tablar', 'vite'))
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/sass/tabler.scss', 'resources/sass/tabler-icons.scss'])

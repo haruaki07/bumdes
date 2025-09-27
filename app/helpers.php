@@ -9,3 +9,25 @@ if (! function_exists('human_filesize')) {
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).' '.$size[$factor];
     }
 }
+
+if (! function_exists('get_initials')) {
+    /**
+     * Get the first and last initials from a full name.
+     *
+     * @param  string  $name  Full name.
+     * @return string Uppercase initials.
+     */
+    function get_initials(string $name): string
+    {
+        $words = preg_split('/\s+/', trim($name));
+
+        if (empty($words)) {
+            return '';
+        }
+
+        $firstInitial = strtoupper($words[0][0]);
+        $lastInitial = strtoupper($words[count($words) - 1][0]);
+
+        return $firstInitial.$lastInitial;
+    }
+}

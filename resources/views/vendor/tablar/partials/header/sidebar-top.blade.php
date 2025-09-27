@@ -6,7 +6,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-nav flex-row order-md-last">
-      <div class="d-none d-md-flex">
+      <div class="d-none d-md-flex nav-item">
         @include('tablar::partials.header.theme-mode')
         @include('tablar::partials.header.notifications')
       </div>

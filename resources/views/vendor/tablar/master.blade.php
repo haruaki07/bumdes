@@ -1,5 +1,17 @@
+@php
+  $dataTheme = '';
+
+  if (!empty($themeConfig)) {
+      foreach ($themeConfig as $key => $value) {
+          if ($value !== '') {
+              $dataTheme .= " data-bs-{$key}=\"{$value}\"";
+          }
+      }
+  }
+@endphp
+
 <!doctype html>
-<html lang="{{ Config::get('app.locale') }}" {!! config('tablar.layout') == 'rtl' ? 'dir="rtl"' : '' !!}>
+<html lang="{{ Config::get('app.locale') }}" {!! config('tablar.layout') == 'rtl' ? 'dir="rtl"' : '' !!} {!! $dataTheme !!}>
 
 <head>
   <meta charset="utf-8" />
@@ -19,6 +31,11 @@
     @yield('title', config('tablar.title', 'Tablar'))
     @yield('title_postfix', config('tablar.title_postfix', ''))
   </title>
+
+  <!-- Fonts -->
+  <style>
+    @import url("https://rsms.me/inter/inter.css");
+  </style>
 
   <!-- CSS/JS files -->
   @if (config('tablar', 'vite'))
