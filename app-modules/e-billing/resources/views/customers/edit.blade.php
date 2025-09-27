@@ -166,9 +166,9 @@
                     <label class="form-label required">Tanggal jatuh tempo</label>
                     <input type="number" name="due" id="dueInput"
                       class="form-control @error('due') is-invalid @enderror" required
-                      value="{{ old('due') ?? $customer->due }}" min="1" max="31">
+                      value="{{ old('due') ?? $customer->due }}" min="1" max="28">
                     <div class="form-text">
-                      Tanggal jatuh tempo dapat diubah jika diperlukan. Isi dengan angka 1-31.
+                      Tanggal jatuh tempo dapat diubah jika diperlukan (Isi dengan angka 1-28)
                     </div>
                     @error('due')
                       <div class="invalid-feedback">{{ $message }}</div>
@@ -176,7 +176,7 @@
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label class="form-label required">Hari Pengingat Sebelum Jatuh Tempo</label>
+                    <label class="form-label required">Tanggal Pengingat</label>
                     <div class="input-group">
                       <input type="number" name="due_reminder_days" id="dueReminderInput"
                         class="form-control @error('due_reminder_days') is-invalid @enderror" required
@@ -184,8 +184,7 @@
                         max="30">
                       <span class="input-group-text">Hari</span>
                     </div>
-                    <div class="form-text">Berapa hari sebelum jatuh tempo sistem mengirimkan pengingat pertama
-                      (default 5).</div>
+                    <div class="form-text">Notifikasi pengingat sebelum jatuh tempo</div>
                     @error('due_reminder_days')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -200,7 +199,7 @@
                         max="31">
                       <span class="input-group-text">Hari</span>
                     </div>
-                    <div class="form-text">Jumlah hari setelah jatuh tempo sebelum pelanggan diisolir / dinonaktifkan.
+                    <div class="form-text">Jumlah hari setelah jatuh tempo sebelum pelanggan dinonaktifkan
                     </div>
                     @error('grace_period')
                       <div class="invalid-feedback">{{ $message }}</div>
@@ -302,7 +301,7 @@
 
   @vite(['resources/js/leaflet.js'])
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw0GxwYh8kT-pVOYwoh33l0oXMgChS63A&libraries=places&v=weekly"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw0GxwYh8kT-pVOYwoh33l0oXMgChS63A&libraries=places&v=weekly&loading=async"
     async defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
