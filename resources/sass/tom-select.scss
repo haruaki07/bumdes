@@ -13,3 +13,7 @@
 .ts-dropdown.ts-dropdown .active {
     background-color: var(--tblr-tertiary-bg);
 }
+
+.ts-dropdown .option {
+    padding: 0.375rem 0.75rem !important;
+}
