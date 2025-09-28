@@ -59,7 +59,7 @@
                                     <div class="col-12">
                                       <a href="{{ $att->getUrl() }}" class="btn btn-sm btn-light" target="_blank"
                                         rel="noopener" download>
-                                        <i class="ti ti-sm ti-paperclip icon"></i>
+                                        <i class="ti ti-xs ti-paperclip icon"></i>
                                         {{ $att->filename }}.{{ $att->extension }} ({{ human_filesize($att->size) }})
                                       </a>
                                     </div>
@@ -188,6 +188,7 @@
   </div>
 
   @push('js')
+    @vite(['resources/js/hugerte.js'])
     <script type="module">
       let options = {
         selector: '#messageInput',
