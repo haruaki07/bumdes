@@ -18,6 +18,7 @@ class TransferReceipt extends Model
         'size_bytes',
         'note',
         'status',
+        'payment_method_id',
         'reviewed_by',
         'reviewed_at',
     ];
@@ -35,5 +36,10 @@ class TransferReceipt extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 }

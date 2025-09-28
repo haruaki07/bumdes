@@ -110,6 +110,7 @@
                 <div class="card-body">
                   <h4 class="card-title mb-3">Unggah Bukti Transfer</h4>
                   <form id="receiptForm" class="row g-2">
+                    <input type="hidden" name="payment_method" value="{{ $session['payment_method']['id'] }}">
                     <div class="col-12 col-md-6">
                       <input type="file" name="file" id="receiptFile" class="form-control" accept="image/*,.pdf"
                         required>
