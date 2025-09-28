@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'auth_ebil' => \Modules\EBilling\Http\Middleware\UserAuthenticate::class,
+            'auth.telescope' => \App\Http\Middleware\TelescopeAuthMiddleware::class,
         ]);
         $middleware->web([
             \App\Http\Middleware\ThemeConfigMiddleware::class,
