@@ -30,6 +30,13 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         });
     }
 
+    public function boot(): void
+    {
+        // handle authentication via custom middleware
+        // look at app/Http/Middleware/TelescopeAuthMiddleware.php
+        Telescope::auth(fn ($request) => true);
+    }
+
     /**
      * Prevent sensitive request details from being logged by Telescope.
      */
