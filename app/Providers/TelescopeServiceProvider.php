@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use Laravel\Telescope\EntryType;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
@@ -21,12 +22,15 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
-            return $isLocal ||
-                $entry->isReportableException() ||
-                $entry->isFailedRequest() ||
-                $entry->isFailedJob() ||
-                $entry->isScheduledTask() ||
-                $entry->hasMonitoredTag();
+            return
+                $entry->type === EntryType::SCHEDULED_TASK ||
+                $entry->type === EntryType::JOB ||
+                $entry->type === EntryType::EVENT ||
+                $entry->type === EntryType::EXCEPTION ||
+                $entry->type === EntryType::LOG ||
+                $entry->type === EntryType::MAIL ||
+                $entry->type === EntryType::NOTIFICATION ||
+                $isLocal;
         });
     }
 
