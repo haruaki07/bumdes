@@ -3,11 +3,14 @@
 namespace Modules\EBilling\Models;
 
 use App\Traits\Datatable;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\EBilling\Enums\InvoiceStatus;
+use Modules\EBilling\Policies\InvoicePolicy;
 
+#[UsePolicy(InvoicePolicy::class)]
 class Invoice extends Model
 {
     use Datatable, SoftDeletes;

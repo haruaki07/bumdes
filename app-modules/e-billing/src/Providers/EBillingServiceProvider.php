@@ -2,6 +2,7 @@
 
 namespace Modules\EBilling\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Modules\EBilling\Services\Contracts\PaymentServiceInterface;
@@ -19,6 +20,10 @@ class EBillingServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('admin') ? true : null;
+        });
+
         // limit WhatsApp messages to 10 per minute
         RateLimiter::for('whatsapp', function ($job) {
             return \Illuminate\Cache\RateLimiting\Limit::perMinute(10);

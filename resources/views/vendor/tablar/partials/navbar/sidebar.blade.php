@@ -12,15 +12,6 @@
         @yield('logo', View::make('tablar::partials.common.logo'))
       </h1>
       <div class="navbar-nav flex-row d-lg-none">
-        <div class="nav-item d-none d-lg-flex me-3">
-          <div class="btn-list">
-            @include('tablar::partials.header.header-button')
-          </div>
-        </div>
-        <div class="d-none d-lg-flex">
-          @include('tablar::partials.header.theme-mode')
-          @include('tablar::partials.header.notifications')
-        </div>
         @include('tablar::partials.header.top-right')
       </div>
 

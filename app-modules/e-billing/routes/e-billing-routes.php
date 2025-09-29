@@ -9,6 +9,7 @@ use Modules\EBilling\Http\Controllers\CustomerController;
 use Modules\EBilling\Http\Controllers\DashboardController;
 use Modules\EBilling\Http\Controllers\DeviceController;
 use Modules\EBilling\Http\Controllers\InvoiceController;
+use Modules\EBilling\Http\Controllers\NotificationController;
 use Modules\EBilling\Http\Controllers\PackageController;
 use Modules\EBilling\Http\Controllers\PaymentMethodController;
 use Modules\EBilling\Http\Controllers\RoleController;
@@ -67,6 +68,11 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::get('/{group}', [SettingsController::class, 'show'])->name('show');
                 Route::put('/{group}', [SettingsController::class, 'update'])->name('update');
             });
+
+            Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+            Route::get('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+            Route::get('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+            Route::delete('/notifications', [NotificationController::class, 'clear'])->name('notifications.clear');
         });
     });
 
