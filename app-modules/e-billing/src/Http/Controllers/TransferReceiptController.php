@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Models\Invoice;
 use Modules\EBilling\Models\TransferReceipt;
@@ -23,6 +24,7 @@ class TransferReceiptController extends Controller
             $request->validate([
                 'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
                 'note' => ['nullable', 'string', 'max:500'],
+                'payment_method' => ['required', 'string', Rule::exists('ebil_payment_methods', 'id')],
             ]);
 
             DB::beginTransaction();
@@ -51,6 +53,7 @@ class TransferReceiptController extends Controller
                 'size_bytes' => $request->file('file')->getSize(),
                 'note' => $request->input('note'),
                 'status' => 'pending',
+                'payment_method_id' => $request->input('payment_method'),
             ]);
 
             DB::commit();

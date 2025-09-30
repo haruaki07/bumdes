@@ -17,7 +17,7 @@
 
 @if ($authenticated)
   <div class="nav-item dropdown">
-    <a href="#" class="nav-link d-flex lh-1 text-reset p-0 px-2" data-bs-toggle="dropdown"
+    <a href="#" class="nav-link d-flex lh-1 text-reset p-0 px-lg-2" data-bs-toggle="dropdown"
       aria-label="Open user menu">
       <span class="avatar avatar-sm">
         {{ get_initials($user->name) }}

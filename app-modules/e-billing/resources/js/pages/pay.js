@@ -342,7 +342,6 @@ function renderInstructionsTabs(instructions, vars) {
     if (!file) return;
     const btn = document.getElementById("btnUploadReceipt");
     const statusEl = document.getElementById("uploadStatus");
-    const token = new URLSearchParams(window.location.search).get("token");
     const url = meta?.transfer_receipt_url;
     const formData = new FormData(form);
     btn.setAttribute("disabled", "disabled");

@@ -557,7 +557,7 @@ class InvoiceController extends Controller
             $latestReceipt->reviewed_by = $request->user()?->id;
             $latestReceipt->reviewed_at = now();
             $latestReceipt->save();
-            $invoice->payment_method_code = $latestReceipt->payment_method_code;
+            $invoice->payment_method_code = $latestReceipt->paymentMethod->code ?? null;
         }
 
         $invoice->save();

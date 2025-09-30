@@ -201,7 +201,7 @@
                 @if ($invoice->payment_method_code)
                   <div class="datagrid-item">
                     <div class="datagrid-title">Metode Pembayaran</div>
-                    <div class="datagrid-content text-capitalize">
+                    <div class="datagrid-content">
                       @if ($invoice->paymentMethod->brand_logo)
                         <span class="payment payment-xs me-1"
                           style="background-image:url('{{ asset($invoice->paymentMethod->brand_logo) }}');"></span>
@@ -231,6 +231,7 @@
                       <th>Waktu</th>
                       <th>Status</th>
                       <th>File</th>
+                      <th>Metode Pembayaran</th>
                       <th>Catatan</th>
                     </tr>
                   </thead>
@@ -244,6 +245,13 @@
                         <td>
                           <a href="{{ Storage::url($r->file_path) }}" target="_blank"
                             rel="noopener">{{ $r->original_name ?? basename($r->file_path) }}</a>
+                        </td>
+                        <td>
+                          @if ($r->paymentMethod->brand_logo)
+                            <span class="payment payment-xs me-1"
+                              style="background-image:url('{{ asset($r->paymentMethod->brand_logo) }}');"></span>
+                          @endif
+                          {{ $r->paymentMethod->name ?? '-' }} - {{ $r->paymentMethod->type->label() }}
                         </td>
                         <td class="text-secondary"
                           style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">

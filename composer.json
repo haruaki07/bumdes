@@ -19,6 +19,7 @@
     "modules/e-billing": "*",
     "phpoffice/phpspreadsheet": "^5.1",
     "plank/laravel-mediable": "^6.3",
+    "pusher/pusher-php-server": "^7.2",
     "saloonphp/laravel-plugin": "^3.0",
     "saloonphp/saloon": "^3.0",
     "spatie/laravel-permission": "^6.21",
