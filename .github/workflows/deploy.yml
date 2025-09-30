@@ -46,6 +46,10 @@ jobs:
           node-version: 20
           cache: "npm"
 
+      - name: Set environment variables
+        run: |
+          echo "${{ secrets.ENV }}" > .env
+
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
