@@ -70,6 +70,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
             });
 
             Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+            Route::get('/notifications/dropdown', [NotificationController::class, 'dropdown'])->name('notifications.dropdown');
             Route::get('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
             Route::get('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
             Route::delete('/notifications', [NotificationController::class, 'clear'])->name('notifications.clear');

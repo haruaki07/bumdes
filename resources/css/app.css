@@ -36,3 +36,12 @@ i.ti-xxs {
     margin-left: 15rem;
   }
 }
+
+.htmx-display-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-display-indicator,
+.htmx-request.htmx-display-indicator {
+  display: block;
+}

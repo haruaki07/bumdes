@@ -9,16 +9,16 @@ class NotificationFormatter
 {
     public static function format(DatabaseNotification $notification): string
     {
-        return match (NotificationType::tryFrom($notification->type)) {
-            NotificationType::INVOICE_PAID => self::formatInvoicePaid($notification),
+        $type = NotificationType::tryFrom($notification->type);
+
+        return match ($type) {
+            NotificationType::INVOICE_PAID => self::formatInvoicePaid($type, $notification->data),
             default => '',
         };
     }
 
-    protected static function formatInvoicePaid(DatabaseNotification $notification): string
+    public static function formatInvoicePaid(NotificationType $type, array $data): string
     {
-        $type = NotificationType::from($notification->type);
-
-        return "<b>{$type->label()}</b> - Tagihan dengan nomor {$notification->data['invoice_number']} telah dibayar.";
+        return "<b>{$type->label()}</b> - Tagihan dengan nomor {$data['invoice_number']} telah dibayar.";
     }
 }

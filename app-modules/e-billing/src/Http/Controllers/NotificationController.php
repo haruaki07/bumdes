@@ -20,6 +20,13 @@ class NotificationController
         return view('e-billing::notifications.index', compact('notifications'));
     }
 
+    public function dropdown(Request $request)
+    {
+        $user = $request->user('ebil');
+
+        return view('tablar::partials.header.notification-card', compact('user'));
+    }
+
     public function markAsRead(Request $request, $id)
     {
         $user = $request->user('ebil');
