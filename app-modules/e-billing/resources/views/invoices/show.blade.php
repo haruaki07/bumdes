@@ -18,7 +18,7 @@
             Kembali
           </a>
           <a class="btn btn-outline-primary" href="{{ $invoice->public_url }}" target="_blank">
-            <i class="ti ti-external-link icon"></i> Halaman Publik
+            <i class="ti ti-external-link icon"></i> Lihat Tagihan
           </a>
           @if ($invoice->status !== InvoiceStatus::PAID)
             <form method="POST" action="{{ route('e-billing.invoices.send-notification', $invoice) }}"
