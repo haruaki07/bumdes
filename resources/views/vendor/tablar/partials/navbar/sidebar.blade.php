@@ -12,7 +12,7 @@
         @yield('logo', View::make('tablar::partials.common.logo'))
       </h1>
       <div class="navbar-nav flex-row d-lg-none">
-        @include('tablar::partials.header.top-right')
+        @include('tablar::partials.header.top-right', ['mobile' => true])
       </div>
 
       <div class="collapse navbar-collapse" id="sidebar-menu">

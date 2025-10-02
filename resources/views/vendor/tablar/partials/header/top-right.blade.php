@@ -13,6 +13,8 @@
   }
 
   $user = $authenticated ? auth($guard)->user() : null;
+
+  $formId = isset($mobile) && $mobile ? 'form-logout-mobile' : 'form-logout';
 @endphp
 
 @if ($authenticated)
@@ -39,13 +41,14 @@
 
       <a href="{{ $settings_url }}" class="dropdown-item">Pengaturan</a>
       <div class="dropdown-divider"></div>
+
       <a class="dropdown-item text-danger" href="#"
-        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        onclick="event.preventDefault(); document.getElementById('{{ $formId }}').submit();">
         <i class="ti ti-logout icon"></i>
         Keluar
       </a>
 
-      <form id="logout-form" action="{{ $logoutUrl }}" method="POST" style="display: none;">
+      <form id="{{ $formId }}" action="{{ $logoutUrl }}" method="POST" style="display: none;">
         @if (config('tablar.logout_method'))
           {{ method_field(config('tablar.logout_method')) }}
         @endif
