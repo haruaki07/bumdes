@@ -3,6 +3,7 @@
 
   <div class="page-body">
     <div class="container-xl">
+      @include('tablar::common.alert')
       <div class="card overflow-hidden">
         <div class="row g-0">
           @include('e-billing::settings.partials._menu')

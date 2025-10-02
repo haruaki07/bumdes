@@ -31,7 +31,7 @@ class WhatsappChannel
 
         $recipient = preg_replace('/[^0-9]/', '', (string) $notifiable->phone);
         if ($recipient) {
-            $this->whatsappService->sendMessage($recipient.'@c.us', $message);
+            $this->whatsappService->sendMessage($recipient, $message);
         }
     }
 }

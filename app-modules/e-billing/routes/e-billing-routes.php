@@ -67,6 +67,8 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::get('/', [SettingsController::class, 'index'])->name('index');
                 Route::get('/{group}', [SettingsController::class, 'show'])->name('show');
                 Route::put('/{group}', [SettingsController::class, 'update'])->name('update');
+
+                Route::get('/whatsapp/device-info', [SettingsController::class, 'whatsappDeviceInfo'])->name('whatsapp.device-info');
             });
 
             Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

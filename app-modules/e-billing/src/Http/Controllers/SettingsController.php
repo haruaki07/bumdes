@@ -2,6 +2,8 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
+use App\Http\Integrations\WhatsApp\Requests\Wablas\DeviceInfoRequest;
+use App\Http\Integrations\WhatsApp\WablasConnector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -82,10 +84,13 @@ class SettingsController
             $settings->enabled = (bool) ($data['enabled'] ?? false);
             $settings->provider = $data['provider'];
             $settings->phoneNumber = $data['phoneNumber'] ?? '';
-            // WAHA
-            $settings->waha_base_url = $data['waha_base_url'] ?? null;
-            $settings->waha_api_key = $data['waha_api_key'] ?? null;
-            $settings->waha_session = $data['waha_session'] ?? 'default';
+
+            if ($data['provider'] === 'wablas') {
+                $settings->wablas_server = $data['wablas_server'] ?? '';
+                $settings->wablas_api_key = $data['wablas_api_key'] ?? '';
+                $settings->wablas_secret_key = $data['wablas_secret_key'] ?? '';
+            }
+
             if (isset($data['invoice_reminder_template'])) {
                 $settings->invoice_reminder_template = $data['invoice_reminder_template'];
             }
@@ -93,7 +98,7 @@ class SettingsController
         }
 
         return redirect()->route('e-billing.settings.show', ['group' => $group->value])
-            ->with('success', 'Settings updated successfully.');
+            ->with('success', 'Pengaturan berhasil diperbarui.');
     }
 
     protected function getValidationRules(SettingsGroup $group)
@@ -123,11 +128,39 @@ class SettingsController
             case SettingsGroup::WHATSAPP:
                 return [
                     'enabled' => 'nullable|boolean',
-                    'provider' => 'required|in:waha',
+                    'provider' => 'required|in:waha,wablas',
+                    'wablas_server' => 'nullable|required_if:provider,wablas|string',
+                    'wablas_api_key' => 'nullable|required_if:provider,wablas|string',
+                    'wablas_secret_key' => 'nullable|required_if:provider,wablas|string',
                     'invoice_reminder_template' => 'required|string|max:500',
                 ];
             default:
                 return [];
+        }
+    }
+
+    /**
+     * Fetch Wablas device info for testing connection
+     */
+    public function whatsappDeviceInfo(Request $request)
+    {
+        try {
+            $connector = new WablasConnector(
+                server: $request->input('server'),
+                apiKey: $request->input('api_key'),
+                secretKey: $request->input('secret_key')
+            );
+            $response = $connector->send(new DeviceInfoRequest);
+            $deviceInfo = $response->dto();
+
+            return response()->json($deviceInfo);
+        } catch (\Exception $e) {
+            logger()->error('Failed to fetch Wablas device info: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mendapatkan informasi device',
+            ], 400);
         }
     }
 }

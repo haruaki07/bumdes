@@ -8,16 +8,17 @@ class EBillingWhatsappSettings extends Settings
 {
     public bool $enabled;
 
-    public string $provider; // currently only "waha" is supported
+    public string $provider; // currently only "waha" and "wablas" are supported
 
     public string $waha_session;
 
-    /**
-     * Template pesan pengingat invoice WhatsApp.
-     * Gunakan placeholder berikut (akan diganti otomatis):
-     * {customer_name}, {invoice_number}, {invoice_amount}, {invoice_due_date}, {invoice_grace_period_end_date}, {invoice_status}, {invoice_public_url}, {package_name}, {business_name}
-     */
     public string $invoice_reminder_template;
+
+    public string $wablas_server;
+
+    public string $wablas_api_key;
+
+    public string $wablas_secret_key;
 
     public static function group(): string
     {
