@@ -1,5 +1,8 @@
 @php
   use Modules\EBilling\Enums\InvoiceStatus;
+
+  $customer = $invoice->customer ?? $invoice->customer_detail;
+  $package = $invoice->package ?? $invoice->package_detail;
 @endphp
 
 <x-e-billing::layouts.panel>
@@ -130,12 +133,12 @@
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Paket</div>
-                  <div class="datagrid-content">{{ $invoice->package_detail->name ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $package->name ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Harga Paket</div>
                   <div class="datagrid-content">
-                    Rp{{ number_format($invoice->package_detail->price ?? $invoice->amount, 0, ',', '.') }}</div>
+                    Rp{{ number_format($package->price ?? $invoice->amount, 0, ',', '.') }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Terakhir Diperbarui</div>
@@ -155,19 +158,19 @@
               <div class="datagrid">
                 <div class="datagrid-item">
                   <div class="datagrid-title">Nama</div>
-                  <div class="datagrid-content">{{ $invoice->customer_detail->name ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $customer->name ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">ID Pelanggan</div>
-                  <div class="datagrid-content">{{ $invoice->customer_detail->customer_id ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $customer->customer_id ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Email</div>
-                  <div class="datagrid-content">{{ $invoice->customer_detail->email ?? '-' }}</div>
+                  <div class="datagrid-content">{{ $customer->email ?? '-' }}</div>
                 </div>
                 <div class="datagrid-item">
                   <div class="datagrid-title">Telepon</div>
-                  <div class="datagrid-content">{{ $invoice->customer_detail->phone ?? '-' }}</div>
+                  <div class="datagrid-content">{{ phone($customer->phone, 'ID')->formatNational() ?? '-' }}</div>
                 </div>
               </div>
             </div>
@@ -183,7 +186,7 @@
               <div class="datagrid">
                 <div class="datagrid-item">
                   <div class="datagrid-title">Harga Paket</div>
-                  <div class="datagrid-content">Rp{{ number_format($invoice->package_detail->price, 0, ',', '.') }}
+                  <div class="datagrid-content">Rp{{ number_format($package->price, 0, ',', '.') }}
                   </div>
                 </div>
                 @if ($invoice->paymentMethod && $invoice->paymentMethod->calculateFee($invoice->amount) > 0)

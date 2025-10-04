@@ -2,6 +2,7 @@ import axios from "axios";
 import * as anime from "./anime";
 import * as QRCode from "qrcode";
 import JsBarcode from "jsbarcode";
+import IMask from "imask";
 
 import { tabler, TomSelect } from "./tabler-init";
 import {
@@ -35,3 +36,4 @@ window.TomSelect = TomSelect;
 window.AddressModal = AddressModal;
 window.LoadingButton = LoadingButton;
 window.Toast = Toast;
+window.IMask = IMask;

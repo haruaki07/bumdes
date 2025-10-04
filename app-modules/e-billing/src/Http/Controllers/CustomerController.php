@@ -4,8 +4,8 @@ namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
+use Modules\EBilling\Http\Requests\Customer\CreateCustomerRequest;
+use Modules\EBilling\Http\Requests\Customer\UpdateCustomerRequest;
 use Modules\EBilling\Jobs\ImportCustomersJob;
 use Modules\EBilling\Models\Customer;
 use Modules\EBilling\Models\Device;
@@ -39,23 +39,9 @@ class CustomerController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateCustomerRequest $request)
     {
-        $data = $request->validate([
-            'customer_id' => 'required|string|max:50|unique:ebil_customers,customer_id',
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'site_id' => 'required|exists:ebil_sites,id',
-            'package_id' => 'required|exists:ebil_packages,id',
-            'device_id' => 'required|exists:ebil_devices,id',
-            'serial_number' => 'nullable|string|max:100',
-            'mac_address' => 'nullable|string|max:100',
-            'due' => 'required|integer',
-        ]);
+        $data = $request->validated();
 
         Customer::create([
             ...$data,
@@ -88,23 +74,9 @@ class CustomerController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Customer $customer)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        $data = $request->validate([
-            'customer_id' => ['required', 'string', 'max:50', Rule::unique('ebil_customers', 'customer_id')->ignore($customer->id)],
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'site_id' => 'required|exists:ebil_sites,id',
-            'package_id' => 'required|exists:ebil_packages,id',
-            'device_id' => 'required|exists:ebil_devices,id',
-            'serial_number' => 'nullable|string|max:100',
-            'mac_address' => 'nullable|string|max:100',
-            'due' => 'required|integer',
-        ]);
+        $data = $request->validated();
 
         $customer->update($data);
 

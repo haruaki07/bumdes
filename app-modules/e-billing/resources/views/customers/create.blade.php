@@ -62,7 +62,7 @@
                 <div class="mb-3">
                   <label class="form-label required">Nomor HP</label>
                   <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                    value="{{ old('phone') }}" required placeholder="08512345">
+                    value="{{ old('phone') }}" required placeholder="0812-3456-7890" data-mask-phone>
                   @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -295,77 +295,73 @@
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw0GxwYh8kT-pVOYwoh33l0oXMgChS63A&libraries=places&v=weekly&loading=async"
     async defer></script>
-  <script>
-    // Bridge the web component to the form
-    document.addEventListener('DOMContentLoaded', function() {
-      const el = document.querySelector('address-modal');
-      const addressInput = document.getElementById('addressInput');
-      const latInput = document.getElementById('latitudeInput');
-      const lngInput = document.getElementById('longitudeInput');
-      const display = document.getElementById('addressDisplay');
+  <script type="module">
+    const el = document.querySelector('address-modal');
+    const addressInput = document.getElementById('addressInput');
+    const latInput = document.getElementById('latitudeInput');
+    const lngInput = document.getElementById('longitudeInput');
+    const display = document.getElementById('addressDisplay');
 
-      if (!el) return;
+    el.addEventListener('address-apply', function(ev) {
+      const {
+        address,
+        lat,
+        lng
+      } = ev.detail || {};
+      addressInput.value = address || '';
+      display.textContent = address || '';
+      display.style.display = address ? '' : 'none';
 
-      el.addEventListener('address-apply', function(ev) {
-        const {
-          address,
-          lat,
-          lng
-        } = ev.detail || {};
-        addressInput.value = address || '';
-        display.textContent = address || '';
-        display.style.display = address ? '' : 'none';
+      if (lat && lng) {
+        latInput.value = lat;
+        lngInput.value = lng;
+      } else {
+        latInput.value = '';
+        lngInput.value = '';
+      }
+    });
 
-        if (lat && lng) {
-          latInput.value = lat;
-          lngInput.value = lng;
-        } else {
-          latInput.value = '';
-          lngInput.value = '';
-        }
+    const pkgSelect = document.getElementById('packageSelect');
+
+    function formatDate(d) {
+      return d.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
       });
+    }
 
-      const pkgSelect = document.getElementById('packageSelect');
-
-      function formatDate(d) {
-        return d.toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: 'short',
+    function generateBillingPreview() {
+      const dueInput = document.getElementById('dueInput');
+      const reminderInput = document.getElementById('dueReminderInput');
+      const graceInput = document.getElementById('gracePeriodInput');
+      const tableBody = document.querySelector('#billingPreviewTable tbody');
+      const opt = pkgSelect.options[pkgSelect.selectedIndex];
+      const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
+      const dueDay = parseInt(dueInput.value, 10);
+      const grace = parseInt(graceInput.value, 10);
+      if (!dueDay) {
+        tableBody.innerHTML =
+          '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
+        return;
+      }
+      const today = new Date();
+      let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+      if (today.getDate() > dueDay) {
+        firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
+      }
+      const rows = [];
+      for (let i = 0; i < 6; i++) {
+        const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
+        const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + (isNaN(grace) ? 0 : grace));
+        // Period start = previous month (due+1) pattern, following backend accessor logic
+        const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
+        const periodLabel = formatDate(periodStart) + ' - ' + formatDate(dueDate);
+        const bulanLabel = dueDate.toLocaleDateString('id-ID', {
+          month: 'long',
           year: 'numeric'
         });
-      }
-
-      function generateBillingPreview() {
-        const dueInput = document.getElementById('dueInput');
-        const reminderInput = document.getElementById('dueReminderInput');
-        const graceInput = document.getElementById('gracePeriodInput');
-        const tableBody = document.querySelector('#billingPreviewTable tbody');
-        const opt = pkgSelect.options[pkgSelect.selectedIndex];
-        const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
-        const dueDay = parseInt(dueInput.value, 10);
-        const grace = parseInt(graceInput.value, 10);
-        if (!dueDay) {
-          tableBody.innerHTML =
-            '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
-          return;
-        }
-        const today = new Date();
-        let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
-        if (today.getDate() > dueDay) {
-          firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
-        }
-        const rows = [];
-        for (let i = 0; i < 6; i++) {
-          const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
-          const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + (isNaN(grace) ? 0 : grace));
-          // Period start = previous month (due+1) pattern, following backend accessor logic
-          const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
-          const periodLabel = formatDate(periodStart) + ' - ' + formatDate(dueDate);
-          const bulanLabel = dueDate.toLocaleDateString('id-ID', {
-            month: 'long',
-            year: 'numeric'
-          });
-          rows.push(`<tr>
+        rows.push(`<tr>
             <td>${bulanLabel}</td>
             <td>1 Bulan</td>
             <td>${formatDate(dueDate)}</td>
@@ -373,48 +369,47 @@
             <td>${periodLabel}</td>
             <td>${formatRupiah(rawPrice)}</td>
           </tr>`);
-        }
-        tableBody.innerHTML = rows.join('');
       }
+      tableBody.innerHTML = rows.join('');
+    }
 
-      const updatePackageInfo = () => {
-        const dueInput = document.getElementById('dueInput');
-        const bandwidthInput = document.getElementById('bandwidthInput');
-        const priceInput = document.getElementById('priceInput');
+    const updatePackageInfo = () => {
+      const dueInput = document.getElementById('dueInput');
+      const bandwidthInput = document.getElementById('bandwidthInput');
+      const priceInput = document.getElementById('priceInput');
 
-        const opt = pkgSelect.options[pkgSelect.selectedIndex];
-        if (!opt?.value || !opt.dataset) {
-          dueInput.value = '';
-          bandwidthInput.value = '';
-          priceInput.value = '';
-          generateBillingPreview();
-          return;
-        }
-
-        const price = opt.dataset.price;
-        const bandwidth = opt.dataset.bandwidth;
-        const due = opt.dataset.due;
-
-        if (!dueInput.value) dueInput.value = due || '';
-        bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
-        priceInput.value = price || '-';
+      const opt = pkgSelect.options[pkgSelect.selectedIndex];
+      if (!opt?.value || !opt.dataset) {
+        dueInput.value = '';
+        bandwidthInput.value = '';
+        priceInput.value = '';
         generateBillingPreview();
+        return;
       }
 
-      ['dueInput', 'dueReminderInput', 'gracePeriodInput'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('input', generateBillingPreview);
-        }
-      });
+      const price = opt.dataset.price;
+      const bandwidth = opt.dataset.bandwidth;
+      const due = opt.dataset.due;
 
-      pkgSelect.addEventListener('change', updatePackageInfo);
-      updatePackageInfo();
+      if (!dueInput.value) dueInput.value = due || '';
+      bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
+      priceInput.value = price || '-';
+      generateBillingPreview();
+    }
 
-      document.querySelectorAll('[data-tom-select]').forEach(select => {
-        new TomSelect(select, {
-          maxItems: 1
-        });
+    ['dueInput', 'dueReminderInput', 'gracePeriodInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', generateBillingPreview);
+      }
+    });
+
+    pkgSelect.addEventListener('change', updatePackageInfo);
+    updatePackageInfo();
+
+    document.querySelectorAll('[data-tom-select]').forEach(select => {
+      new TomSelect(select, {
+        maxItems: 1
       });
     });
   </script>

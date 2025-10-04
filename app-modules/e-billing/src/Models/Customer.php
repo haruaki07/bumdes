@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Modules\EBilling\Enums\CustomerStatus;
+use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 class Customer extends Model
 {
@@ -55,6 +56,7 @@ class Customer extends Model
         'registration_date' => 'datetime',
         'next_billing_date' => 'datetime',
         'status' => CustomerStatus::class,
+        'phone' => E164PhoneNumberCast::class.':ID',
     ];
 
     protected static function booted()

@@ -155,6 +155,7 @@ return [
     'uppercase' => ':Attribute harus berupa huruf kapital.',
     'url' => 'Format :attribute tidak valid.',
     'uuid' => ':Attribute harus merupakan UUID yang valid.',
+    'phone' => ':Attribute harus berupa nomor telepon yang valid.',
     'attributes' => [
         'address' => 'alamat',
         'affiliate_url' => 'URL afiliasi',

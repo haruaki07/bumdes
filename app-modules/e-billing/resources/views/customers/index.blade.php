@@ -69,7 +69,7 @@
                   </td>
                   <td>{{ $customer->name }}</td>
                   <td>{{ $customer->email }}</td>
-                  <td>{{ $customer->phone }}</td>
+                  <td>{{ $customer->phone?->formatNational() }}</td>
                   <td>
                     <x-common.badge color="info" :label="$customer->package->name" />
                   </td>

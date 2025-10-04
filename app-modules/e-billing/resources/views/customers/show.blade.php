@@ -56,7 +56,7 @@
 
                 <div class="datagrid-item">
                   <div class="datagrid-title">Nomor HP</div>
-                  <div class="datagrid-content">{{ $customer->phone }}</div>
+                  <div class="datagrid-content">{{ $customer->phone?->formatNational() }}</div>
                 </div>
 
                 <div class="datagrid-item">

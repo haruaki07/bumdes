@@ -37,11 +37,15 @@
 
             <x-slot:tbody>
               @forelse ($invoices as $invoice)
+                @php
+                  $customer = $invoice->customer ?? $invoice->customer_detail;
+                  $package = $invoice->package ?? $invoice->package_detail;
+                @endphp
                 <tr>
                   <td>{{ $loop->iteration + $invoices->firstItem() - 1 }}</td>
                   <td class="fw-medium">{{ $invoice->invoice_number }}</td>
-                  <td>{{ $invoice->customer->name ?? '-' }}</td>
-                  <td>{{ $invoice->package->name ?? '-' }}</td>
+                  <td>{{ $customer->name ?? '-' }}</td>
+                  <td>{{ $package->name ?? '-' }}</td>
                   <td>Rp{{ number_format($invoice->amount, 0, ',', '.') }}</td>
                   <td>
                     <x-common.badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
