@@ -13,7 +13,7 @@
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
             {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.sites.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+            <a href="{{ route('e-billing.master-data.sites.create') }}" class="btn btn-primary">
               <i class="icon ti ti-plus"></i>
               Tambah Site
             </a>

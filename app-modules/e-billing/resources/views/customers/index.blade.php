@@ -12,14 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <button class="btn btn-outline-secondary d-none d-sm-inline-block" data-bs-toggle="modal"
-              data-bs-target="#importCustomerModal">
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importCustomerModal">
               <i class="ti ti-upload icon"></i>
               Import
             </button>
             {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.customers.create') }}"
-              class="btn btn-primary d-none d-sm-inline-block">
+            <a href="{{ route('e-billing.master-data.customers.create') }}" class="btn btn-primary">
               <i class="icon ti ti-plus"></i>
               Tambah Pelanggan
             </a>
