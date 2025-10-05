@@ -40,6 +40,13 @@
             <div class="card-body">
               <div class="datagrid">
                 <div class="datagrid-item">
+                  <div class="datagrid-title">Kode Paket</div>
+                  <div class="datagrid-content">
+                    <x-common.badge color="primary" :label="$package->code" light />
+                  </div>
+                </div>
+
+                <div class="datagrid-item">
                   <div class="datagrid-title">Nama Paket</div>
                   <div class="datagrid-content">{{ $package->name }}</div>
                 </div>

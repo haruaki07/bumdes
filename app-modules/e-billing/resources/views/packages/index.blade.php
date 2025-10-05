@@ -48,8 +48,8 @@
               @forelse ($packages as $package)
                 <tr>
                   <td>{{ $loop->iteration + $packages->firstItem() - 1 }}</td>
-                  <td class="fw-medium">{{ $package->code }}</td>
-                  <td>{{ $package->name }}</td>
+                  <td><x-common.badge color="primary" :label="$package->code" light /></td>
+                  <td class="fw-medium">{{ $package->name }}</td>
                   <td title="{{ $package->description }}">{{ Str::limit($package->description, 30) ?? '-' }}</td>
                   <td>{{ $package->bandwidth }} Mbps</td>
                   <td>Rp{{ number_format($package->price, 0, ',', '.') }}</td>
