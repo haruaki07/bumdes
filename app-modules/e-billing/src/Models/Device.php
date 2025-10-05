@@ -14,12 +14,14 @@ class Device extends Model
     protected $table = 'ebil_devices';
 
     protected $fillable = [
+        'code',
         'brand',
         'model',
         'description',
     ];
 
     protected $dataTableColumns = [
+        'code' => 'searchable|sortable',
         'brand' => 'searchable|sortable',
         'model' => 'searchable|sortable',
         'description' => 'searchable|sortable',

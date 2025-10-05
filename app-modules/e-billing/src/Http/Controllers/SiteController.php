@@ -2,9 +2,9 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Modules\EBilling\Http\Requests\Site\CreateSiteRequest;
+use Modules\EBilling\Http\Requests\Site\UpdateSiteRequest;
 use Modules\EBilling\Models\Site;
-use TakiElias\TablarKit\Builder\FormBuilder;
 
 class SiteController
 {
@@ -23,32 +23,15 @@ class SiteController
      */
     public function create()
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.sites.store'))
-            ->method('POST')
-
-            ->input('name', 'Nama', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan nama site')
-
-            ->textarea('description', 'Deskripsi', ['topGap' => ''])
-            ->placeholder('Masukkan deskripsi site (opsional)')
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::sites.create', compact('form'));
+        return view('e-billing::sites.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateSiteRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'description' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $site = Site::create($data);
 
@@ -68,34 +51,15 @@ class SiteController
      */
     public function edit(Site $site)
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.sites.update', $site))
-            ->method('PUT')
-
-            ->input('name', 'Nama', ['topGap' => ''])
-            ->required()
-            ->value($site->name)
-            ->placeholder('Masukkan nama site')
-
-            ->textarea('description', 'Deskripsi', ['topGap' => ''])
-            ->value($site->description)
-            ->placeholder('Masukkan deskripsi site (opsional)')
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::sites.edit', compact('form'));
+        return view('e-billing::sites.edit', compact('site'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Site $site)
+    public function update(UpdateSiteRequest $request, Site $site)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'description' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $site->update($data);
 

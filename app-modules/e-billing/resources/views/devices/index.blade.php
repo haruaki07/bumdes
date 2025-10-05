@@ -34,6 +34,7 @@
             <x-slot:thead>
               <tr>
                 <th>#</th>
+                <x-sortable-header field="code" label="Kode" />
                 <x-sortable-header field="brand" label="Merek" />
                 <x-sortable-header field="model" label="Model" />
                 <x-sortable-header field="description" label="Deskripsi" />
@@ -45,9 +46,10 @@
               @forelse ($devices as $device)
                 <tr>
                   <td>{{ $loop->iteration + $devices->firstItem() - 1 }}</td>
+                  <td><x-common.badge color="primary" :label="$device->code" light /></td>
                   <td class="fw-medium">{{ $device->brand }}</td>
                   <td>{{ $device->model }}</td>
-                  <td title="{{ $device->description }}">{{ Str::limit($device->description, 75) ?? '-' }}</td>
+                  <td title="{{ $device->description }}">{{ Str::limit($device->description, 30) ?? '-' }}</td>
                   <td>
                     <a href="{{ route('e-billing.master-data.devices.show', $device) }}"
                       class="btn btn-icon btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"

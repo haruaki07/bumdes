@@ -2,10 +2,9 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Modules\EBilling\Http\Requests\Device\CreateDeviceRequest;
+use Modules\EBilling\Http\Requests\Device\UpdateDeviceRequest;
 use Modules\EBilling\Models\Device;
-use TakiElias\TablarKit\Builder\FormBuilder;
 
 class DeviceController
 {
@@ -24,44 +23,15 @@ class DeviceController
      */
     public function create()
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.devices.store'))
-            ->method('POST')
-
-            ->input('brand', 'Merek', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan nama perangkat')
-
-            ->input('model', 'Model', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan model perangkat')
-
-            ->textarea('description', 'Deskripsi', ['topGap' => ''])
-            ->placeholder('Masukkan deskripsi perangkat (opsional)')
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::devices.create', compact('form'));
+        return view('e-billing::devices.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateDeviceRequest $request)
     {
-        $data = $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('ebil_devices', 'model')->where('brand', $request->brand),
-            ],
-            'description' => 'nullable|string|max:1000',
-        ], [
-            'model.unique' => 'Model perangkat dengan merek :input sudah ada.',
-        ]);
+        $data = $request->validated();
 
         Device::create($data);
 
@@ -82,47 +52,15 @@ class DeviceController
      */
     public function edit(Device $device)
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.devices.update', $device))
-            ->method('PUT')
-
-            ->input('brand', 'Merek', ['topGap' => ''])
-            ->required()
-            ->value($device->brand)
-            ->placeholder('Masukkan nama perangkat')
-
-            ->input('model', 'Model', ['topGap' => ''])
-            ->required()
-            ->value($device->model)
-            ->placeholder('Masukkan model perangkat')
-
-            ->textarea('description', 'Deskripsi', ['topGap' => ''])
-            ->value($device->description)
-            ->placeholder('Masukkan deskripsi perangkat (opsional)')
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::devices.edit', compact('form'));
+        return view('e-billing::devices.edit', compact('device'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Device $device)
+    public function update(UpdateDeviceRequest $request, Device $device)
     {
-        $data = $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('ebil_devices', 'model')->where('brand', $request->brand)->ignore($device->id),
-            ],
-            'description' => 'nullable|string|max:1000',
-        ], [
-            'model.unique' => 'Model perangkat dengan merek :input sudah ada.',
-        ]);
+        $data = $request->validated();
 
         $device->update($data);
 

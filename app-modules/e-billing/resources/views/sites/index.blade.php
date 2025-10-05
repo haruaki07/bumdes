@@ -33,6 +33,7 @@
             <x-slot:thead>
               <tr>
                 <th>#</th>
+                <x-sortable-header field="code" label="Kode" />
                 <x-sortable-header field="name" label="Nama" />
                 <x-sortable-header field="description" label="Deskripsi" />
                 <th>Aksi</th>
@@ -43,8 +44,9 @@
               @forelse ($sites as $site)
                 <tr>
                   <td>{{ $loop->iteration }}</td>
+                  <td><x-common.badge color="primary" :label="$site->code" light /></td>
                   <td class="fw-medium">{{ $site->name }}</td>
-                  <td>{{ $site->description ?? '-' }}</td>
+                  <td title="{{ $site->description }}">{{ Str::limit($site->description, 30) ?? '-' }}</td>
                   <td>
                     <a href="{{ route('e-billing.master-data.sites.show', $site) }}" class="btn btn-icon btn-primary"
                       data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">

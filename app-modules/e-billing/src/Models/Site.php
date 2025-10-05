@@ -14,11 +14,13 @@ class Site extends Model
     protected $table = 'ebil_sites';
 
     protected $fillable = [
+        'code',
         'name',
         'description',
     ];
 
     protected $dataTableColumns = [
+        'code' => 'searchable|sortable',
         'name' => 'searchable|sortable',
         'description' => 'searchable|sortable',
     ];
