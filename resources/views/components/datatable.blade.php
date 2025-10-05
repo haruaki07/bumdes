@@ -29,7 +29,7 @@
   <div class="card-body border-bottom py-3">
     {{ $cardheader ?? '' }}
 
-    <div class="d-flex align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center justify-content-sm-between justify-content-center flex-wrap gap-3">
       @if ($limit)
         <div class="text-muted">
           Tampilkan
@@ -52,7 +52,7 @@
       @endif
 
       @if ($search)
-        <div class="ms-auto d-flex align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center justify-content-center flex-wrap gap-3">
           {{ $headerRight ?? '' }}
           <div class="text-muted">
             Cari:
