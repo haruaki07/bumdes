@@ -2,9 +2,9 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Modules\EBilling\Http\Requests\Package\CreatePackageRequest;
+use Modules\EBilling\Http\Requests\Package\UpdatePackageRequest;
 use Modules\EBilling\Models\Package;
-use TakiElias\TablarKit\Builder\FormBuilder;
 
 class PackageController
 {
@@ -23,48 +23,15 @@ class PackageController
      */
     public function create()
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.packages.store'))
-            ->method('POST')
-
-            ->input('name', 'Nama Paket', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan nama paket')
-
-            ->input('description', 'Deskripsi', ['topGap' => ''])
-            ->placeholder('Masukkan deskripsi paket (opsional)')
-
-            ->number('bandwidth', 'Bandwidth (Mbps)', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan bandwidth paket')
-
-            ->number('price', 'Harga (IDR)', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan harga paket')
-            ->step('any')
-
-            ->number('due', 'Tanggal jatuh tempo', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan jatuh tempo paket')
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::packages.create', compact('form'));
+        return view('e-billing::packages.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreatePackageRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'bandwidth' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'due' => 'required|integer|min:1',
-        ]);
+        $data = $request->validated();
 
         Package::create($data);
 
@@ -85,53 +52,15 @@ class PackageController
      */
     public function edit(Package $package)
     {
-        $form = FormBuilder::create()
-            ->action(route('e-billing.master-data.packages.update', $package))
-            ->method('PUT')
-
-            ->input('name', 'Nama Paket', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan nama paket')
-            ->value($package->name)
-
-            ->input('description', 'Deskripsi', ['topGap' => ''])
-            ->placeholder('Masukkan deskripsi paket (opsional)')
-            ->value($package->description)
-
-            ->number('bandwidth', 'Bandwidth (Mbps)', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan bandwidth paket')
-            ->value($package->bandwidth)
-
-            ->number('price', 'Harga (IDR)', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan harga paket')
-            ->value($package->price)
-            ->step('any')
-
-            ->number('due', 'Tanggal jatuh tempo', ['topGap' => ''])
-            ->required()
-            ->placeholder('Masukkan jatuh tempo paket')
-            ->value($package->due)
-
-            ->button('Simpan', '', ['topGap' => 'd-inline-flex'])
-            ->addClass('btn btn-primary');
-
-        return view('e-billing::packages.edit', compact('form'));
+        return view('e-billing::packages.edit', compact('package'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Package $package)
+    public function update(UpdatePackageRequest $request, Package $package)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'bandwidth' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'due' => 'required|integer|min:1',
-        ]);
+        $data = $request->validated();
 
         $package->update($data);
 

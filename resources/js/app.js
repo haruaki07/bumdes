@@ -29,8 +29,19 @@ document.querySelectorAll("input[data-mask-phone]").forEach((input) => {
   });
 });
 
-document.addEventListener("wheel", function(event){
-    if(document.activeElement.type === "number"){
-        document.activeElement.blur();
-    }
+document.addEventListener("wheel", function (event) {
+  if (document.activeElement.type === "number") {
+    document.activeElement.blur();
+  }
+});
+
+document.querySelectorAll("input[data-mask-currency]").forEach((input) => {
+  if (input._imask) return;
+
+  input._imask = window.IMask(input, {
+    mask: Number,
+    thousandsSeparator: ".",
+    radix: ",", // decimal separator
+    scale: 0, // no decimals
+  });
 });

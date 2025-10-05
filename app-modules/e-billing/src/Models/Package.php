@@ -16,6 +16,7 @@ class Package extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'description',
         'bandwidth', // in Mbps
         'price', // in IDR
@@ -24,9 +25,14 @@ class Package extends Model
 
     protected $dataTableColumns = [
         'name' => 'searchable|sortable',
+        'code' => 'searchable|sortable',
         'description' => 'searchable|sortable',
         'bandwidth' => 'searchable|sortable',
         'price' => 'searchable|sortable',
         'due' => 'searchable|sortable',
+    ];
+
+    protected $casts = [
+        'price' => 'float',
     ];
 }

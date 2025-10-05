@@ -39,6 +39,7 @@ class PackageFactory extends Factory
                 'Family',
                 'Bisnis',
             ])." {$bandwidth} Mbps",
+            'code' => strtoupper($this->faker->bothify('PKG-???-###')),
 
             'description' => $this->faker->optional()->randomElement([
                 'Internet cepat dan stabil untuk kebutuhan sehari-hari.',

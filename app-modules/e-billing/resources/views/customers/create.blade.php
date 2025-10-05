@@ -159,7 +159,7 @@
                     <label class="form-label required">Tanggal jatuh tempo</label>
                     <input type="number" name="due" id="dueInput"
                       class="form-control @error('due') is-invalid @enderror" required value="{{ old('due') }}"
-                      min="1" max="31">
+                      min="1" max="28">
                     <div class="form-text">
                       Tanggal jatuh tempo dapat diubah jika diperlukan (Isi dengan angka 1-28)
                     </div>

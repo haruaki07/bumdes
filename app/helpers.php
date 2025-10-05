@@ -31,3 +31,10 @@ if (! function_exists('get_initials')) {
         return $firstInitial.$lastInitial;
     }
 }
+
+if (! function_exists('normalize_currency')) {
+    function normalize_currency(string $value): string
+    {
+        return str_replace(',', '.', str_replace('.', '', $value));
+    }
+}

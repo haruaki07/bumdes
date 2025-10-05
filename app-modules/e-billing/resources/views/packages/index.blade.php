@@ -34,6 +34,7 @@
             <x-slot:thead>
               <tr>
                 <th>#</th>
+                <x-sortable-header field="code" label="Kode" />
                 <x-sortable-header field="name" label="Nama Paket" />
                 <x-sortable-header field="description" label="Deskripsi" />
                 <x-sortable-header field="bandwidth" label="Bandwidth" />
@@ -47,8 +48,9 @@
               @forelse ($packages as $package)
                 <tr>
                   <td>{{ $loop->iteration + $packages->firstItem() - 1 }}</td>
-                  <td class="fw-medium">{{ $package->name }}</td>
-                  <td>{{ Str::limit($package->description, 50) ?? '-' }}</td>
+                  <td class="fw-medium">{{ $package->code }}</td>
+                  <td>{{ $package->name }}</td>
+                  <td title="{{ $package->description }}">{{ Str::limit($package->description, 30) ?? '-' }}</td>
                   <td>{{ $package->bandwidth }} Mbps</td>
                   <td>Rp{{ number_format($package->price, 0, ',', '.') }}</td>
                   <td>Setiap tanggal {{ $package->due }}</td>

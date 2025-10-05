@@ -156,6 +156,7 @@ return [
     'url' => 'Format :attribute tidak valid.',
     'uuid' => ':Attribute harus merupakan UUID yang valid.',
     'phone' => ':Attribute harus berupa nomor telepon yang valid.',
+    'normalized_currency' => ':Attribute harus berisi nominal yang valid.',
     'attributes' => [
         'address' => 'alamat',
         'affiliate_url' => 'URL afiliasi',
