@@ -197,6 +197,8 @@ class AddressModal extends HTMLElement {
       return;
     }
 
+    L.Icon.Default.imagePath = "/assets/js/leaflet/images/";
+
     this.state.map = L.map(this.els.mapContainer).setView(
       [this.defaultLat, this.defaultLng],
       11
