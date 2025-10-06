@@ -1,15 +1,23 @@
-import Echo from 'laravel-echo';
+import Echo from "laravel-echo";
 
-import Pusher from 'pusher-js';
+import Pusher from "pusher-js";
 window.Pusher = Pusher;
 
+const echoConfig = JSON.parse(
+  document.getElementById("echo-config").textContent
+);
+
+if (!echoConfig) {
+  console.error("Echo configuration not found");
+}
+
 window.Echo = new Echo({
-    broadcaster: "pusher",
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    wsHost: import.meta.env.VITE_PUSHER_HOST,
-    wsPort: import.meta.env.VITE_PUSHER_PORT,
-    wssPort: import.meta.env.VITE_PUSHER_PORT,
-    enabledTransports: ["ws", "wss"],
+  broadcaster: "pusher",
+  key: echoConfig.key,
+  cluster: echoConfig.cluster,
+  forceTLS: true,
+  wsHost: echoConfig.host,
+  wsPort: echoConfig.port,
+  wssPort: echoConfig.port,
+  enabledTransports: ["ws", "wss"],
 });
