@@ -6,6 +6,13 @@ VENDOR_ARCHIVE=${1:-}
 ASSETS_ARCHIVE=${2:-}
 
 main() {
+    for cmd in git composer tar; do
+        command -v "$cmd" >/dev/null 2>&1 || { echo "Missing required command: $cmd"; exit 1; }
+    done
+
+    PHP_BIN=$(detect_php)
+    log "Using PHP binary: $PHP_BIN"
+
     # unzip composer deps
     if [ -f "$VENDOR_ARCHIVE" ]; then
         log "Extracting composer dependencies..."
@@ -29,26 +36,26 @@ main() {
     fi
 
     log "Putting app into maintenance mode..."
-    php artisan down --no-ansi --no-interaction
+    "$PHP_BIN" artisan down --no-ansi --no-interaction
 
     log "Installing composer dependencies..."
     composer install --no-interaction --prefer-dist --optimize-autoloader
 
     log "Migrating database..."
-    php artisan migrate --force --no-ansi --no-interaction
+    "$PHP_BIN" artisan migrate --force --no-ansi --no-interaction
 
     log "Clearing cache bootstrap files..."
-    php artisan optimize:clear --no-ansi --no-interaction
+    "$PHP_BIN" artisan optimize:clear --no-ansi --no-interaction
 
     log "Caching bootstrap files..."
-    php artisan optimize --no-ansi --no-interaction
-    php artisan view:cache --no-ansi --no-interaction
+    "$PHP_BIN" artisan optimize --no-ansi --no-interaction
+    "$PHP_BIN" artisan view:cache --no-ansi --no-interaction
 
     log "Restoring app..."
-    php artisan up --no-ansi --no-interaction
+    "$PHP_BIN" artisan up --no-ansi --no-interaction
 
     log "Restarting queue workers..."
-    php artisan queue:restart
+    "$PHP_BIN" artisan queue:restart
 
     log "Deploy finished!"
 }
@@ -61,6 +68,23 @@ log() {
 
     echo -e "\033[36m$message\033[0m"
     echo "$log_entry" | tee -a "$log_file" > /dev/null
+}
+
+detect_php() {
+    if [[ -n "${PHP_CMD:-}" && -x "$(command -v "$PHP_CMD")" ]]; then
+        echo "$PHP_CMD"
+        return
+    fi
+
+    for bin in php php8.4 php8.3 php8.2 php8.1 php8.0; do
+        if command -v "$bin" >/dev/null 2>&1; then
+            echo "$bin"
+            return
+        fi
+    done
+
+    log "No PHP binary found! Please install PHP or set PHP_CMD explicitly."
+    exit 1
 }
 
 main "$@"

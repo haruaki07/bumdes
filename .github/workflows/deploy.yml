@@ -75,5 +75,5 @@ jobs:
           ssh "${{ secrets.MACHINE_USER }}@${{ secrets.SSH_HOST }}" /bin/bash << EOF
             cd "${{ secrets.MACHINE_WORKDIR }}"
             git pull
-            ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
+            PHP_CMD=/www/server/php/83/bin/php ./scripts/deploy.sh "$ARCHIVE_VENDOR" "$ARCHIVE_ASSETS"
           EOF
