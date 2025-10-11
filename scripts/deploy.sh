@@ -16,6 +16,7 @@ main() {
     # unzip composer deps
     if [ -f "$VENDOR_ARCHIVE" ]; then
         log "Extracting composer dependencies..."
+        rm -rf vendor
         tar -xJf "$VENDOR_ARCHIVE"
         rm -f "$VENDOR_ARCHIVE"
     fi
@@ -23,7 +24,7 @@ main() {
     # unzip assets
     if [ -f "$ASSETS_ARCHIVE" ]; then
         log "Extracting assets..."
-        tar -xJf "$ASSETS_ARCHIVE"
+        tar --overwrite -xJf "$ASSETS_ARCHIVE"
         rm -f "$ASSETS_ARCHIVE"
     fi
 
