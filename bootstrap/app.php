@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,4 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // generate bills daily at midnight
+        $schedule->command('e-billing:create-bills')
+            ->timezone('Asia/Jakarta')
+            ->daily()
+            ->withoutOverlapping()
+            ->storeOutput();
+
+        // send billing notifications every day at 8 AM
+        $schedule->command('e-billing:check-bills')
+            ->timezone('Asia/Jakarta')
+            ->dailyAt('08:00')
+            ->withoutOverlapping()
+            ->storeOutput();
+    })
+    ->create();
