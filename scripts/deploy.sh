@@ -1,22 +1,23 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'log "Error on line $LINENO. Deployment aborted."; exit 1' ERR
 
-VENDOR_ARCHIVE=$1
-ASSETS_ARCHIVE=$2
+VENDOR_ARCHIVE=${1:-}
+ASSETS_ARCHIVE=${2:-}
 
 main() {
     # unzip composer deps
     if [ -f "$VENDOR_ARCHIVE" ]; then
         log "Extracting composer dependencies..."
-        tar -xJf $VENDOR_ARCHIVE
-        rm -f $VENDOR_ARCHIVE
+        tar -xJf "$VENDOR_ARCHIVE"
+        rm -f "$VENDOR_ARCHIVE"
     fi
 
     # unzip assets
     if [ -f "$ASSETS_ARCHIVE" ]; then
         log "Extracting assets..."
-        tar -xJf $ASSETS_ARCHIVE
-        rm -f $ASSETS_ARCHIVE
+        tar -xJf "$ASSETS_ARCHIVE"
+        rm -f "$ASSETS_ARCHIVE"
     fi
 
     log "Deploying app with commit ($(git rev-parse --short HEAD))..."
@@ -46,6 +47,9 @@ main() {
     log "Restoring app..."
     php artisan up --no-ansi --no-interaction
 
+    log "Restarting queue workers..."
+    php artisan queue:restart
+
     log "Deploy finished!"
 }
 
@@ -55,7 +59,7 @@ log() {
     local timestamp="$(date +"%Y-%m-%d %H:%M:%S")"
     local log_entry="[$timestamp] $message"
 
-    echo $message
+    echo -e "\033[36m$message\033[0m"
     echo "$log_entry" | tee -a "$log_file" > /dev/null
 }
 
