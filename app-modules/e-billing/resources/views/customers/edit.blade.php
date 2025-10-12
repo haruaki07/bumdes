@@ -178,33 +178,34 @@
 
                   <div class="col-md-4 mb-3">
                     <label class="form-label required">Tanggal Pengingat</label>
-                    <div class="input-group">
+                    <div class="input-group @error('due_reminder_days') has-validation @enderror position-relative">
                       <input type="number" name="due_reminder_days" id="dueReminderInput"
                         class="form-control @error('due_reminder_days') is-invalid @enderror" required
-                        value="{{ old('due_reminder_days', $customer->due_reminder_days ?? 5) }}" min="0"
+                        value="{{ old('due_reminder_days', $customer->due_reminder_days ?? 5) }}" min="1"
                         max="30">
                       <span class="input-group-text">Hari</span>
+                      @error('due_reminder_days')
+                        <div class="invalid-tooltip">{{ $message }}</div>
+                      @enderror
                     </div>
                     <div class="form-text">Notifikasi pengingat sebelum jatuh tempo</div>
-                    @error('due_reminder_days')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label class="form-label required">Batas Waktu Pembayaran</label>
-                    <div class="input-group">
+                    <label class="form-label required">Batas Waktu Pembayaran (Masa Tenggang)</label>
+                    <div class="input-group @error('grace_period') has-validation @enderror position-relative">
                       <input type="number" name="grace_period" id="gracePeriodInput"
                         class="form-control @error('grace_period') is-invalid @enderror" required
-                        value="{{ old('grace_period', $customer->grace_period ?? 3) }}" min="0"
-                        max="31">
+                        value="{{ old('grace_period', $customer->grace_period ?? 3) }}" min="1"
+                        max="30">
                       <span class="input-group-text">Hari</span>
+                      @error('grace_period')
+                        <div class="invalid-tooltip">{{ $message }}</div>
+                      @enderror
                     </div>
-                    <div class="form-text">Jumlah hari setelah jatuh tempo sebelum pelanggan dinonaktifkan
+                    <div class="form-text">
+                      Jumlah hari setelah jatuh tempo sebelum pelanggan dinonaktifkan
                     </div>
-                    @error('grace_period')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
                   </div>
                 </div>
 
@@ -219,9 +220,9 @@
                         <tr>
                           <th>Bulan</th>
                           <th>Masa Aktif</th>
+                          <th>Periode</th>
                           <th>Tanggal Jatuh Tempo</th>
                           <th>Tanggal Isolir</th>
-                          <th>Periode (Range)</th>
                           <th>Nominal</th>
                         </tr>
                       </thead>
@@ -311,8 +312,6 @@
     const lngInput = document.getElementById('longitudeInput');
     const display = document.getElementById('addressDisplay');
 
-    if (!el) return;
-
     el.addEventListener('address-apply', function(ev) {
       const {
         address,
@@ -364,7 +363,7 @@
       }
 
       tableBody.innerHTML = cycles.map(cycle => {
-        const monthLabel = new Date(cycle.due_date).toLocaleDateString("id-ID", {
+        const monthLabel = new Date(cycle.period.start).toLocaleDateString("id-ID", {
           month: "long",
           year: "numeric",
         });
@@ -372,9 +371,9 @@
         return `<tr>
           <td>${monthLabel}</td>
           <td>${cycle.duration} Bulan</td>
+          <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
           <td>${formatDate(cycle.due_date)}</td>
           <td>${formatDate(cycle.isolation_date)}</td>
-          <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
           <td>${formatRupiah(rawPrice)}</td>
         </tr>`;
       }).join('');

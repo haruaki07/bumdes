@@ -23,7 +23,6 @@ export function getBillingCycles({ due, grace }) {
     );
 
     data.push({
-      month: dueDate.getMonth(),
       duration: 1, // month
       due_date: dueDate,
       isolation_date: isolationDate,

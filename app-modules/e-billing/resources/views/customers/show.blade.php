@@ -168,9 +168,9 @@
                     <tr>
                       <th>Bulan</th>
                       <th>Masa Aktif</th>
+                      <th>Periode</th>
                       <th>Tanggal Jatuh Tempo</th>
                       <th>Tanggal Isolir</th>
-                      <th>Periode (Range)</th>
                       <th>Nominal</th>
                     </tr>
                   </thead>
@@ -312,7 +312,7 @@
     });
 
     tableBody.innerHTML = cycles.map(cycle => {
-      const monthLabel = new Date(cycle.due_date).toLocaleDateString("id-ID", {
+      const monthLabel = new Date(cycle.period.start).toLocaleDateString("id-ID", {
         month: "long",
         year: "numeric",
       });
@@ -320,9 +320,9 @@
       return `<tr>
         <td>${monthLabel}</td>
         <td>${cycle.duration} Bulan</td>
+        <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
         <td>${formatDate(cycle.due_date)}</td>
         <td>${formatDate(cycle.isolation_date)}</td>
-        <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
         <td>${formatRupiah({{ $customer->package->price }})}</td>
       </tr>`;
     }).join('');

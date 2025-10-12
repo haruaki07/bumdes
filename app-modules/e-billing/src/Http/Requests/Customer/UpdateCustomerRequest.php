@@ -40,6 +40,8 @@ class UpdateCustomerRequest extends FormRequest
             'serial_number' => 'nullable|string|max:100',
             'mac_address' => 'nullable|string|max:100',
             'due' => 'required|integer|min:1|max:28',
+            'due_reminder_days' => 'required|integer|min:1|max:30',
+            'grace_period' => 'required|integer|min:1|max:30',
         ];
     }
 
@@ -59,6 +61,8 @@ class UpdateCustomerRequest extends FormRequest
             'serial_number' => 'Serial Number',
             'mac_address' => 'MAC Address',
             'due' => 'Tanggal Jatuh Tempo',
+            'due_reminder_days' => 'Tanggal Pengingat',
+            'grace_period' => 'Batas Waktu Pembayaran',
         ];
     }
 }
