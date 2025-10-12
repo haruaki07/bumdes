@@ -340,37 +340,33 @@
       const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
       const dueDay = parseInt(dueInput.value, 10);
       const grace = parseInt(graceInput.value, 10);
+
+      const cycles = getBillingCycles({
+        due: dueDay,
+        grace: grace
+      });
+
       if (!dueDay) {
         tableBody.innerHTML =
           '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
         return;
       }
-      const today = new Date();
-      let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
-      if (today.getDate() > dueDay) {
-        firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
-      }
-      const rows = [];
-      for (let i = 0; i < 6; i++) {
-        const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
-        const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + (isNaN(grace) ? 0 : grace));
-        // Period start = previous month (due+1) pattern, following backend accessor logic
-        const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
-        const periodLabel = formatDate(periodStart) + ' - ' + formatDate(dueDate);
-        const bulanLabel = dueDate.toLocaleDateString('id-ID', {
-          month: 'long',
-          year: 'numeric'
+
+      tableBody.innerHTML = cycles.map(cycle => {
+        const monthLabel = new Date(cycle.due_date).toLocaleDateString("id-ID", {
+          month: "long",
+          year: "numeric",
         });
-        rows.push(`<tr>
-            <td>${bulanLabel}</td>
-            <td>1 Bulan</td>
-            <td>${formatDate(dueDate)}</td>
-            <td>${formatDate(isolirDate)}</td>
-            <td>${periodLabel}</td>
+
+        return `<tr>
+            <td>${monthLabel}</td>
+            <td>${cycle.duration} Bulan</td>
+            <td>${formatDate(cycle.due_date)}</td>
+            <td>${formatDate(cycle.isolation_date)}</td>
+            <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
             <td>${formatRupiah(rawPrice)}</td>
-          </tr>`);
-      }
-      tableBody.innerHTML = rows.join('');
+          </tr>`;
+      }).join('');
     }
 
     const updatePackageInfo = () => {
@@ -391,7 +387,7 @@
       const bandwidth = opt.dataset.bandwidth;
       const due = opt.dataset.due;
 
-      if (!dueInput.value) dueInput.value = due || '';
+      dueInput.value = due || '';
       bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
       priceInput.value = price || '-';
       generateBillingPreview();

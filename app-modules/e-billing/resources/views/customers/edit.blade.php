@@ -304,118 +304,118 @@
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw0GxwYh8kT-pVOYwoh33l0oXMgChS63A&libraries=places&v=weekly&loading=async"
     async defer></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const el = document.querySelector('address-modal');
-      const addressInput = document.getElementById('addressInput');
-      const latInput = document.getElementById('latitudeInput');
-      const lngInput = document.getElementById('longitudeInput');
-      const display = document.getElementById('addressDisplay');
+  <script type="module">
+    const el = document.querySelector('address-modal');
+    const addressInput = document.getElementById('addressInput');
+    const latInput = document.getElementById('latitudeInput');
+    const lngInput = document.getElementById('longitudeInput');
+    const display = document.getElementById('addressDisplay');
 
-      if (!el) return;
+    if (!el) return;
 
-      el.addEventListener('address-apply', function(ev) {
-        const {
-          address,
-          lat,
-          lng
-        } = ev.detail || {};
-        addressInput.value = address || '';
-        display.textContent = address || '';
-        display.style.display = address ? '' : 'none';
+    el.addEventListener('address-apply', function(ev) {
+      const {
+        address,
+        lat,
+        lng
+      } = ev.detail || {};
+      addressInput.value = address || '';
+      display.textContent = address || '';
+      display.style.display = address ? '' : 'none';
 
-        if (lat && lng) {
-          latInput.value = lat;
-          lngInput.value = lng;
-        } else {
-          latInput.value = '';
-          lngInput.value = '';
-        }
+      if (lat && lng) {
+        latInput.value = lat;
+        lngInput.value = lng;
+      } else {
+        latInput.value = '';
+        lngInput.value = '';
+      }
+    });
+
+    const pkgSelect = document.getElementById('packageSelect');
+
+    function formatDate(d) {
+      return d.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    function generateBillingPreview() {
+      const dueInput = document.getElementById('dueInput');
+      const reminderInput = document.getElementById('dueReminderInput');
+      const graceInput = document.getElementById('gracePeriodInput');
+      const tableBody = document.querySelector('#billingPreviewTable tbody');
+      const opt = pkgSelect.options[pkgSelect.selectedIndex];
+      const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
+      const dueDay = parseInt(dueInput.value, 10);
+      const grace = parseInt(graceInput.value, 10);
+
+      const cycles = getBillingCycles({
+        due: dueDay,
+        grace: grace
       });
 
-      const pkgSelect = document.getElementById('packageSelect');
+      if (!dueDay) {
+        tableBody.innerHTML =
+          '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
+        return;
+      }
 
-      function formatDate(d) {
-        return d.toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
+      tableBody.innerHTML = cycles.map(cycle => {
+        const monthLabel = new Date(cycle.due_date).toLocaleDateString("id-ID", {
+          month: "long",
+          year: "numeric",
         });
-      }
 
-      function generateBillingPreview() {
-        const dueInput = document.getElementById('dueInput');
-        const graceInput = document.getElementById('gracePeriodInput');
-        const tableBody = document.querySelector('#billingPreviewTable tbody');
-        const opt = pkgSelect.options[pkgSelect.selectedIndex];
-        const rawPrice = opt && opt.dataset.rawPrice ? parseInt(opt.dataset.rawPrice, 10) : 0;
-        const dueDay = parseInt(dueInput.value, 10);
-        const grace = parseInt(graceInput.value, 10) || 0;
-        if (!dueDay) {
-          tableBody.innerHTML =
-            '<tr><td colspan="6" class="text-muted text-center">Isi tanggal jatuh tempo.</td></tr>';
-          return;
-        }
-        const today = new Date();
-        let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
-        if (today.getDate() > dueDay) {
-          firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
-        }
-        const rows = [];
-        for (let i = 0; i < 6; i++) {
-          const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
-          const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + grace);
-          const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
-          const bulanLabel = dueDate.toLocaleDateString('id-ID', {
-            month: 'long',
-            year: 'numeric'
-          });
-          rows.push(`<tr>
-            <td>${bulanLabel}</td>
-            <td>1 Bulan</td>
-            <td>${formatDate(dueDate)}</td>
-            <td>${formatDate(isolirDate)}</td>
-            <td>${formatDate(periodStart)} - ${formatDate(dueDate)}</td>
-            <td>${formatRupiah(rawPrice)}</td>
-          </tr>`);
-        }
-        tableBody.innerHTML = rows.join('');
-      }
+        return `<tr>
+          <td>${monthLabel}</td>
+          <td>${cycle.duration} Bulan</td>
+          <td>${formatDate(cycle.due_date)}</td>
+          <td>${formatDate(cycle.isolation_date)}</td>
+          <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
+          <td>${formatRupiah(rawPrice)}</td>
+        </tr>`;
+      }).join('');
+    }
 
-      const updatePackageInfo = () => {
-        const dueInput = document.getElementById('dueInput');
-        const bandwidthInput = document.getElementById('bandwidthInput');
-        const priceInput = document.getElementById('priceInput');
-        const opt = pkgSelect.options[pkgSelect.selectedIndex];
-        if (!opt?.value || !opt.dataset) {
-          bandwidthInput.value = '';
-          priceInput.value = '';
-          generateBillingPreview();
-          return;
-        }
-        const price = opt.dataset.price;
-        const bandwidth = opt.dataset.bandwidth;
-        const due = opt.dataset.due;
-        if (!dueInput.value) dueInput.value = due || '';
-        bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
-        priceInput.value = price || '-';
+    const updatePackageInfo = () => {
+      const dueInput = document.getElementById('dueInput');
+      const bandwidthInput = document.getElementById('bandwidthInput');
+      const priceInput = document.getElementById('priceInput');
+
+      const opt = pkgSelect.options[pkgSelect.selectedIndex];
+      if (!opt?.value || !opt.dataset) {
+        bandwidthInput.value = '';
+        priceInput.value = '';
         generateBillingPreview();
+        return;
       }
 
-      ['dueInput', 'dueReminderInput', 'gracePeriodInput'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('input', generateBillingPreview);
-        }
-      });
+      const price = opt.dataset.price;
+      const bandwidth = opt.dataset.bandwidth;
+      const due = opt.dataset.due;
 
-      pkgSelect.addEventListener('change', updatePackageInfo);
-      updatePackageInfo();
+      dueInput.value = due || '';
+      bandwidthInput.value = (bandwidth ? bandwidth + ' Mbps' : '-');
+      priceInput.value = price || '-';
+      generateBillingPreview();
+    }
 
-      document.querySelectorAll('[data-tom-select]').forEach(select => {
-        new TomSelect(select, {
-          maxItems: 1
-        });
+    ['dueInput', 'dueReminderInput', 'gracePeriodInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', generateBillingPreview);
+      }
+    });
+
+    pkgSelect.addEventListener('change', updatePackageInfo);
+    updatePackageInfo();
+
+    document.querySelectorAll('[data-tom-select]').forEach(select => {
+      new TomSelect(select, {
+        maxItems: 1
       });
     });
   </script>

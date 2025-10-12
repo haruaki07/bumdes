@@ -292,54 +292,39 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const tableBody = document.querySelector('#billingPreviewTable tbody');
-      if (!tableBody) return;
+  <script type="module">
+    const tableBody = document.querySelector('#billingPreviewTable tbody');
+    if (!tableBody) {
+      throw new Error('Table body not found');
+    }
 
-      function formatDate(d) {
-        return d.toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
-        });
-      }
+    function formatDate(d) {
+      return d.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
 
-      const dueDay = {{ (int) ($customer->due ?? 0) }};
-      const grace = {{ (int) ($customer->grace_period ?? 0) }};
-      const rawPrice = {{ (int) ($customer->package->price ?? 0) }};
-
-      if (!dueDay) {
-        tableBody.innerHTML =
-          '<tr><td colspan="6" class="text-muted text-center">Tanggal jatuh tempo tidak tersedia.</td></tr>';
-        return;
-      }
-
-      const today = new Date();
-      let firstDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
-      if (today.getDate() > dueDay) {
-        firstDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
-      }
-
-      const rows = [];
-      for (let i = 0; i < 6; i++) {
-        const dueDate = new Date(firstDue.getFullYear(), firstDue.getMonth() + i, dueDay);
-        const isolirDate = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDay + (isNaN(grace) ? 0 : grace));
-        const periodStart = new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, dueDay + 1);
-        const bulanLabel = dueDate.toLocaleDateString('id-ID', {
-          month: 'long',
-          year: 'numeric'
-        });
-        rows.push(`<tr>
-          <td>${bulanLabel}</td>
-          <td>1 Bulan</td>
-          <td>${formatDate(dueDate)}</td>
-          <td>${formatDate(isolirDate)}</td>
-          <td>${formatDate(periodStart)} - ${formatDate(dueDate)}</td>
-          <td>${formatRupiah(rawPrice)}</td>
-        </tr>`);
-      }
-      tableBody.innerHTML = rows.join('');
+    const cycles = getBillingCycles({
+      due: {{ $customer->due }},
+      grace: {{ $customer->grace_period }}
     });
+
+    tableBody.innerHTML = cycles.map(cycle => {
+      const monthLabel = new Date(cycle.due_date).toLocaleDateString("id-ID", {
+        month: "long",
+        year: "numeric",
+      });
+
+      return `<tr>
+        <td>${monthLabel}</td>
+        <td>${cycle.duration} Bulan</td>
+        <td>${formatDate(cycle.due_date)}</td>
+        <td>${formatDate(cycle.isolation_date)}</td>
+        <td>${formatDate(cycle.period.start)} - ${formatDate(cycle.period.end)}</td>
+        <td>${formatRupiah({{ $customer->package->price }})}</td>
+      </tr>`;
+    }).join('');
   </script>
 </x-e-billing::layouts.panel>

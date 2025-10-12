@@ -13,6 +13,7 @@ export default defineConfig({
         "resources/js/hugerte.js",
         "app-modules/e-billing/resources/css/e-billing.css",
         "app-modules/e-billing/resources/js/pages/pay.js",
+        "app-modules/e-billing/resources/js/main.js",
       ],
       refresh: [
         "resources/views/**/*.blade.php",

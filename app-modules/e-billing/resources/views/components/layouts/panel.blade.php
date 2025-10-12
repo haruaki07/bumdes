@@ -6,7 +6,7 @@
 @endsection
 
 @push('css')
-  @vite(['app-modules/e-billing/resources/css/e-billing.css'])
+  @vite(['app-modules/e-billing/resources/css/e-billing.css', 'app-modules/e-billing/resources/js/main.js'])
 @endpush
 
 @section('content')
