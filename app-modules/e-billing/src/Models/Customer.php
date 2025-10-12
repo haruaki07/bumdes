@@ -70,7 +70,7 @@ class Customer extends Model
     {
         $relative = $relative ?? now();
 
-        return $relative->addMonth()->setDay((int) $customer->due)->subDays((int) $customer->due_reminder_days ?? 5);
+        return $relative->addMonth()->setDay((int) $customer->due);
     }
 
     public function site()
