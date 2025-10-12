@@ -3,6 +3,7 @@ import * as anime from "./anime";
 import * as QRCode from "qrcode";
 import JsBarcode from "jsbarcode";
 import IMask from "imask";
+import ApexCharts from "apexcharts";
 
 import { tabler, TomSelect } from "./tabler-init";
 import {
@@ -37,3 +38,4 @@ window.AddressModal = AddressModal;
 window.LoadingButton = LoadingButton;
 window.Toast = Toast;
 window.IMask = IMask;
+window.ApexCharts = ApexCharts;

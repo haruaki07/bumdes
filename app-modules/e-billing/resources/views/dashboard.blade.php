@@ -191,7 +191,6 @@
   </div>
 
   @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1"></script>
     <script>
       const els = {
         income: document.getElementById('income'),
