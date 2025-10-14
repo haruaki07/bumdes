@@ -39,7 +39,7 @@
     <div class="row g-0 h-100">
       <div class="col-md-8 border-0 rounded-0 card">
 
-        <div class="container py-5" style="max-width: 720px;">
+        <div class="container py-5 px-4 px-sm-0" style="max-width: 720px;">
 
           <div class="alert alert-info d-flex gap-2" role="alert" id="countdownAlert"
             @if ($descriptor === 'BANK_TRANSFER_DETAILS') style="display:none" @endif>
