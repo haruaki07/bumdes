@@ -18,8 +18,8 @@
     <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" data-bs-auto-close="outside" tabindex="-1"
       aria-label="Show notifications" hx-get="{{ route('e-billing.notifications.dropdown') }}"
       hx-target="#notificationContent" hx-trigger="click" hx-indicator="#loadingIndicator" hx-swap="innerHTML"
-      hx-on::before-request="document.querySelector('#notificationContent').innerHTML = ''">
-      <i class="ti ti-bell icon" id="bellIcon"></i>
+      hx-on::before-request="document.querySelector('#notificationContent').innerHTML = ''" id="bellBtn">
+      <i class="ti ti-bell icon"></i>
       @if ($user->unreadNotifications->count() > 0)
         <span class="badge bg-red" id="notificationCount"></span>
       @endif
@@ -51,7 +51,7 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
       integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
     <script type="module">
-      const bell = document.getElementById("bellIcon");
+      const bell = document.getElementById("bellBtn");
 
       let ringAnimation;
 
@@ -85,7 +85,7 @@
           }
         ];
 
-        ringAnimation = bell.animate(
+        ringAnimation = bell.querySelector('.icon').animate(
           keyframes, {
             duration: 1000,
             iterations: Infinity,
