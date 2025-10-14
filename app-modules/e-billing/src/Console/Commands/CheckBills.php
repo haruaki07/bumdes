@@ -28,12 +28,15 @@ class CheckBills extends Command
      */
     public function handle()
     {
-        $now = now();
         $invoices = Invoice::with(['customer'])
             ->unpaid()
-            ->whereNotNull('due_date')
-            ->where('due_date', '<=', $now)
-            ->get();
+            ->get()
+            ->filter(function (Invoice $invoice) {
+                // Check if today is the due reminder date or past due date
+                $reminderDateStart = $invoice->due_date->copy()->subDays($invoice->customer->due_reminder_days);
+
+                return $reminderDateStart->isNowOrPast() || $invoice->due_date->isNowOrPast();
+            });
 
         if ($invoices->isEmpty()) {
             $this->info('No unpaid invoices past due date.');

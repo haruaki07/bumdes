@@ -31,9 +31,8 @@ class CreateBills extends Command
     public function handle()
     {
         $currentDate = now();
-        Customer::whereNotNull('next_billing_date')
-            ->whereNull('invoice_number')
-            ->whereDate('next_billing_date', '<=', now())
+        Customer::whereNull('invoice_number')
+            ->whereNowOrPast('next_billing_date')
             ->whereStatus(CustomerStatus::ACTIVE)
             ->each(function (Customer $customer) use ($currentDate) {
                 try {
@@ -70,7 +69,6 @@ class CreateBills extends Command
 
                     $customer->update([
                         'invoice_number' => $invoice->invoice_number,
-                        'next_billing_date' => Customer::getNextBillingDate($customer),
                     ]);
 
                     DB::commit();

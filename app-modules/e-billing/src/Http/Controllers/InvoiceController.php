@@ -41,14 +41,8 @@ class InvoiceController extends Controller
             return back()->with('error', 'Pelanggan tidak aktif.');
         }
 
-        // Prevent duplicate invoice for same period (month + customer)
-        $periodMonth = now()->format('Ym');
-        $already = Invoice::where('customer_id', $customer->id)
-            ->whereYear('period_end_date', now()->year)
-            ->whereMonth('period_end_date', now()->month)
-            ->exists();
-        if ($already) {
-            return back()->with('error', 'Invoice bulan ini sudah ada untuk pelanggan ini.');
+        if ($customer->invoice_number) {
+            return back()->with('error', 'Pelanggan sudah memiliki tagihan aktif.');
         }
 
         $currentDate = now();
