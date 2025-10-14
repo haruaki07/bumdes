@@ -34,7 +34,7 @@ class LoginController extends Controller
             return '/e-billing';
         }
 
-        return '/home';
+        return '/dashboard';
     }
 
     /**

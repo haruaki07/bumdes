@@ -2,19 +2,16 @@
 
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('dashboard'));
+Route::get('/', fn () => view('home'));
 Auth::routes();
-
-Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
     // Dashboard
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
-    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Business Registration Management
     Route::resource('business-registrations', BusinessRegistrationController::class)->except(['edit', 'update']);
@@ -53,12 +50,3 @@ Route::middleware(['auth'])->group(function () {
     //   Route::get('/samsat', [DashboardController::class, 'samsatReport'])->name('samsat');
     // });
 });
-
-Route::get('/hello', function () {
-    return 'Hello World';
-});
-
-// Redirect root to dashboard for authenticated users
-// Route::get('/', function () {
-//   return redirect()->route('dashboard');
-// })->middleware('auth');
