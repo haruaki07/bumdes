@@ -22,6 +22,8 @@ use Modules\EBilling\Http\Controllers\WebhookController;
 
 Route::prefix('e-billing')->as('e-billing.')->group(function () {
     Route::middleware(['web'])->group(function () {
+        Route::get('/', fn () => view('e-billing::home'))->name('home');
+
         Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [LoginController::class, 'login'])->name('login.post');
         Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -31,7 +33,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
         Route::get('/invoice/{customer_id}', [InvoiceController::class, 'customerShow'])->name('invoice.customer-show');
 
         Route::middleware(['auth_ebil'])->group(function () {
-            Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/metrics', [DashboardController::class, 'metrics'])->name('dashboard.metrics');
             Route::prefix('master-data')->as('master-data.')->group(function () {
                 Route::resource('sites', SiteController::class);

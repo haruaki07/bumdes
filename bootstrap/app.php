@@ -13,6 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // redirect authenticated users to the respective dashboard
+        $middleware->redirectUsersTo(function ($request) {
+            if ($request->routeIs('e-billing.*')) {
+                return route('e-billing.dashboard');
+            }
+
+            return route('dashboard');
+        });
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'auth_ebil' => \Modules\EBilling\Http\Middleware\UserAuthenticate::class,

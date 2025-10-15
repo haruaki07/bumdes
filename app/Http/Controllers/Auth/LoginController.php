@@ -31,10 +31,10 @@ class LoginController extends Controller
     protected function redirectTo(): string
     {
         if (request()->routeIs('e-billing.*')) {
-            return '/e-billing';
+            return route('e-billing.dashboard');
         }
 
-        return '/dashboard';
+        return route('dashboard');
     }
 
     /**

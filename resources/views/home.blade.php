@@ -2,26 +2,6 @@
 
 @section('title', 'Home')
 
-@section('tablar_css')
-  <style>
-    .app-icon {
-      width: 70px;
-      aspect-ratio: 1;
-      padding: 1rem;
-      background-color: white;
-      object-fit: cover;
-      transform-origin: center bottom;
-      transition: box-shadow ease-in 0.1s, transform ease-in 0.1s;
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.02), 0 2px 2px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.02), 0 8px 8px rgba(0, 0, 0, 0.02), 0 16px 16px rgba(0, 0, 0, 0.02);
-    }
-
-    .app:hover .app-icon {
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.03), 0 4px 4px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.03), 0 12px 12px rgba(0, 0, 0, 0.03), 0 24px 24px rgba(0, 0, 0, 0.03);
-      transform: translateY(-2px);
-    }
-  </style>
-@endsection
-
 @section('content')
 
   <div class="container h-100 d-flex align-items-center justify-content-center">
