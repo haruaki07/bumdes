@@ -2,12 +2,24 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Modules\EBilling\Http\Requests\Package\CreatePackageRequest;
 use Modules\EBilling\Http\Requests\Package\UpdatePackageRequest;
 use Modules\EBilling\Models\Package;
 
-class PackageController
+class PackageController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-packages,ebil', only: ['index', 'show']),
+            new Middleware('permission:create-packages,ebil', only: ['create', 'store']),
+            new Middleware('permission:update-packages,ebil', only: ['edit', 'update']),
+            new Middleware('permission:delete-packages,ebil', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

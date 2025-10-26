@@ -12,12 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.packages.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah Paket
-            </a>
-            {{-- @endcan --}}
+            @haspermission('create-packages', 'ebil')
+              <a href="{{ route('e-billing.master-data.packages.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah Paket
+              </a>
+            @endhaspermission
           </div>
         </div>
       </div>
@@ -59,17 +59,19 @@
                       title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    {{-- @can('update', $package) --}}
-                    <a href="{{ route('e-billing.master-data.packages.edit', $package) }}"
-                      class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    {{-- @endcan --}}
-                    <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.master-data.packages.destroy', $package) }}')"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                      <i class="ti ti-trash"></i>
-                    </button>
+                    @haspermission('update-packages', 'ebil')
+                      <a href="{{ route('e-billing.master-data.packages.edit', $package) }}"
+                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    @endhaspermission
+                    @haspermission('delete-packages', 'ebil')
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm('{{ route('e-billing.master-data.packages.destroy', $package) }}')"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @endhaspermission
                   </td>
                 </tr>
               @empty
