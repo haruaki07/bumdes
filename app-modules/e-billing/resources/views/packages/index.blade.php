@@ -12,12 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            @haspermission('create-packages', 'ebil')
+            @if (auth('ebil')->user()->can('create-packages'))
               <a href="{{ route('e-billing.master-data.packages.create') }}" class="btn btn-primary">
                 <i class="icon ti ti-plus"></i>
                 Tambah Paket
               </a>
-            @endhaspermission
+            @endif
           </div>
         </div>
       </div>
@@ -59,19 +59,20 @@
                       title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    @haspermission('update-packages', 'ebil')
+                    @if (auth('ebil')->user()->can('update-packages'))
                       <a href="{{ route('e-billing.master-data.packages.edit', $package) }}"
-                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Edit">
                         <i class="ti ti-edit"></i>
                       </a>
-                    @endhaspermission
-                    @haspermission('delete-packages', 'ebil')
+                    @endif
+                    @if (auth('ebil')->user()->can('delete-packages'))
                       <button class="btn btn-icon btn-danger"
                         onclick="deleteConfirm('{{ route('e-billing.master-data.packages.destroy', $package) }}')"
                         data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                         <i class="ti ti-trash"></i>
                       </button>
-                    @endhaspermission
+                    @endif
                   </td>
                 </tr>
               @empty

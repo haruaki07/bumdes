@@ -12,17 +12,17 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            @haspermission('update-packages', 'ebil')
+            @if (auth('ebil')->user()->can('update-packages'))
               <a href="{{ route('e-billing.master-data.packages.edit', $package) }}" class="btn btn-warning">
                 Edit
               </a>
-            @endhaspermission
-            @haspermission('delete-packages', 'ebil')
+            @endif
+            @if (auth('ebil')->user()->can('delete-packages'))
               <button class="btn btn-danger"
                 onclick="deleteConfirm('{{ route('e-billing.master-data.packages.destroy', $package) }}')">
                 Hapus
               </button>
-            @endhaspermission
+            @endif
             <a href="{{ route('e-billing.master-data.packages.index') }}" class="btn btn-secondary">
               Kembali
             </a>

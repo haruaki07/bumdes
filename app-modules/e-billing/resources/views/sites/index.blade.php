@@ -12,12 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            @haspermission('create-sites', 'ebil')
+            @if (auth('ebil')->user()->can('create-sites'))
               <a href="{{ route('e-billing.master-data.sites.create') }}" class="btn btn-primary">
                 <i class="icon ti ti-plus"></i>
                 Tambah Site
               </a>
-            @endhaspermission
+            @endif
           </div>
         </div>
       </div>
@@ -52,19 +52,19 @@
                       data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    @haspermission('update-sites', 'ebil')
+                    @if (auth('ebil')->user()->can('update-sites'))
                       <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-icon btn-warning"
                         data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                         <i class="ti ti-edit"></i>
                       </a>
-                    @endhaspermission
-                    @haspermission('delete-sites', 'ebil')
+                    @endif
+                    @if (auth('ebil')->user()->can('delete-sites'))
                       <button class="btn btn-icon btn-danger"
                         onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')"
                         data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                         <i class="ti ti-trash"></i>
                       </button>
-                    @endhaspermission
+                    @endif
                   </td>
                 </tr>
               @empty

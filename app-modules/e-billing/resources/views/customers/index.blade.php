@@ -12,7 +12,7 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            @haspermission('create-customers', 'ebil')
+            @if (auth('ebil')->user()->can('create-customers'))
               <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importCustomerModal">
                 <i class="ti ti-upload icon"></i>
                 Import
@@ -21,7 +21,7 @@
                 <i class="icon ti ti-plus"></i>
                 Tambah Pelanggan
               </a>
-            @endhaspermission
+            @endif
           </div>
         </div>
       </div>
@@ -136,14 +136,14 @@
                         title="Lihat detail">
                         <i class="ti ti-eye"></i>
                       </a>
-                      @haspermission('update-customers', 'ebil')
+                      @if (auth('ebil')->user()->can('update-customers'))
                         <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}"
                           class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
                           title="Edit">
                           <i class="ti ti-edit"></i>
                         </a>
-                      @endhaspermission
-                      @haspermission('delete-customers', 'ebil')
+                      @endif
+                      @if (auth('ebil')->user()->can('delete-customers'))
                         <button class="btn btn-icon btn-danger"
                           onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.destroy', $customer) }}',
@@ -153,9 +153,9 @@
                           data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                           <i class="ti ti-trash"></i>
                         </button>
-                      @endhaspermission
+                      @endif
                     @else
-                      @haspermission('update-customers', 'ebil')
+                      @if (auth('ebil')->user()->can('update-customers'))
                         <button class="btn btn-icon btn-primary"
                           onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.restore', ['id' => $customer->id]) }}',
@@ -172,8 +172,8 @@
                           data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
                           <i class="ti ti-restore"></i>
                         </button>
-                      @endhaspermission
-                      @haspermission('delete-customers', 'ebil')
+                      @endif
+                      @if (auth('ebil')->user()->can('delete-customers'))
                         <button class="btn btn-icon btn-danger"
                           onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.destroy-trashed', ['id' => $customer->id]) }}',
@@ -186,7 +186,7 @@
                           data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                           <i class="ti ti-trash"></i>
                         </button>
-                      @endhaspermission
+                      @endif
                     @endif
                   </td>
                 </tr>
