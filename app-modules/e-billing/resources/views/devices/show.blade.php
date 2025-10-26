@@ -12,13 +12,17 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.master-data.devices.edit', $device) }}" class="btn btn-warning">
-              Edit
-            </a>
-            <button class="btn btn-danger"
-              onclick="deleteConfirm('{{ route('e-billing.master-data.devices.destroy', $device) }}')">
-              Hapus
-            </button>
+            @haspermission('update-devices', 'ebil')
+              <a href="{{ route('e-billing.master-data.devices.edit', $device) }}" class="btn btn-warning">
+                Edit
+              </a>
+            @endhaspermission
+            @haspermission('delete-devices', 'ebil')
+              <button class="btn btn-danger"
+                onclick="deleteConfirm('{{ route('e-billing.master-data.devices.destroy', $device) }}')">
+                Hapus
+              </button>
+            @endhaspermission
             <a href="{{ route('e-billing.master-data.devices.index') }}" class="btn btn-secondary">
               Kembali
             </a>

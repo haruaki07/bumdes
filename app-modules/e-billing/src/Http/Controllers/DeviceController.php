@@ -2,12 +2,24 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Modules\EBilling\Http\Requests\Device\CreateDeviceRequest;
 use Modules\EBilling\Http\Requests\Device\UpdateDeviceRequest;
 use Modules\EBilling\Models\Device;
 
-class DeviceController
+class DeviceController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-devices,ebil', only: ['index', 'show']),
+            new Middleware('permission:create-devices,ebil', only: ['create', 'store']),
+            new Middleware('permission:update-devices,ebil', only: ['edit', 'update']),
+            new Middleware('permission:delete-devices,ebil', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

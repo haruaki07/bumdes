@@ -12,12 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.devices.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah Perangkat
-            </a>
-            {{-- @endcan --}}
+            @haspermission('create-devices', 'ebil')
+              <a href="{{ route('e-billing.master-data.devices.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah Perangkat
+              </a>
+            @endhaspermission
           </div>
         </div>
       </div>
@@ -55,17 +55,19 @@
                       title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    {{-- @can('update', $device) --}}
-                    <a href="{{ route('e-billing.master-data.devices.edit', $device) }}"
-                      class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    {{-- @endcan --}}
-                    <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.master-data.devices.destroy', $device) }}')"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                      <i class="ti ti-trash"></i>
-                    </button>
+                    @haspermission('update-devices', 'ebil')
+                      <a href="{{ route('e-billing.master-data.devices.edit', $device) }}"
+                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    @endhaspermission
+                    @haspermission('delete-devices', 'ebil')
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm('{{ route('e-billing.master-data.devices.destroy', $device) }}')"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @endhaspermission
                   </td>
                 </tr>
               @empty
