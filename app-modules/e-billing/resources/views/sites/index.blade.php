@@ -12,12 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.sites.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah Site
-            </a>
-            {{-- @endcan --}}
+            @haspermission('create-sites', 'ebil')
+              <a href="{{ route('e-billing.master-data.sites.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah Site
+              </a>
+            @endhaspermission
           </div>
         </div>
       </div>
@@ -52,17 +52,19 @@
                       data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    {{-- @can('update', $site) --}}
-                    <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-icon btn-warning"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    {{-- @endcan --}}
-                    <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                      <i class="ti ti-trash"></i>
-                    </button>
+                    @haspermission('update-sites', 'ebil')
+                      <a href="{{ route('e-billing.master-data.sites.edit', $site) }}" class="btn btn-icon btn-warning"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    @endhaspermission
+                    @haspermission('delete-sites', 'ebil')
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm('{{ route('e-billing.master-data.sites.destroy', $site) }}')"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @endhaspermission
                   </td>
                 </tr>
               @empty

@@ -2,12 +2,24 @@
 
 namespace Modules\EBilling\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Modules\EBilling\Http\Requests\Site\CreateSiteRequest;
 use Modules\EBilling\Http\Requests\Site\UpdateSiteRequest;
 use Modules\EBilling\Models\Site;
 
-class SiteController
+class SiteController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-sites,ebil', only: ['index', 'show']),
+            new Middleware('permission:create-sites,ebil', only: ['create', 'store']),
+            new Middleware('permission:update-sites,ebil', only: ['edit', 'update']),
+            new Middleware('permission:delete-sites,ebil', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -23,10 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
             'auth_ebil' => \Modules\EBilling\Http\Middleware\UserAuthenticate::class,
             'auth.telescope' => \App\Http\Middleware\TelescopeAuthMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+
         $middleware->web([
             \App\Http\Middleware\ThemeConfigMiddleware::class,
         ]);
