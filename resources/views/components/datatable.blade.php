@@ -27,7 +27,7 @@
   </div>
 
   <div class="card-body border-bottom py-3">
-    {{ $cardheader ?? '' }}
+    {{ $cardHeader ?? '' }}
 
     <div class="d-flex align-items-center justify-content-sm-between justify-content-center flex-wrap gap-3">
       @if ($limit)

@@ -3,6 +3,8 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Http\Requests\Customer\CreateCustomerRequest;
 use Modules\EBilling\Http\Requests\Customer\UpdateCustomerRequest;
 use Modules\EBilling\Imports\CustomersImport;
@@ -16,9 +18,19 @@ class CustomerController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::datatable();
+        $users = Customer::query();
+
+        if ($request->filled('status')) {
+            $users->status($request->status);
+        }
+
+        if ($request->filled('archive') && $request->archive == 'true') {
+            $users->onlyTrashed();
+        }
+
+        $customers = $users->datatable();
 
         return view('e-billing::customers.index', compact('customers'));
     }
@@ -90,6 +102,51 @@ class CustomerController
         $customer->delete();
 
         return redirect()->route('e-billing.master-data.customers.index')->with('success', 'Pelanggan berhasil dihapus.');
+    }
+
+    /**
+     * Permanently delete a trashed customer.
+     */
+    public function destroyTrashed(int $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $customer = Customer::onlyTrashed()->findOrFail($id);
+            if (! $customer) {
+                return back()->with('error', 'Pelanggan tidak ditemukan atau belum diarsipkan.');
+            }
+
+            $customer->invoices()->where('status', InvoiceStatus::UNPAID)->update(['status' => InvoiceStatus::EXPIRED]);
+            $customer->tickets()->delete();
+            $customer->transferReceipts()->delete();
+            $customer->paymentCodes()->delete();
+            $customer->forceDelete();
+
+            DB::commit();
+
+            return back()->with('success', 'Pelanggan berhasil dihapus secara permanen.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error during permanent deletion of customer: '.$e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan saat menghapus pelanggan secara permanen.');
+        }
+    }
+
+    /**
+     * Restore a trashed customer.
+     */
+    public function restore(int $id)
+    {
+        $customer = Customer::onlyTrashed()->findOrFail($id);
+        if (! $customer) {
+            return back()->with('error', 'Pelanggan tidak ditemukan atau belum diarsipkan.');
+        }
+
+        $customer->restore();
+
+        return redirect()->route('e-billing.master-data.customers.index')->with('success', 'Pelanggan berhasil dipulihkan.');
     }
 
     /**

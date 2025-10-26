@@ -52,7 +52,42 @@
 
       <div class="row row-deck row-cards">
         <div class="col-12">
-          <x-datatable tableId="customersTable" title="Daftar Pelanggan" :data="$customers">
+          <x-datatable tableId="customersTable" :data="$customers">
+            <x-slot:title>
+              <div class="d-flex align-items-center">
+                <span>Daftar Pelanggan</span>
+                <div class="d-flex gap-2 align-items-center ms-3 text-muted">
+                  <a class="btn btn-link fs-5 p-0 m-0 {{ request()->archive == null ? 'disabled' : '' }}"
+                    href="{{ route('e-billing.master-data.customers.index') }}">
+                    Semua
+                  </a>
+                  <a class="btn btn-link fs-5 p-0 m-0 {{ request()->archive == 'true' ? 'disabled' : '' }}"
+                    href="{{ route('e-billing.master-data.customers.index', ['archive' => 'true']) }}">
+                    Arsip
+                  </a>
+                </div>
+              </div>
+            </x-slot>
+
+            <x-slot:headerRight>
+              <div class="text-muted">
+                Status:
+                <div class="ms-2 d-inline-block">
+                  <select class="form-select form-select-sm" style="width: auto;" aria-label="Filter status"
+                    id="statusFilter">
+                    <option value="" value="" {{ request()->status == null ? 'selected' : '' }}>
+                      Semua
+                    </option>
+                    @foreach (\Modules\EBilling\Enums\CustomerStatus::cases() as $status)
+                      <option value="{{ $status->value }}" @selected(request()->status == $status->value)>
+                        {{ $status->label() }}
+                      </option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+            </x-slot>
+
             <x-slot:thead>
               <tr>
                 <th>#</th>
@@ -95,22 +130,57 @@
                     <x-e-billing::modules.customer.status-badge :status="$customer->status" />
                   </td>
                   <td>
-                    <a href="{{ route('e-billing.master-data.customers.show', $customer) }}"
-                      class="btn btn-icon btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"
-                      title="Lihat detail">
-                      <i class="ti ti-eye"></i>
-                    </a>
-                    {{-- @can('update', $customer) --}}
-                    <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}"
-                      class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    {{-- @endcan --}}
-                    <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.master-data.customers.destroy', $customer) }}')"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                      <i class="ti ti-trash"></i>
-                    </button>
+                    @if (request()->archive != 'true')
+                      <a href="{{ route('e-billing.master-data.customers.show', $customer) }}"
+                        class="btn btn-icon btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Lihat detail">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                      {{-- @can('update', $customer) --}}
+                      <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}"
+                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm(
+                          '{{ route('e-billing.master-data.customers.destroy', $customer) }}',
+                          'DELETE',
+                          { message: 'Data pelanggan akan disembunyikan dari daftar aktif dan dapat dipulihkan kapan saja melalui menu Arsip.'}
+                        )"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @else
+                      <button class="btn btn-icon btn-primary"
+                        onclick="deleteConfirm(
+                          '{{ route('e-billing.master-data.customers.restore', ['id' => $customer->id]) }}',
+                          'PUT',
+                          {
+                            title: 'Pulihkan Pelanggan?',
+                            message: '<p>Data pelanggan akan dipulihkan dan muncul kembali di daftar aktif.</p>',
+                            buttons: {
+                              cancel: { label: 'Batal' },
+                              confirm: { label: 'Pulihkan', className: 'btn-primary' },
+                            }
+                          }
+                        )"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
+                        <i class="ti ti-restore"></i>
+                      </button>
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm(
+                          '{{ route('e-billing.master-data.customers.destroy-trashed', ['id' => $customer->id]) }}',
+                          'DELETE',
+                          {
+                            title: 'Hapus Permanen Pelanggan?',
+                            message: '<p>Data pelanggan akan dihapus <b>secara permanen</b> dan <b>tidak dapat dipulihkan</b>.</p>'
+                          }
+                        )"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @endif
                   </td>
                 </tr>
               @empty
@@ -140,7 +210,8 @@
             <div id="customerImportAlerts"></div>
             <div class="mb-3">
               <label class="form-label required">Unggah File (.xlsx / .xls / .csv)</label>
-              <input type="file" class="form-control form-dropzone" name="file" accept=".xlsx,.xls,.csv" required>
+              <input type="file" class="form-control form-dropzone" name="file" accept=".xlsx,.xls,.csv"
+                required>
             </div>
             <div class="text-center">
               <a href="{{ asset('templates/customer_import_template.xlsx') }}" class="btn btn-link" download>
@@ -157,4 +228,19 @@
       </div>
     </div>
   </div>
+
+  @push('js')
+    <script type="module">
+      document.getElementById('statusFilter').addEventListener('change', function() {
+        const url = new URL(window.location);
+        if (this.value) {
+          url.searchParams.set('status', this.value);
+        } else {
+          url.searchParams.delete('status');
+        }
+        url.searchParams.delete('page');
+        window.location = url.toString();
+      });
+    </script>
+  @endpush
 </x-e-billing::layouts.panel>

@@ -1,4 +1,4 @@
-window.deleteConfirm = async function (url, method = "DELETE") {
+window.deleteConfirm = async function (url, method = "DELETE", opts = {}) {
   const res = await new Promise((resolve) => {
     bootbox.confirm({
       title: "Hapus Data?",
@@ -8,6 +8,7 @@ window.deleteConfirm = async function (url, method = "DELETE") {
         confirm: { label: "Ya", className: "btn-danger" },
       },
       callback: (result) => resolve(result),
+      ...opts,
     });
   });
 

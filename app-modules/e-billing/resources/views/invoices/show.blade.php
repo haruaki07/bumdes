@@ -23,7 +23,7 @@
           <a class="btn btn-outline-primary" href="{{ $invoice->public_url }}" target="_blank">
             <i class="ti ti-external-link icon"></i> Lihat Tagihan
           </a>
-          @if ($invoice->status !== InvoiceStatus::PAID)
+          @if ($invoice->status === InvoiceStatus::UNPAID)
             <form method="POST" action="{{ route('e-billing.invoices.send-notification', $invoice) }}"
               class="d-inline">
               @csrf
@@ -38,8 +38,7 @@
                 <i class="ti ti-check icon"></i> Tandai Lunas
               </button>
             </form>
-          @endif
-          @if ($invoice->status === InvoiceStatus::PAID)
+          @elseif ($invoice->status === InvoiceStatus::PAID)
             <form method="POST" action="{{ route('e-billing.invoices.mark-unpaid', $invoice) }}" class="d-inline">
               @csrf
               <button class="btn btn-outline-danger">

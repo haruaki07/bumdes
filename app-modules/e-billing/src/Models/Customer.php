@@ -108,8 +108,28 @@ class Customer extends Model
         return $this->getDueDateAttribute();
     }
 
+    public function scopestatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function paymentCodes()
+    {
+        return $this->hasMany(PaymentCode::class);
+    }
+
+    public function transferReceipts()
+    {
+        return $this->hasMany(TransferReceipt::class);
     }
 }

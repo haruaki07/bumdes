@@ -109,7 +109,7 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            $customer = Customer::find($invoice->customer_id);
+            $customer = Customer::find($invoice->customer_id) ?? new Customer($invoice->customer_detail->toArray());
         } else {
             $customer = Customer::where('customer_id', $customerId)->first();
             if (! $customer) {

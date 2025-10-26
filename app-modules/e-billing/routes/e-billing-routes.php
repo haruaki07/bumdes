@@ -41,6 +41,8 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::resource('packages', PackageController::class);
                 Route::resource('customers', CustomerController::class);
                 Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
+                Route::put('/customers/{id}/restore', [CustomerController::class, 'restore'])->name('customers.restore');
+                Route::delete('/customers/{id}/destroy-trashed', [CustomerController::class, 'destroyTrashed'])->name('customers.destroy-trashed');
             });
 
             // Tickets
