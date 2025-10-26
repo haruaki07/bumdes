@@ -3,6 +3,8 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Modules\EBilling\Enums\InvoiceStatus;
 use Modules\EBilling\Http\Requests\Customer\CreateCustomerRequest;
@@ -13,8 +15,18 @@ use Modules\EBilling\Models\Device;
 use Modules\EBilling\Models\Package;
 use Modules\EBilling\Models\Site;
 
-class CustomerController
+class CustomerController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-customers,ebil', only: ['index', 'show']),
+            new Middleware('permission:create-customers,ebil', only: ['create', 'store', 'import']),
+            new Middleware('permission:update-customers,ebil', only: ['edit', 'update', 'restore']),
+            new Middleware('permission:delete-customers,ebil', only: ['destroy', 'destroyTrashed']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

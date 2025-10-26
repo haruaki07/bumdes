@@ -12,16 +12,16 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importCustomerModal">
-              <i class="ti ti-upload icon"></i>
-              Import
-            </button>
-            {{-- @can('create', \App\Models\BusinessRegistration::class) --}}
-            <a href="{{ route('e-billing.master-data.customers.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah Pelanggan
-            </a>
-            {{-- @endcan --}}
+            @haspermission('create-customers', 'ebil')
+              <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importCustomerModal">
+                <i class="ti ti-upload icon"></i>
+                Import
+              </button>
+              <a href="{{ route('e-billing.master-data.customers.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah Pelanggan
+              </a>
+            @endhaspermission
           </div>
         </div>
       </div>
@@ -136,24 +136,28 @@
                         title="Lihat detail">
                         <i class="ti ti-eye"></i>
                       </a>
-                      {{-- @can('update', $customer) --}}
-                      <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}"
-                        class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="Edit">
-                        <i class="ti ti-edit"></i>
-                      </a>
-                      <button class="btn btn-icon btn-danger"
-                        onclick="deleteConfirm(
+                      @haspermission('update-customers', 'ebil')
+                        <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}"
+                          class="btn btn-icon btn-warning" data-bs-toggle="tooltip" data-bs-placement="top"
+                          title="Edit">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                      @endhaspermission
+                      @haspermission('delete-customers', 'ebil')
+                        <button class="btn btn-icon btn-danger"
+                          onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.destroy', $customer) }}',
                           'DELETE',
                           { message: 'Data pelanggan akan disembunyikan dari daftar aktif dan dapat dipulihkan kapan saja melalui menu Arsip.'}
                         )"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                        <i class="ti ti-trash"></i>
-                      </button>
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      @endhaspermission
                     @else
-                      <button class="btn btn-icon btn-primary"
-                        onclick="deleteConfirm(
+                      @haspermission('update-customers', 'ebil')
+                        <button class="btn btn-icon btn-primary"
+                          onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.restore', ['id' => $customer->id]) }}',
                           'PUT',
                           {
@@ -165,11 +169,13 @@
                             }
                           }
                         )"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
-                        <i class="ti ti-restore"></i>
-                      </button>
-                      <button class="btn btn-icon btn-danger"
-                        onclick="deleteConfirm(
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
+                          <i class="ti ti-restore"></i>
+                        </button>
+                      @endhaspermission
+                      @haspermission('delete-customers', 'ebil')
+                        <button class="btn btn-icon btn-danger"
+                          onclick="deleteConfirm(
                           '{{ route('e-billing.master-data.customers.destroy-trashed', ['id' => $customer->id]) }}',
                           'DELETE',
                           {
@@ -177,9 +183,10 @@
                             message: '<p>Data pelanggan akan dihapus <b>secara permanen</b> dan <b>tidak dapat dipulihkan</b>.</p>'
                           }
                         )"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                        <i class="ti ti-trash"></i>
-                      </button>
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      @endhaspermission
                     @endif
                   </td>
                 </tr>

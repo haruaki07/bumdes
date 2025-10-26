@@ -12,13 +12,17 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}" class="btn btn-warning">
-              Edit
-            </a>
-            <button class="btn btn-danger"
-              onclick="deleteConfirm('{{ route('e-billing.master-data.customers.destroy', $customer) }}')">
-              Hapus
-            </button>
+            @haspermission('update-customers', 'ebil')
+              <a href="{{ route('e-billing.master-data.customers.edit', $customer) }}" class="btn btn-warning">
+                Edit
+              </a>
+            @endhaspermission
+            @haspermission('delete-customers', 'ebil')
+              <button class="btn btn-danger"
+                onclick="deleteConfirm('{{ route('e-billing.master-data.customers.destroy', $customer) }}')">
+                Hapus
+              </button>
+            @endhaspermission
             <a href="{{ route('e-billing.master-data.customers.index') }}" class="btn btn-secondary">
               Kembali
             </a>
