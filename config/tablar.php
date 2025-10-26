@@ -181,24 +181,28 @@ return [
                     'text' => 'Site',
                     'route' => 'e-billing.master-data.sites.index',
                     'icon' => 'ti ti-world-pin',
+                    'hasAnyPermission' => ['read-sites'],
                 ],
                 [
                     'group' => 'e-billing',
                     'text' => 'Perangkat',
                     'route' => 'e-billing.master-data.devices.index',
                     'icon' => 'ti ti-router',
+                    'hasAnyPermission' => ['read-devices'],
                 ],
                 [
                     'group' => 'e-billing',
                     'text' => 'Paket',
                     'route' => 'e-billing.master-data.packages.index',
                     'icon' => 'ti ti-package',
+                    'hasAnyPermission' => ['read-packages'],
                 ],
                 [
                     'group' => 'e-billing',
                     'text' => 'Pelanggan',
                     'route' => 'e-billing.master-data.customers.index',
                     'icon' => 'ti ti-users',
+                    'hasAnyPermission' => ['read-customers'],
                 ],
             ],
         ],
@@ -215,6 +219,7 @@ return [
                     'text' => 'Tagihan',
                     'icon' => 'ti ti-file-invoice',
                     'route' => 'e-billing.invoices.index',
+                    'hasAnyPermission' => ['read-invoices'],
                 ],
             ],
         ],
@@ -266,7 +271,7 @@ return [
     */
 
     'filters' => [
-        TakiElias\Tablar\Menu\Filters\GateFilter::class,
+        // TakiElias\Tablar\Menu\Filters\GateFilter::class,
         TakiElias\Tablar\Menu\Filters\HrefFilter::class,
         TakiElias\Tablar\Menu\Filters\SearchFilter::class,
         TakiElias\Tablar\Menu\Filters\ActiveFilter::class,
@@ -274,6 +279,7 @@ return [
         TakiElias\Tablar\Menu\Filters\LangFilter::class,
         TakiElias\Tablar\Menu\Filters\DataFilter::class,
         \App\Filters\RouteGroupFilter::class,
+        \App\Filters\RolePermissionFilter::class,
     ],
 
     /*
