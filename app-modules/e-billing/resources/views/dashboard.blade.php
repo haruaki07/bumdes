@@ -191,7 +191,7 @@
   </div>
 
   @push('js')
-    <script>
+    <script type="module">
       const els = {
         income: document.getElementById('income'),
         incomeGrowth: document.getElementById('incomeGrowth'),
