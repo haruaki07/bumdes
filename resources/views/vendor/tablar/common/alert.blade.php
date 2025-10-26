@@ -51,23 +51,3 @@
     </div>
   @endforeach
 @endif
-
-
-@pushIf($errors->any() || session('message') || session('success') || session('warning') || session('error'), 'js')
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const alertList = document.querySelectorAll('.alert.alert-dismissible[role="alert"][data-bs-timeout]');
-    alertList.forEach(function(alert) {
-      const timeout = parseInt(alert.getAttribute('data-bs-timeout')) || 5000;
-      setTimeout(function() {
-        const bsAlert = tabler.Alert.getOrCreateInstance(alert);
-        anime.waapi.animate(alert, {
-          duration: 500,
-          opacity: 0,
-          onComplete: () => bsAlert.close()
-        });
-      }, timeout);
-    });
-  });
-</script>
-@endPushIf

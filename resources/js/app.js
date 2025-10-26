@@ -45,3 +45,18 @@ document.querySelectorAll("input[data-mask-currency]").forEach((input) => {
     scale: 0, // no decimals
   });
 });
+
+// auto dismissable alerts
+document
+  .querySelectorAll('.alert.alert-dismissible[role="alert"][data-bs-timeout]')
+  .forEach(function (alert) {
+    const timeout = parseInt(alert.getAttribute("data-bs-timeout")) || 5000;
+    setTimeout(function () {
+      const bsAlert = tabler.Alert.getOrCreateInstance(alert);
+      anime.waapi.animate(alert, {
+        duration: 500,
+        opacity: 0,
+        onComplete: () => bsAlert.close(),
+      });
+    }, timeout);
+  });

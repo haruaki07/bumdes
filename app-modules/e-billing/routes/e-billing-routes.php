@@ -40,11 +40,7 @@ Route::prefix('e-billing')->as('e-billing.')->group(function () {
                 Route::resource('devices', DeviceController::class);
                 Route::resource('packages', PackageController::class);
                 Route::resource('customers', CustomerController::class);
-                // Customer import (AJAX + SSE stream)
-                Route::post('customers-import', [CustomerController::class, 'importStore'])
-                    ->name('customers.import.store');
-                Route::get('customers-import/stream/{token}', [CustomerController::class, 'importStream'])
-                    ->name('customers.import.stream');
+                Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
             });
 
             // Tickets
