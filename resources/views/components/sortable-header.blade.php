@@ -26,15 +26,12 @@
   $isCurrentSort = $sort && str_starts_with($sort, $field . ':');
   $sortClass = $isCurrentSort ? ($direction === 'asc' ? ' asc' : ' desc') : '';
 
-  $tooltip = $nextDirection
-      ? 'Click to sort ' . ($nextDirection === 'asc' ? 'ascending' : 'descending')
-      : 'Click to clear sorting';
+  $tooltip = $nextDirection ? 'Urutkan ' . ($nextDirection === 'asc' ? 'menaik' : 'menurun') : 'Hapus pengurutan';
 @endphp
 
 <th @if ($class) class="{{ $class }}" @endif>
-  <button class="table-sort{{ $sortClass }} gap-2"
-    type="button"title="{{ $tooltip }}" data-bs-toggle="tooltip" data-bs-placement="top"
-    data-datatable-sort="{{ $tableId }}" data-datatable-sort-field="{{ $field }}"
+  <button class="table-sort{{ $sortClass }} gap-2" type="button"title="{{ $tooltip }}" data-bs-toggle="tooltip"
+    data-bs-placement="top" data-datatable-sort="{{ $tableId }}" data-datatable-sort-field="{{ $field }}"
     data-datatable-sort-direction="{{ $direction }}" data-datatable-sort-next-direction="{{ $nextDirection }}">
     {{ $label }}
   </button>
