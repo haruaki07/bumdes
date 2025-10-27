@@ -1,3 +1,7 @@
+@php
+  $canUpdate = auth('ebil')->user()->can('update-system-settings');
+@endphp
+
 <x-e-billing::layouts.panel>
   @include('e-billing::settings.partials._header')
 
@@ -26,13 +30,15 @@
                   <div class="row align-items-center">
                     <div class="col-auto"><span id="logoPreview" class="avatar avatar-xl"
                         style="background-image: url({{ asset($settings->logo) }})"> </span></div>
-                    <div class="col-auto">
-                      <label class="btn btn-icon" data-bs-toggle="tooltip" title="Ganti logo" data-bs-placement="top">
-                        <i class="ti ti-edit"></i>
-                        <input id="logoInput" type="file" name="logo" class="d-none"
-                          accept=".jpg,.jpeg,.png,.svg">
-                      </label>
-                    </div>
+                    @if ($canUpdate)
+                      <div class="col-auto">
+                        <label class="btn btn-icon" data-bs-toggle="tooltip" title="Ganti logo" data-bs-placement="top">
+                          <i class="ti ti-edit"></i>
+                          <input id="logoInput" type="file" name="logo" class="d-none"
+                            accept=".jpg,.jpeg,.png,.svg">
+                        </label>
+                      </div>
+                    @endif
                     @error('logo')
                       <div class="col-auto">
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -43,8 +49,8 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label required">Nama usaha</label>
                   <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                    value="{{ old('name') ?? $settings->name }}" required
-                    placeholder="Masukkan nama channel pembayaran">
+                    value="{{ old('name') ?? $settings->name }}" required placeholder="Masukkan nama channel pembayaran"
+                    @if (!$canUpdate) readonly @endif>
                   @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -54,7 +60,7 @@
                   <input type="text" name="description"
                     class="form-control @error('description') is-invalid @enderror"
                     value="{{ old('description') ?? $settings->description }}" required
-                    placeholder="Masukkan keterangan usaha">
+                    placeholder="Masukkan keterangan usaha" @if (!$canUpdate) readonly @endif>
                   @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -62,7 +68,8 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label required">Nomor telepon</label>
                   <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                    value="{{ old('phone') ?? $settings->phone }}" required placeholder="Masukkan nomor telepon">
+                    value="{{ old('phone') ?? $settings->phone }}" required placeholder="Masukkan nomor telepon"
+                    @if (!$canUpdate) readonly @endif>
                   @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -70,7 +77,8 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label required">Alamat email</label>
                   <input type="text" name="email" class="form-control @error('email') is-invalid @enderror"
-                    value="{{ old('email') ?? $settings->email }}" required placeholder="Masukkan alamat email">
+                    value="{{ old('email') ?? $settings->email }}" required placeholder="Masukkan alamat email"
+                    @if (!$canUpdate) readonly @endif>
                   @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -78,7 +86,7 @@
                 <div class="col-12 mb-3">
                   <label class="form-label required">Alamat usaha</label>
                   <textarea name="address" class="form-control @error('address') is-invalid @enderror" required
-                    placeholder="Masukkan alamat usaha (Jl. Contoh No. 123)">{{ old('address') ?? $settings->address }}</textarea>
+                    placeholder="Masukkan alamat usaha (Jl. Contoh No. 123)" @if (!$canUpdate) readonly @endif>{{ old('address') ?? $settings->address }}</textarea>
                   @error('address')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -87,8 +95,12 @@
             </div>
             <div class="card-footer bg-transparent mt-auto">
               <div class="btn-list justify-content-end">
-                <button type="reset" class="btn"> Reset </button>
-                <button type="submit" class="btn btn-primary"> Simpan </button>
+                <button type="reset" class="btn"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Reset
+                </button>
+                <button type="submit" class="btn btn-primary"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Simpan
+                </button>
               </div>
             </div>
           </form>

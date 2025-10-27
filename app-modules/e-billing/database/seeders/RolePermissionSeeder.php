@@ -71,6 +71,10 @@ class RolePermissionSeeder extends Seeder
                     'read-payment-methods' => 'Melihat Metode Pembayaran',
                     'update-payment-methods' => 'Memperbarui Metode Pembayaran',
                 ],
+                'Pengaturan Sistem' => [
+                    'read-system-settings' => 'Melihat Pengaturan Sistem',
+                    'update-system-settings' => 'Memperbarui Pengaturan Sistem',
+                ],
             ],
         ];
 

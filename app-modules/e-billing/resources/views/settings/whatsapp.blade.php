@@ -1,5 +1,6 @@
 @php
   $provider = request('provider', $settings->provider ?? null);
+  $canUpdate = auth('ebil')->user()->can('update-system-settings');
 @endphp
 
 <x-e-billing::layouts.panel>
@@ -26,7 +27,8 @@
               <div class="mb-3">
                 <label class="form-check">
                   <input type="checkbox" name="enabled" value="1" class="form-check-input"
-                    {{ old('enabled', $settings->enabled ?? false) ? 'checked' : '' }}>
+                    {{ old('enabled', $settings->enabled ?? false) ? 'checked' : '' }}
+                    @if (!$canUpdate) onclick="return false;" @endif>
                   <span class="form-check-label">Aktif</span>
                 </label>
               </div>
@@ -34,7 +36,7 @@
               <div class="mb-3">
                 <label class="form-label required">API Provider</label>
                 <select name="provider" class="form-select @error('provider') is-invalid @enderror" required
-                  id="providerSelect" data-tom-select>
+                  id="providerSelect" data-tom-select @if (!$canUpdate) disabled @endif>
                   <option value="">Pilih</option>
                   @foreach (['waha' => 'WAHA (Unofficial)', 'wablas' => 'Wablas.com (Unofficial)'] as $value => $label)
                     <option value="{{ $value }}" {{ old('provider', $provider) == $value ? 'selected' : '' }}>
@@ -70,23 +72,25 @@
                     </div>
 
 
-                    <div class="btn-list mt-4">
-                      <span data-bs-toggle="tooltip" title="Hubungkan" data-bs-placement="top" id="btnConnect"
-                        class="d-none">
-                        <button type="button" class="btn btn-ghost-primary btn-icon" data-bs-toggle="modal"
-                          data-bs-target="#connectWhatsappModal">
-                          <i class="ti ti-qrcode"></i>
+                    @if ($canUpdate)
+                      <div class="btn-list mt-4">
+                        <span data-bs-toggle="tooltip" title="Hubungkan" data-bs-placement="top" id="btnConnect"
+                          class="d-none">
+                          <button type="button" class="btn btn-ghost-primary btn-icon" data-bs-toggle="modal"
+                            data-bs-target="#connectWhatsappModal">
+                            <i class="ti ti-qrcode"></i>
+                          </button>
+                        </span>
+                        <button type="button" class="btn btn-ghost-secondary btn-icon" data-bs-toggle="tooltip"
+                          title="Refresh" data-bs-placement="top" id="btnRefresh">
+                          <i class="ti ti-refresh"></i>
                         </button>
-                      </span>
-                      <button type="button" class="btn btn-ghost-secondary btn-icon" data-bs-toggle="tooltip"
-                        title="Refresh" data-bs-placement="top" id="btnRefresh">
-                        <i class="ti ti-refresh"></i>
-                      </button>
-                      <button type="button" class="btn btn-ghost-danger btn-icon d-none" data-bs-toggle="tooltip"
-                        title="Logout" data-bs-placement="top" id="btnLogout">
-                        <i class="ti ti-logout"></i>
-                      </button>
-                    </div>
+                        <button type="button" class="btn btn-ghost-danger btn-icon d-none" data-bs-toggle="tooltip"
+                          title="Logout" data-bs-placement="top" id="btnLogout">
+                          <i class="ti ti-logout"></i>
+                        </button>
+                      </div>
+                    @endif
                   </div>
                 </div>
               @elseif ($provider === 'wablas')
@@ -116,7 +120,8 @@
                         <label class="form-selectgroup-item">
                           <input type="radio" name="wablas_server" value="{{ $key }}"
                             class="form-selectgroup-input"
-                            {{ $key === old('wablas_server', $settings->wablas_server) ? 'checked' : '' }} />
+                            {{ $key === old('wablas_server', $settings->wablas_server) ? 'checked' : '' }}
+                            @if (!$canUpdate) onclick="return false;" @endif />
                           <span class="form-selectgroup-label">{{ $label }}</span>
                         </label>
                       @endforeach
@@ -128,7 +133,7 @@
                       <input type="text" name="wablas_api_key"
                         class="form-control @error('wablas_api_key') is-invalid @enderror"
                         value="{{ old('wablas_api_key') ?? $settings->wablas_api_key }}" required
-                        placeholder="Masukkan API key/token">
+                        placeholder="Masukkan API key/token" @if (!$canUpdate) readonly @endif>
                       @error('wablas_api_key')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -138,14 +143,16 @@
                       <input type="text" name="wablas_secret_key"
                         class="form-control @error('wablas_secret_key') is-invalid @enderror"
                         value="{{ old('wablas_secret_key') ?? $settings->wablas_secret_key }}" required
-                        placeholder="Masukkan secret key">
+                        placeholder="Masukkan secret key" @if (!$canUpdate) readonly @endif>
                       @error('wablas_secret_key')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
-                  <button type="button" class="btn" id="btnCheckConnection" data-bs-toggle="loading-button"
-                    data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Cek Koneksi</button>
+                  @if ($canUpdate)
+                    <button type="button" class="btn" id="btnCheckConnection" data-bs-toggle="loading-button"
+                      data-bs-disabled-on-loading="true" data-bs-spinner-type="dots">Cek Koneksi</button>
+                  @endif
                 </div>
               @endif
 
@@ -158,7 +165,7 @@
                 <div class="col-md-7">
                   <label class="form-label required">Template</label>
                   <textarea name="invoice_reminder_template" rows="6" class="form-control font-monospace" placeholder="Ketik..."
-                    required>{{ old('invoice_reminder_template', $settings->invoice_reminder_template ?? '') }}</textarea>
+                    required @if (!$canUpdate) readonly @endif>{{ old('invoice_reminder_template', $settings->invoice_reminder_template ?? '') }}</textarea>
                   <small class="text-muted">Maks 500 karakter.</small>
                   @error('invoice_reminder_template')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -224,8 +231,12 @@
             </div>
             <div class="card-footer bg-transparent mt-auto">
               <div class="btn-list justify-content-end">
-                <button type="reset" class="btn"> Reset </button>
-                <button type="submit" class="btn btn-primary"> Simpan </button>
+                <button type="reset" class="btn"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Reset
+                </button>
+                <button type="submit" class="btn btn-primary"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Simpan
+                </button>
               </div>
             </div>
           </form>
@@ -393,6 +404,11 @@
 
     @if ($provider === 'waha')
       <script type="module">
+        const can = {
+          update: {{ $canUpdate ? 'true' : 'false' }}
+        };
+
+
         const providerSelect = document.querySelector('select[name="provider"]');
         const wahaBox = document.getElementById('wahaSettings');
         const whatsappNumber = document.getElementById('whatsappNumber');
@@ -419,6 +435,8 @@
         toggle();
 
         function setStatus(status) {
+          if (!can.update) return;
+
           let connected = false;
           let label = "-";
           let color = "secondary";

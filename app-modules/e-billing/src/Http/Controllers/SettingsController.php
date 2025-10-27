@@ -5,15 +5,43 @@ namespace Modules\EBilling\Http\Controllers;
 use App\Http\Integrations\WhatsApp\Requests\Wablas\DeviceInfoRequest;
 use App\Http\Integrations\WhatsApp\WablasConnector;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Modules\EBilling\Enums\SettingsGroup;
 use Modules\EBilling\Settings\EBillingBusinessProfileSettings;
 use Modules\EBilling\Settings\EBillingWhatsappSettings;
 use Modules\EBilling\Settings\EBillingXenditSettings;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class SettingsController
+class SettingsController implements HasMiddleware
 {
+    public static $bypassGroups = ['account'];
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-system-settings,ebil', only: ['index']),
+
+            new Middleware(function ($request, $next) {
+                if (in_array(request()->route('group'), self::$bypassGroups)) {
+                    return $next($request);
+                }
+
+                return app(PermissionMiddleware::class)->handle($request, $next, 'read-system-settings', 'ebil');
+            }, only: ['show']),
+
+            new Middleware(function ($request, $next) {
+                if (in_array(request()->route('group'), self::$bypassGroups)) {
+                    return $next($request);
+                }
+
+                return app(PermissionMiddleware::class)->handle($request, $next, 'update-system-settings', 'ebil');
+            }, only: ['update']),
+        ];
+    }
+
     public function index()
     {
         return redirect(route('e-billing.settings.show', ['group' => 'account']));

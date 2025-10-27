@@ -1,3 +1,7 @@
+@php
+  $canUpdate = auth('ebil')->user()->can('update-system-settings');
+@endphp
+
 <x-e-billing::layouts.panel>
   @include('e-billing::settings.partials._header')
 
@@ -25,7 +29,8 @@
               <div class="mb-3">
                 <label class="form-label required">Secret key</label>
                 <input type="text" name="secret" class="form-control @error('secret') is-invalid @enderror"
-                  value="{{ old('secret') ?? $settings->secret }}" required placeholder="Masukkan secret key">
+                  value="{{ old('secret') ?? $settings->secret }}" required placeholder="Masukkan secret key"
+                  @if (!$canUpdate) readonly @endif>
                 <div id="passwordHelpBlock" class="form-text">
                   Secret key digunakan untuk keperluan pembayaran tagihan oleh pelanggan. <a href="#"
                     class="link" data-bs-toggle="modal" data-bs-target="#secretKeyGuideModal">Panduan</a>
@@ -39,7 +44,7 @@
                 <input type="text" name="webhook_token"
                   class="form-control @error('webhook_token') is-invalid @enderror"
                   value="{{ old('webhook_token') ?? $settings->webhook_token }}" required
-                  placeholder="Masukkan webhook token">
+                  placeholder="Masukkan webhook token" @if (!$canUpdate) readonly @endif>
                 <div id="passwordHelpBlock" class="form-text">
                   Webhook token digunakan untuk keperluan verifikasi status pembayaran yang dilakukan oleh pelanggan. <a
                     href="#" class="link" data-bs-toggle="modal" data-bs-target="#webhookGuideModal">Panduan</a>
@@ -61,8 +66,12 @@
             </div>
             <div class="card-footer bg-transparent mt-auto">
               <div class="btn-list justify-content-end">
-                <button type="reset" class="btn"> Reset </button>
-                <button type="submit" class="btn btn-primary"> Simpan </button>
+                <button type="reset" class="btn"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Reset
+                </button>
+                <button type="submit" class="btn btn-primary"
+                  @if (!$canUpdate) style="pointer-events: none; visibility: hidden;" @endif> Simpan
+                </button>
               </div>
             </div>
           </form>

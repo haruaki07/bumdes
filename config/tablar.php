@@ -236,18 +236,21 @@ return [
                     'text' => 'Manajemen Role',
                     'route' => 'e-billing.settings.roles.index',
                     'icon' => 'ti ti-lock',
+                    'hasAnyPermission' => ['read-roles'],
                 ],
                 [
                     'group' => 'e-billing',
                     'text' => 'Manajemen User',
                     'route' => 'e-billing.settings.users.index',
                     'icon' => 'ti ti-users',
+                    'hasAnyPermission' => ['read-users'],
                 ],
                 [
                     'group' => 'e-billing',
                     'text' => 'Metode Pembayaran',
                     'route' => 'e-billing.settings.payment-methods.index',
                     'icon' => 'ti ti-credit-card',
+                    'hasAnyPermission' => ['read-payment-methods'],
                 ],
                 [
                     'group' => 'e-billing',
