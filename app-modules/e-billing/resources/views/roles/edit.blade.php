@@ -29,7 +29,7 @@
             Pengaturan
           </div>
           <h2 class="page-title">
-            Edit Role
+            Detail Role
           </h2>
         </div>
         <div class="col-auto ms-auto d-print-none">
@@ -56,7 +56,7 @@
                   <div class="col-md-4 mb-3">
                     <label class="form-label required">Nama</label>
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                      value="{{ old('name', $role->name) }}" required>
+                      value="{{ old('name', $role->name) }}" required @if (auth('ebil')->user()->cannot('update-roles')) readonly @endif>
                     @error('name')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -65,7 +65,8 @@
                     <label class="form-label">Deskripsi</label>
                     <input type="text" name="description"
                       class="form-control @error('description') is-invalid @enderror"
-                      value="{{ old('description', $role->description) }}">
+                      value="{{ old('description', $role->description) }}"
+                      @if (auth('ebil')->user()->cannot('update-roles')) readonly @endif>
                     @error('description')
                       <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -113,11 +114,14 @@
                           @endphp
                           <td class="text-center">
                             @if ($permission)
-                              <input type="checkbox" class="form-check-input cell-checkbox" name="permissions[]"
-                                value="{{ $permission->name }}" data-group="{{ $menu }}"
-                                @checked(in_array($permission->name, old('permissions', $role->permissions->pluck('name')->toArray()))) data-bs-toggle="tooltip"
+                              <span class="d-inline-block" data-bs-toggle="tooltip"
                                 title="{{ $permission->description ?? '' }}" data-bs-placement="top"
-                                data-bs-trigger="hover" />
+                                data-bs-trigger="hover">
+                                <input type="checkbox" class="form-check-input cell-checkbox" name="permissions[]"
+                                  value="{{ $permission->name }}" data-group="{{ $menu }}"
+                                  @checked(in_array($permission->name, old('permissions', $role->permissions->pluck('name')->toArray())))
+                                  @if (auth('ebil')->user()->cannot('update-roles')) onclick="return false;" @endif />
+                              </span>
                             @else
                               <span class="text-muted">-</span>
                             @endif
@@ -126,7 +130,7 @@
                         <td>
                           <div class="dropdown">
                             <button class="btn btn-action" type="button" data-bs-toggle="dropdown"
-                              aria-expanded="false" tabindex="-1">
+                              aria-expanded="false" tabindex="-1" @if (auth('ebil')->user()->cannot('update-roles')) disabled @endif>
                               <i class="ti ti-dots"></i>
                             </button>
                             <ul class="dropdown-menu">
@@ -143,7 +147,9 @@
                 </table>
               </div>
               <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                @if (auth('ebil')->user()->can('update-roles'))
+                  <button type="submit" class="btn btn-primary">Simpan</button>
+                @endif
               </div>
             </form>
           </div>

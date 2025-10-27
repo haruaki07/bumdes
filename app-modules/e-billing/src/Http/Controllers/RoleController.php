@@ -5,13 +5,25 @@ namespace Modules\EBilling\Http\Controllers;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 
-class RoleController
+class RoleController implements HasMiddleware
 {
     protected $actions = ['read', 'create', 'update', 'delete'];
 
     protected $groupOrder = ['master_data', 'transactions', 'settings'];
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-roles,ebil', only: ['index', 'edit']),
+            new Middleware('permission:create-roles,ebil', only: ['create', 'store']),
+            new Middleware('permission:update-roles,ebil', only: ['update']),
+            new Middleware('permission:delete-roles,ebil', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a listing of the resource.

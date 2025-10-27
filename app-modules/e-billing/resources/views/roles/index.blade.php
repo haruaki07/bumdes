@@ -12,10 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.settings.roles.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah Role
-            </a>
+            @if (auth('ebil')->user()->can('create-roles'))
+              <a href="{{ route('e-billing.settings.roles.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah Role
+              </a>
+            @endif
           </div>
         </div>
       </div>
@@ -68,12 +70,13 @@
                         data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
                         <i class="ti ti-eye"></i>
                       </a>
-                      {{-- @endcan --}}
-                      <button class="btn btn-icon btn-danger"
-                        onclick="deleteConfirm('{{ route('e-billing.settings.roles.destroy', $role) }}')"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                        <i class="ti ti-trash"></i>
-                      </button>
+                      @if (auth('ebil')->user()->can('delete-roles'))
+                        <button class="btn btn-icon btn-danger"
+                          onclick="deleteConfirm('{{ route('e-billing.settings.roles.destroy', $role) }}')"
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      @endif
                     @else
                       <div style="height:36px"></div>
                     @endif
