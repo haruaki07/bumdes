@@ -4,14 +4,26 @@ namespace Modules\EBilling\Http\Controllers;
 
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Modules\EBilling\Enums\UserRole;
 use Modules\EBilling\Models\User;
 
-class UserController
+class UserController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-users,ebil', only: ['index', 'show']),
+            new Middleware('permission:create-users,ebil', only: ['create', 'store']),
+            new Middleware('permission:update-users,ebil', only: ['edit', 'update']),
+            new Middleware('permission:delete-users,ebil', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

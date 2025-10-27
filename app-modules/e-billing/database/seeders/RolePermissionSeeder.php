@@ -61,6 +61,12 @@ class RolePermissionSeeder extends Seeder
                     'update-roles' => 'Memperbarui Role',
                     'delete-roles' => 'Menghapus Role',
                 ],
+                'User' => [
+                    'read-users' => 'Melihat User',
+                    'create-users' => 'Membuat User',
+                    'update-users' => 'Memperbarui User',
+                    'delete-users' => 'Menghapus User',
+                ],
             ],
         ];
 

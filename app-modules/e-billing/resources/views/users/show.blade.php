@@ -12,9 +12,13 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.settings.users.edit', $user) }}" class="btn btn-warning">Edit</a>
-            <button class="btn btn-danger"
-              onclick="deleteConfirm('{{ route('e-billing.settings.users.destroy', $user) }}')">Hapus</button>
+            @if (auth('ebil')->user()->can('update-users'))
+              <a href="{{ route('e-billing.settings.users.edit', $user) }}" class="btn btn-warning">Edit</a>
+            @endif
+            @if (auth('ebil')->user()->can('delete-users'))
+              <button class="btn btn-danger"
+                onclick="deleteConfirm('{{ route('e-billing.settings.users.destroy', $user) }}')">Hapus</button>
+            @endif
             <a href="{{ route('e-billing.settings.users.index') }}" class="btn btn-secondary">Kembali</a>
           </div>
         </div>

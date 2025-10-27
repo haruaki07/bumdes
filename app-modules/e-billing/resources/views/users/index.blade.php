@@ -12,10 +12,12 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="{{ route('e-billing.settings.users.create') }}" class="btn btn-primary">
-              <i class="icon ti ti-plus"></i>
-              Tambah User
-            </a>
+            @if (auth('ebil')->user()->can('create-users'))
+              <a href="{{ route('e-billing.settings.users.create') }}" class="btn btn-primary">
+                <i class="icon ti ti-plus"></i>
+                Tambah User
+              </a>
+            @endif
           </div>
         </div>
       </div>
@@ -72,17 +74,19 @@
                       data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat detail">
                       <i class="ti ti-eye"></i>
                     </a>
-                    {{-- @can('update', $user) --}}
-                    <a href="{{ route('e-billing.settings.users.edit', $user) }}" class="btn btn-icon btn-warning"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    {{-- @endcan --}}
-                    <button class="btn btn-icon btn-danger"
-                      onclick="deleteConfirm('{{ route('e-billing.settings.users.destroy', $user) }}')"
-                      data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
-                      <i class="ti ti-trash"></i>
-                    </button>
+                    @if (auth('ebil')->user()->can('update-users'))
+                      <a href="{{ route('e-billing.settings.users.edit', $user) }}" class="btn btn-icon btn-warning"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    @endif
+                    @if (auth('ebil')->user()->can('delete-users'))
+                      <button class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm('{{ route('e-billing.settings.users.destroy', $user) }}')"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    @endif
                   </td>
                 </tr>
               @empty
