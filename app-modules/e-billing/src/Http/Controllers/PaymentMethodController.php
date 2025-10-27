@@ -3,13 +3,23 @@
 namespace Modules\EBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Modules\EBilling\Enums\PaymentMethodType;
 use Modules\EBilling\Models\PaymentMethod;
 
-class PaymentMethodController
+class PaymentMethodController implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:read-payment-methods,ebil', only: ['index', 'show']),
+            new Middleware('permission:update-payment-methods,ebil', only: ['update', 'updateStatus']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

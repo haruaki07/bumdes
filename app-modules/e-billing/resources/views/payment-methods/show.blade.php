@@ -1,6 +1,8 @@
 @php
   use Modules\EBilling\Enums\PaymentMethodType;
   use Modules\EBilling\Enums\PaymentMethodFeeType;
+
+  $canUpdate = auth('ebil')->user()->can('update-payment-methods');
 @endphp
 
 <x-e-billing::layouts.panel>
@@ -49,7 +51,8 @@
                         <label class="form-label required">Nama</label>
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                           value="{{ old('name') ?? $paymentMethod->name }}" required
-                          placeholder="Masukkan nama channel pembayaran">
+                          placeholder="Masukkan nama channel pembayaran"
+                          @if (!$canUpdate) readonly @endif>
                         @error('name')
                           <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -57,7 +60,8 @@
 
                       <div class="col-md-6 mb-3">
                         <label class="form-label">Kode Channel</label>
-                        <input type="text" readonly class="form-control" value="{{ $paymentMethod->code }}">
+                        <input type="text" readonly class="form-control" value="{{ $paymentMethod->code }}"
+                          @if (!$canUpdate) readonly @endif>
                       </div>
 
                       @if ($paymentMethod->type === PaymentMethodType::BANK_TRANSFER)
@@ -66,7 +70,8 @@
                           <input type="text" name="account_number"
                             class="form-control @error('account_number') is-invalid @enderror"
                             value="{{ old('account_number') ?? $paymentMethod->account_number }}"
-                            placeholder="Masukkan nomor rekening" required>
+                            placeholder="Masukkan nomor rekening" required
+                            @if (!$canUpdate) readonly @endif>
                           @error('account_number')
                             <div class="invalid-feedback">{{ $message }}</div>
                           @enderror
@@ -77,7 +82,8 @@
                         <div class="form-label">Status</div>
                         <label class="form-check form-switch">
                           <input class="form-check-input" type="checkbox" name="is_active"
-                            {{ $paymentMethod->is_active ? 'checked' : '' }} />
+                            {{ $paymentMethod->is_active ? 'checked' : '' }}
+                            @if (!$canUpdate) onclick="return false;" @endif />
                           <span
                             class="form-check-label">{{ $paymentMethod->is_active ? 'Aktif' : 'Tidak Aktif' }}</span>
                         </label>
@@ -95,24 +101,26 @@
                           <img src="{{ asset($paymentMethod->brand_logo) }}" alt="Logo {{ $paymentMethod->name }}"
                             class="img-fluid pt-3 pe-3 flex-shrink-0" style="height:5rem;object-fit:cover"
                             loading="lazy" id="brandLogoPreview" />
-                          <div class="d-flex flex-column">
-                            <button type="button" class="btn btn-icon mb-1 d-none" data-bs-toggle="tooltip"
-                              title="Reset Logo" data-bs-placement="top" id="brandLogoReset">
-                              <i class="ti ti-refresh"></i>
-                            </button>
-                            <label class="btn btn-icon" data-bs-toggle="tooltip" title="Ubah Logo"
-                              data-bs-placement="top">
-                              <i class="ti ti-edit"></i>
-                              <input type="file" name="brand_logo" class="d-none" accept=".jpg,.jpeg,.png,.svg"
-                                id="brandLogoInput">
-                            </label>
-                          </div>
+                          @if ($canUpdate)
+                            <div class="d-flex flex-column">
+                              <button type="button" class="btn btn-icon mb-1 d-none" data-bs-toggle="tooltip"
+                                title="Reset Logo" data-bs-placement="top" id="brandLogoReset">
+                                <i class="ti ti-refresh"></i>
+                              </button>
+                              <label class="btn btn-icon" data-bs-toggle="tooltip" title="Ubah Logo"
+                                data-bs-placement="top">
+                                <i class="ti ti-edit"></i>
+                                <input type="file" name="brand_logo" class="d-none" accept=".jpg,.jpeg,.png,.svg"
+                                  id="brandLogoInput">
+                              </label>
+                            </div>
+                          @endif
                         </div>
                       @else
                         <label class="form-label">Logo (opsional)</label>
                         <input type="file" name="brand_logo"
                           class="form-control form-dropzone @error('brand_logo') is-invalid @enderror"
-                          accept=".jpg,.jpeg,.png,.svg">
+                          accept=".jpg,.jpeg,.png,.svg" @if (!$canUpdate) disabled @endif>
                         @error('brand_logo')
                           <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -124,7 +132,8 @@
                 <div class="col-4">
                   <div class="mb-3">
                     <label class="form-label">Biaya Admin (opsional)</label>
-                    <select name="fee_type" id="fee_type" class="form-select">
+                    <select name="fee_type" id="fee_type" class="form-select"
+                      @if (!$canUpdate) disabled @endif>
                       @php $feeType = old('fee_type', $paymentMethod->fee_type ?? 'NONE'); @endphp
                       @foreach (PaymentMethodFeeType::cases() as $type)
                         <option value="{{ $type->value }}" {{ $feeType === $type ? 'selected' : '' }}>
@@ -140,7 +149,7 @@
                       <span class="input-group-text" id="feeAmountPrefix">Rp</span>
                       <input type="number" step="0.01" min="0" name="fee_amount"
                         value="{{ old('fee_amount', $paymentMethod->fee_amount) }}" class="form-control"
-                        placeholder="Masukkan nilai biaya">
+                        placeholder="Masukkan nilai biaya" @if (!$canUpdate) readonly @endif>
                       <span class="input-group-text d-none" id="feeAmountSuffix">%</span>
                     </div>
                     <small class="text-secondary" id="feeHelpText"></small>
@@ -150,14 +159,16 @@
                 <div class="mb-3">
                   <label class="form-label">Deskripsi (opsional)</label>
                   <textarea name="description" class="form-control @error('description') is-invalid @enderror"
-                    placeholder="Masukkan deskripsi channel pembayaran">{{ old('description') ?? $paymentMethod->description }}</textarea>
+                    placeholder="Masukkan deskripsi channel pembayaran" @if (!$canUpdate) readonly @endif>{{ old('description') ?? $paymentMethod->description }}</textarea>
                   @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
                 </div>
 
                 <div class="mt-4">
-                  <button type="submit" class="btn btn-primary">Simpan</button>
+                  @if ($canUpdate)
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                  @endif
                 </div>
               </form>
             </div>

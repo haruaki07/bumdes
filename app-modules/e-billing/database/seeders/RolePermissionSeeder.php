@@ -67,6 +67,10 @@ class RolePermissionSeeder extends Seeder
                     'update-users' => 'Memperbarui User',
                     'delete-users' => 'Menghapus User',
                 ],
+                'Metode Pembayaran' => [
+                    'read-payment-methods' => 'Melihat Metode Pembayaran',
+                    'update-payment-methods' => 'Memperbarui Metode Pembayaran',
+                ],
             ],
         ];
 

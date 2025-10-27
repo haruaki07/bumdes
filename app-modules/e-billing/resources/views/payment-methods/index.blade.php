@@ -68,7 +68,8 @@
                       @method('PATCH')
                       <label class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="is_active"
-                          {{ $paymentMethod->is_active ? 'checked' : '' }} />
+                          {{ $paymentMethod->is_active ? 'checked' : '' }}
+                          @if (auth('ebil')->user()->cannot('update-payment-methods')) onclick="return false;" @endif />
                         <span class="form-check-label">{{ $paymentMethod->is_active ? 'Aktif' : 'Tidak Aktif' }}</span>
                       </label>
                     </form>
