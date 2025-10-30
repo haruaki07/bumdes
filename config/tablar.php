@@ -146,19 +146,19 @@ return [
         [
             'text' => 'Home',
             'icon' => 'ti ti-home',
-            'url' => 'home',
+            'route' => 'dashboard',
         ],
 
         [
             'text' => 'Usaha',
             'icon' => 'ti ti-building',
-            'url' => 'businesses',
+            'route' => 'businesses.index',
         ],
 
         [
             'text' => 'Pengajuan Usaha',
             'icon' => 'ti ti-briefcase',
-            'url' => 'business-registrations',
+            'route' => 'business-registrations.index',
         ],
 
         // e-billing app
