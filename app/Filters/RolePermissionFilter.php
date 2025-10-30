@@ -3,6 +3,7 @@
 namespace App\Filters;
 
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
 use TakiElias\Tablar\Menu\Filters\FilterInterface;
 
 class RolePermissionFilter implements FilterInterface
@@ -19,7 +20,12 @@ class RolePermissionFilter implements FilterInterface
     protected function isVisible($item)
     {
         /** @var \Modules\EBilling\Models\User|\App\Models\User */
-        $user = $item['group'] === 'e-billing' ? Auth::guard('ebil')->user() : Auth::user();
+        $user = ($item['group'] ?? null) === 'e-billing' ? Auth::guard('ebil')->user() : Auth::user();
+
+        // If user model does not use HasRoles trait, bypass the filter
+        if (! in_array(HasRoles::class, class_uses_recursive($user))) {
+            return true;
+        }
 
         if ($user->hasRole('admin')) {
             return true;

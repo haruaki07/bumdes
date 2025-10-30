@@ -21,7 +21,11 @@ class EBillingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('admin') ? true : null;
+            if ($user instanceof \Modules\EBilling\Models\User) {
+                return $user->hasRole('admin') ? true : null;
+            }
+
+            return null;
         });
 
         // limit WhatsApp messages to 10 per minute
