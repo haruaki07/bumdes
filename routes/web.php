@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
+use App\Http\Controllers\BusinessTypeController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Business Management
     Route::resource('businesses', BusinessController::class);
-    // Route::resource('business-types', BusinessTypeController::class);
+    Route::resource('business-types', BusinessTypeController::class);
 
     // // Funding Management
     // Route::resource('funding-requests', FundingRequestController::class);

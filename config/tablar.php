@@ -156,6 +156,12 @@ return [
         ],
 
         [
+            'text' => 'Jenis Usaha',
+            'icon' => 'ti ti-category',
+            'route' => 'business-types.index',
+        ],
+
+        [
             'text' => 'Pengajuan Usaha',
             'icon' => 'ti ti-briefcase',
             'route' => 'business-registrations.index',
