@@ -21,7 +21,7 @@ class BusinessRegistrationController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $registrations = BusinessRegistration::with(['businessType', 'applicant', 'approver'])
+        $registrations = BusinessRegistration::with(['businessType' => fn ($query) => $query->withTrashed(), 'applicant', 'approver'])
             ->when($user->role === 'warga', function ($query) use ($user) {
                 $query->where('applicant_id', $user->id);
             })
@@ -93,7 +93,7 @@ class BusinessRegistrationController extends Controller
     {
         Gate::authorize('view', $businessRegistration);
 
-        $businessRegistration->load(['businessType', 'applicant', 'approver', 'timeline.performer', 'revisions']);
+        $businessRegistration->load(['businessType' => fn ($q) => $q->withTrashed(), 'applicant', 'approver', 'timeline.performer', 'revisions']);
 
         $timeline = $businessRegistration->getTimeline();
 
@@ -114,6 +114,12 @@ class BusinessRegistrationController extends Controller
     public function approve(BusinessRegistration $businessRegistration)
     {
         Gate::authorize('approve', $businessRegistration);
+
+        if ($businessRegistration->businessType->trashed()) {
+            return redirect()
+                ->route('business-registrations.show', $businessRegistration)
+                ->with('error', 'Tidak dapat menyetujui pengajuan karena jenis usaha sudah dihapus dari sistem.');
+        }
 
         DB::transaction(function () use ($businessRegistration) {
             $businessRegistration->update([
@@ -176,6 +182,8 @@ class BusinessRegistrationController extends Controller
 
     public function revise(BusinessRegistration $businessRegistration)
     {
+        $businessRegistration->load(['businessType' => fn ($q) => $q->withTrashed()]);
+
         Gate::authorize('revise', $businessRegistration);
 
         $businessTypes = BusinessType::where('is_active', true)->get();

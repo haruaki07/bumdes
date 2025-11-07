@@ -16,10 +16,12 @@
           <div class="btn-list">
             @if ($businessRegistration->status === 'pending' && $businessRegistration->canBeRevised())
               @can('approve', $businessRegistration)
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
-                  <i class="icon ti ti-check"></i>
-                  Setujui Pengajuan
-                </button>
+                @if (!$businessRegistration->businessType->trashed())
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                    <i class="icon ti ti-check"></i>
+                    Setujui Pengajuan
+                  </button>
+                @endif
               @endcan
               @can('reject', $businessRegistration)
                 <button type="button" class="btn btn-danger d-inline-block" data-bs-toggle="modal"
@@ -61,7 +63,12 @@
 
                 <div class="datagrid-item">
                   <div class="datagrid-title">Jenis Usaha</div>
-                  <div class="datagrid-content">{{ $businessRegistration->businessType->name }}</div>
+                  <div class="datagrid-content">
+                    {{ $businessRegistration->businessType->name }}
+                    @if ($businessRegistration->businessType->trashed())
+                      <x-common.badge color="danger" label="Dihapus" light class="ms-1" />
+                    @endif
+                  </div>
                 </div>
 
                 <div class="datagrid-item">

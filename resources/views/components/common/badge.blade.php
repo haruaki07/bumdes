@@ -12,6 +12,6 @@
   $bgClass = $light ? "bg-{$color}-lt text-{$color}-lt-fg" : "bg-{$color} text-{$color}-fg";
 @endphp
 
-<span class="badge {{ $bgClass }}">
+<span {{ $attributes->class(['badge', $bgClass]) }}>
   {{ $label }}
 </span>
