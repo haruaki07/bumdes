@@ -167,6 +167,12 @@ return [
             'route' => 'business-registrations.index',
         ],
 
+        [
+            'text' => 'Manajemen User',
+            'icon' => 'ti ti-users',
+            'route' => 'users.index',
+        ],
+
         // e-billing app
         [
             'group' => 'e-billing',

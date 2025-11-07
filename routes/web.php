@@ -4,6 +4,7 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
 use App\Http\Controllers\BusinessTypeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('business-types', BusinessTypeController::class);
     Route::put('/business-types/{id}/restore', [BusinessTypeController::class, 'restore'])->name('business-types.restore');
     Route::delete('/business-types/{id}/destroy-trashed', [BusinessTypeController::class, 'destroyTrashed'])->name('business-types.destroy-trashed');
+
+    // User Management
+    Route::resource('users', UserController::class);
 
     // // Funding Management
     // Route::resource('funding-requests', FundingRequestController::class);
