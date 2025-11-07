@@ -173,6 +173,12 @@ return [
             'route' => 'users.index',
         ],
 
+        [
+            'text' => 'Manajemen Role',
+            'icon' => 'ti ti-shield-lock',
+            'route' => 'roles.index',
+        ],
+
         // e-billing app
         [
             'group' => 'e-billing',

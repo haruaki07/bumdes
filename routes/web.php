@@ -4,6 +4,7 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
 use App\Http\Controllers\BusinessTypeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
 
     // User Management
     Route::resource('users', UserController::class);
+
+    // Role Management
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
     // // Funding Management
     // Route::resource('funding-requests', FundingRequestController::class);
