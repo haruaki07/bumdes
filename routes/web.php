@@ -24,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     // Business Management
     Route::resource('businesses', BusinessController::class);
     Route::resource('business-types', BusinessTypeController::class);
+    Route::put('/business-types/{id}/restore', [BusinessTypeController::class, 'restore'])->name('business-types.restore');
+    Route::delete('/business-types/{id}/destroy-trashed', [BusinessTypeController::class, 'destroyTrashed'])->name('business-types.destroy-trashed');
 
     // // Funding Management
     // Route::resource('funding-requests', FundingRequestController::class);

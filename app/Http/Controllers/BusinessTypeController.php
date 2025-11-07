@@ -12,7 +12,13 @@ class BusinessTypeController extends Controller
 
     public function index(Request $request)
     {
-        $businessTypes = BusinessType::withCount('businesses')->datatable();
+        $businessTypes = BusinessType::withCount('businesses');
+
+        if ($request->filled('archive') && $request->archive == 'true') {
+            $businessTypes->onlyTrashed();
+        }
+
+        $businessTypes = $businessTypes->datatable();
 
         return view('business-types.index', compact('businessTypes'));
     }
@@ -82,7 +88,7 @@ class BusinessTypeController extends Controller
     {
         Gate::authorize('delete', $businessType);
 
-        if ($businessType->businesses()->count() > 0) {
+        if (! $businessType->trashed() && $businessType->businesses()->count() > 0) {
             return redirect()
                 ->route('business-types.index')
                 ->with('error', 'Jenis usaha tidak dapat dihapus karena masih memiliki usaha terkait.');
@@ -93,5 +99,45 @@ class BusinessTypeController extends Controller
         return redirect()
             ->route('business-types.index')
             ->with('success', 'Jenis usaha berhasil dihapus.');
+    }
+
+    /**
+     * Permanently delete a trashed business type.
+     */
+    public function destroyTrashed(int $id)
+    {
+        $businessType = BusinessType::onlyTrashed()->findOrFail($id);
+
+        Gate::authorize('delete', $businessType);
+
+        if (! $businessType) {
+            return back()->with('error', 'Jenis usaha tidak ditemukan atau belum diarsipkan.');
+        }
+
+        if ($businessType->businesses()->count() > 0 || $businessType->businessRegistrations()->count() > 0) {
+            return back()->with('error', 'Jenis usaha tidak dapat dihapus secara permanen karena masih memiliki usaha atau pendaftaran usaha terkait.');
+        }
+
+        $businessType->forceDelete();
+
+        return back()->with('success', 'Jenis usaha berhasil dihapus secara permanen.');
+    }
+
+    /**
+     * Restore a trashed business type.
+     */
+    public function restore(int $id)
+    {
+        $businessType = BusinessType::onlyTrashed()->findOrFail($id);
+
+        Gate::authorize('update', $businessType);
+
+        if (! $businessType) {
+            return back()->with('error', 'Jenis usaha tidak ditemukan atau belum diarsipkan.');
+        }
+
+        $businessType->restore();
+
+        return redirect()->route('business-types.index')->with('success', 'Jenis usaha berhasil dipulihkan.');
     }
 }

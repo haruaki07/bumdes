@@ -36,4 +36,9 @@ class BusinessType extends Model
     {
         return $this->hasMany(Business::class);
     }
+
+    public function businessRegistrations(): HasMany
+    {
+        return $this->hasMany(BusinessRegistration::class);
+    }
 }

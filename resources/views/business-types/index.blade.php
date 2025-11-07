@@ -31,7 +31,22 @@
       @include('tablar::common.alert')
       <div class="row row-deck row-cards">
         <div class="col-12">
-          <x-datatable tableId="businessTypesTable" title="Daftar Jenis Usaha" :data="$businessTypes">
+          <x-datatable tableId="businessTypesTable" :data="$businessTypes">
+            <x-slot:title>
+              <div class="d-flex align-items-center">
+                <span>Daftar Jenis Usaha</span>
+                <div class="d-flex gap-2 align-items-center ms-3 text-muted">
+                  <a class="btn btn-link fs-5 p-0 m-0 {{ request()->archive == null ? 'disabled' : '' }}"
+                    href="{{ route('business-types.index') }}">
+                    Semua
+                  </a>
+                  <a class="btn btn-link fs-5 p-0 m-0 {{ request()->archive == 'true' ? 'disabled' : '' }}"
+                    href="{{ route('business-types.index', ['archive' => 'true']) }}">
+                    Arsip
+                  </a>
+                </div>
+              </div>
+            </x-slot>
             <x-slot:thead>
               <tr>
                 <x-sortable-header field="name" label="Nama Jenis Usaha" />
@@ -60,24 +75,61 @@
                   </td>
                   <td>{{ $businessType->created_at->format('d M Y H:i') }}</td>
                   <td>
-                    <div class="btn-list flex-nowrap">
-                      @can('view', $businessType)
-                        <a href="{{ route('business-types.show', $businessType) }}" class="btn btn-icon btn-primary">
-                          <i class="ti ti-eye"></i>
-                        </a>
-                      @endcan
-                      @can('update', $businessType)
-                        <a href="{{ route('business-types.edit', $businessType) }}" class="btn btn-icon btn-warning">
-                          <i class="ti ti-edit"></i>
-                        </a>
-                      @endcan
-                      @can('delete', $businessType)
-                        <button type="button" class="btn btn-icon btn-danger"
-                          onclick="deleteConfirm('{{ route('business-types.destroy', $businessType) }}', 'DELETE', {message: 'Apakah Anda yakin ingin menghapus jenis usaha ini?'})">
-                          <i class="ti ti-trash"></i>
-                        </button>
-                      @endcan
-                    </div>
+                    @if (request()->archive != 'true')
+                      <div class="btn-list flex-nowrap">
+                        @can('view', $businessType)
+                          <a href="{{ route('business-types.show', $businessType) }}" class="btn btn-icon btn-primary">
+                            <i class="ti ti-eye"></i>
+                          </a>
+                        @endcan
+                        @can('update', $businessType)
+                          <a href="{{ route('business-types.edit', $businessType) }}" class="btn btn-icon btn-warning">
+                            <i class="ti ti-edit"></i>
+                          </a>
+                        @endcan
+                        @can('delete', $businessType)
+                          <button type="button" class="btn btn-icon btn-danger"
+                            onclick="deleteConfirm('{{ route('business-types.destroy', $businessType) }}', 'DELETE', {message: 'Data jenis usaha akan disembunyikan dari daftar aktif dan dapat dipulihkan kapan saja melalui menu Arsip.'})">
+                            <i class="ti ti-trash"></i>
+                          </button>
+                        @endcan
+                      </div>
+                    @else
+                      <div class="btn-list flex-nowrap">
+                        @can('update', $businessType)
+                          <button type="button" class="btn btn-icon btn-primary"
+                            onclick="deleteConfirm(
+                              '{{ route('business-types.restore', ['id' => $businessType->id]) }}',
+                              'PUT',
+                              {
+                                title: 'Pulihkan Jenis Usaha?',
+                                message: '<p>Data jenis usaha akan dipulihkan dan muncul kembali di daftar aktif.</p>',
+                                buttons: {
+                                  cancel: { label: 'Batal' },
+                                  confirm: { label: 'Pulihkan', className: 'btn-primary' },
+                                }
+                              }
+                            )"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Pulihkan">
+                            <i class="ti ti-restore"></i>
+                          </button>
+                        @endcan
+                        @can('delete', $businessType)
+                          <button type="button" class="btn btn-icon btn-danger"
+                            onclick="deleteConfirm(
+                              '{{ route('business-types.destroy-trashed', ['id' => $businessType->id]) }}',
+                              'DELETE',
+                              {
+                                title: 'Hapus Permanen Jenis Usaha?',
+                                message: '<p>Data jenis usaha akan dihapus <b>secara permanen</b> dan <b>tidak dapat dipulihkan</b>.</p>'
+                              }
+                            )"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Permanen">
+                            <i class="ti ti-trash"></i>
+                          </button>
+                        @endcan
+                      </div>
+                    @endif
                   </td>
                 </tr>
               @empty

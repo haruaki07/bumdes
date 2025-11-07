@@ -30,6 +30,9 @@
                 Hapus
               </button>
             @endcan
+            <a href="{{ route('business-types.index') }}" class="btn btn-secondary">
+              Kembali
+            </a>
           </div>
         </div>
       </div>
