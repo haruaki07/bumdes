@@ -99,6 +99,21 @@
                 </div>
 
                 <div class="datagrid-item">
+                  <div class="datagrid-title">Dokumen Pendukung</div>
+                  <div class="datagrid-content">
+                    @if ($businessRegistration->document_url)
+                      <a href="{{ Storage::url($businessRegistration->document_url) }}" target="_blank"
+                        class="btn btn-sm btn-primary">
+                        <i class="icon ti ti-xs ti-file-download"></i>
+                        Download Dokumen
+                      </a>
+                    @else
+                      <span class="text-muted">Tidak ada dokumen</span>
+                    @endif
+                  </div>
+                </div>
+
+                <div class="datagrid-item">
                   <div class="datagrid-title">Tanggal Pengajuan</div>
                   <div class="datagrid-content">
                     {{ $businessRegistration->created_at->format('d/m/Y H:i') }}</div>

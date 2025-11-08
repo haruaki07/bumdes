@@ -7,6 +7,7 @@ use App\Models\BusinessType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class BusinessController extends Controller
 {
@@ -44,7 +45,18 @@ class BusinessController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'contact_phone' => ['required', 'string', 'max:20'],
             'contact_email' => ['nullable', 'email', 'max:255'],
+            'document' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,png', 'max:5120'], // 5MB max
         ]);
+
+        // Handle document upload if provided
+        if ($request->hasFile('document')) {
+            $document_url = Storage::disk('public')->putFileAs(
+                'business_documents',
+                $request->document,
+                Auth::id().'_'.time().'_'.$request->document->getClientOriginalName()
+            );
+            $validated['document_url'] = $document_url;
+        }
 
         $validated['owner_id'] = Auth::id();
         $validated['status'] = 'active';
@@ -84,10 +96,26 @@ class BusinessController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'contact_phone' => ['required', 'string', 'max:20'],
             'contact_email' => ['nullable', 'email', 'max:255'],
+            'document' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,png', 'max:5120'], // 5MB max
         ]);
 
         if ($request->has('name') && (Auth::user()->role === 'admin' || Auth::user()->role === 'operator')) {
             $validated['name'] = $request->validate(['name' => ['required', 'string', 'max:255']])['name'];
+        }
+
+        // Handle document upload if provided
+        if ($request->hasFile('document')) {
+            // Delete old document if exists
+            if ($business->document_url) {
+                Storage::disk('public')->delete($business->document_url);
+            }
+
+            $document_url = Storage::disk('public')->putFileAs(
+                'business_documents',
+                $request->document,
+                Auth::id().'_'.time().'_'.$request->document->getClientOriginalName()
+            );
+            $validated['document_url'] = $document_url;
         }
 
         $business->update($validated);

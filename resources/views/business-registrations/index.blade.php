@@ -39,6 +39,7 @@
                 <x-sortable-header field="applicant.name" label="Pemohon" />
                 <x-sortable-header field="location" label="Lokasi" />
                 <x-sortable-header field="status" label="Status" />
+                <th>Dokumen</th>
                 <x-sortable-header field="created_at" label="Tanggal Pengajuan" />
                 <th>Aksi</th>
               </tr>
@@ -54,6 +55,13 @@
                   <td>
                     <x-modules.business-registration.status-badge :status="$registration->status" />
                   </td>
+                  <td class="text-center">
+                    @if ($registration->document_url)
+                      <i class="icon ti ti-file-check text-success" title="Dokumen tersedia"></i>
+                    @else
+                      <i class="icon ti ti-file-off text-muted" title="Tidak ada dokumen"></i>
+                    @endif
+                  </td>
                   <td>{{ $registration->created_at->format('d M Y H:i') }}</td>
                   <td>
                     <div class="btn-list flex-nowrap">
@@ -68,7 +76,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="7" class="text-center">Tidak ada data pengajuan usaha.</td>
+                  <td colspan="8" class="text-center">Tidak ada data pengajuan usaha.</td>
                 </tr>
               @endforelse
             </x-slot>

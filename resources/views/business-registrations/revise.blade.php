@@ -74,6 +74,18 @@
                   </div>
                 </div>
               </div>
+              @if ($businessRegistration->document_url)
+                <div class="mb-3">
+                  <label class="form-label">Dokumen Pendukung (Asli)</label>
+                  <div>
+                    <a href="{{ Storage::url($businessRegistration->document_url) }}" target="_blank"
+                      class="btn btn-sm btn-primary">
+                      <i class="icon ti ti-xs ti-file-download"></i>
+                      Download Dokumen
+                    </a>
+                  </div>
+                </div>
+              @endif
               @if ($businessRegistration->rejection_reason)
                 <div class="alert alert-danger">
                   <h4 class="alert-title">Alasan Penolakan:</h4>
@@ -95,7 +107,8 @@
               </div>
             </div>
             <div class="card-body">
-              <form action="{{ route('business-registrations.store-revision', $businessRegistration) }}" method="POST">
+              <form action="{{ route('business-registrations.store-revision', $businessRegistration) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                   <div class="col-md-6">
@@ -142,7 +155,8 @@
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label class="form-label required">Lokasi</label>
-                      <input type="text" name="location" class="form-control @error('location') is-invalid @enderror"
+                      <input type="text" name="location"
+                        class="form-control @error('location') is-invalid @enderror"
                         value="{{ old('location', $businessRegistration->location) }}" required
                         placeholder="Alamat lokasi usaha">
                       @error('location')
@@ -171,6 +185,18 @@
                     value="{{ old('contact_email', $businessRegistration->contact_email) }}"
                     placeholder="Email (opsional)">
                   @error('contact_email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Dokumen Pendukung (Opsional)</label>
+                  <input type="file" name="document"
+                    class="form-control form-dropzone @error('document') is-invalid @enderror"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                  <small class="form-hint">Upload dokumen baru jika ingin mengganti dokumen sebelumnya. Format: PDF, DOC,
+                    DOCX, JPG, PNG. Max: 5MB</small>
+                  @error('document')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
                 </div>
@@ -237,3 +263,11 @@
     </div>
   </div>
 @endsection
+
+@push('js')
+  <script type="module">
+    new Dropzone(".form-dropzone", {
+      maxFileSize: 5 * 1024 * 1024,
+    });
+  </script>
+@endpush

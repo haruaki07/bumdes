@@ -209,7 +209,21 @@ class BusinessRegistrationController extends Controller
                 'location' => ['required', 'string', 'max:255'],
                 'contact_phone' => ['required', 'string', 'max:20'],
                 'contact_email' => ['nullable', 'email', 'max:255'],
+                'document' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,png', 'max:5120'], // 5MB max
             ]);
+
+            // Handle document upload if provided
+            if ($request->hasFile('document')) {
+                $document_url = Storage::disk('public')->putFileAs(
+                    'business_documents',
+                    $request->document,
+                    Auth::id().'_'.time().'_'.$request->document->getClientOriginalName()
+                );
+                $data['document_url'] = $document_url;
+            } else {
+                // Keep the old document if no new document is uploaded
+                $data['document_url'] = $businessRegistration->document_url;
+            }
 
             $data['applicant_id'] = Auth::id();
             $data['status'] = 'pending';

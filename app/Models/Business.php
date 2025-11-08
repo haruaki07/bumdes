@@ -24,6 +24,7 @@ class Business extends Model
         'location',
         'contact_phone',
         'contact_email',
+        'document_url',
         'status',
         'rejection_reason',
         'name_change_request',
