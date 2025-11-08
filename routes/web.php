@@ -10,18 +10,26 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('home'));
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::middleware(['auth'])->group(function () {
+    // Profile Completion
+    Route::get('/profile/complete', [\App\Http\Controllers\ProfileController::class, 'complete'])->name('profile.complete');
+    Route::post('/profile/complete', [\App\Http\Controllers\ProfileController::class, 'store'])->name('profile.store');
+    Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Business Registration Management
-    Route::resource('business-registrations', BusinessRegistrationController::class)->except(['edit', 'update']);
-    Route::post('/business-registrations/{businessRegistration}/approve', [BusinessRegistrationController::class, 'approve'])->name('business-registrations.approve');
-    Route::post('/business-registrations/{businessRegistration}/reject', [BusinessRegistrationController::class, 'reject'])->name('business-registrations.reject');
-    Route::get('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'revise'])->name('business-registrations.revise');
-    Route::post('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'storeRevision'])->name('business-registrations.store-revision');
+    // Business Registration Management (requires verified email and completed profile)
+    Route::middleware(['profile.completed'])->group(function () {
+        Route::resource('business-registrations', BusinessRegistrationController::class)->except(['edit', 'update']);
+        Route::post('/business-registrations/{businessRegistration}/approve', [BusinessRegistrationController::class, 'approve'])->name('business-registrations.approve');
+        Route::post('/business-registrations/{businessRegistration}/reject', [BusinessRegistrationController::class, 'reject'])->name('business-registrations.reject');
+        Route::get('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'revise'])->name('business-registrations.revise');
+        Route::post('/business-registrations/{businessRegistration}/revise', [BusinessRegistrationController::class, 'storeRevision'])->name('business-registrations.store-revision');
+    });
 
     // Business Management
     Route::resource('businesses', BusinessController::class);
