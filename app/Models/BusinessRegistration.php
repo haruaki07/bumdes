@@ -94,6 +94,16 @@ class BusinessRegistration extends Model
         return ! is_null($this->parent_id);
     }
 
+    public function hasRevisions(): bool
+    {
+        return $this->revisions()->count() > 0;
+    }
+
+    public function getRevision(): ?self
+    {
+        return $this->revisions()->orderBy('created_at', 'desc')->first();
+    }
+
     public function getRootRegistration(): self
     {
         if ($this->isRevision()) {

@@ -155,6 +155,18 @@
                     </div>
                   </div>
                 @endif
+
+                @if ($businessRegistration->hasRevisions())
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">Revisi</div>
+                    <div class="datagrid-content">
+                      <a href="{{ route('business-registrations.show', $businessRegistration->getRevision()) }}"
+                        class="btn btn-sm btn-info">
+                        Lihat Revisi Terbaru
+                      </a>
+                    </div>
+                  </div>
+                @endif
               </div>
 
               <div class="mt-4">
