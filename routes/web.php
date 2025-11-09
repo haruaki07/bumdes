@@ -54,22 +54,4 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/funding-requests/{fundingRequest}/repayments', [\App\Http\Controllers\FundingRequestController::class, 'storeRepayment'])->name('funding-requests.repayments.store');
         Route::post('/repayments/{repayment}/verify', [\App\Http\Controllers\FundingRequestController::class, 'verifyRepayment'])->name('repayments.verify');
     });
-
-    // // Internet Service Management
-    // Route::resource('internet-services', InternetServiceController::class);
-    // Route::post('/internet-services/{internet_service}/suspend', [InternetServiceController::class, 'suspend'])->name('internet-services.suspend');
-    // Route::post('/internet-services/{internet_service}/activate', [InternetServiceController::class, 'activate'])->name('internet-services.activate');
-    // Route::resource('internet-payments', InternetPaymentController::class);
-
-    // // SAMSAT Management
-    // Route::resource('samsat-transactions', SamsatTransactionController::class);
-    // Route::get('/samsat-reports/monthly', [SamsatTransactionController::class, 'monthlyReport'])->name('samsat-reports.monthly');
-
-    // // Reports
-    // Route::prefix('reports')->name('reports.')->group(function () {
-    //   Route::get('/business', [DashboardController::class, 'businessReport'])->name('business');
-    //   Route::get('/funding', [DashboardController::class, 'fundingReport'])->name('funding');
-    //   Route::get('/internet', [DashboardController::class, 'internetReport'])->name('internet');
-    //   Route::get('/samsat', [DashboardController::class, 'samsatReport'])->name('samsat');
-    // });
 });
