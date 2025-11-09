@@ -138,6 +138,7 @@ class BusinessRegistrationController extends Controller
                 'location' => $businessRegistration->location,
                 'contact_phone' => $businessRegistration->contact_phone,
                 'contact_email' => $businessRegistration->contact_email,
+                'document_url' => $businessRegistration->document_url,
                 'status' => BusinessStatus::ACTIVE,
             ]);
 

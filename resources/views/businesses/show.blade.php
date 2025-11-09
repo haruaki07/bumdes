@@ -98,7 +98,7 @@
                     @if ($business->document_url)
                       <a href="{{ Storage::url($business->document_url) }}" target="_blank"
                         class="btn btn-sm btn-primary">
-                        <i class="icon ti ti-file-download"></i>
+                        <i class="icon ti ti-xs ti-file-download"></i>
                         Download Dokumen
                       </a>
                     @else

@@ -23,6 +23,10 @@ class EnsureProfileIsCompleted
             return redirect()->route('login');
         }
 
+        if ($user->role === 'admin' || $user->role === 'operator') {
+            return $next($request);
+        }
+
         // Check if email is verified
         if (! $user->hasVerifiedEmail()) {
             return redirect()->route('verification.notice')
