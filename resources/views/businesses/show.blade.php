@@ -15,16 +15,6 @@
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
             @if ($business->status === 'pending')
-              @can('approve', $business)
-                <form action="{{ route('businesses.approve', $business) }}" method="POST" class="d-inline">
-                  @csrf
-                  <button type="submit" class="btn btn-success"
-                    onclick="return confirm('Apakah Anda yakin ingin menyetujui usaha ini?')">
-                    <i class="icon ti ti-check"></i>
-                    Setujui Usaha
-                  </button>
-                </form>
-              @endcan
               @can('reject', $business)
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
                   <i class="icon ti ti-x"></i>
@@ -169,48 +159,4 @@
       </div>
     </div>
   </div>
-
-  @if ($business->status === 'pending')
-    @can('reject', $business)
-      <!-- Reject Modal -->
-      <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <form action="{{ route('businesses.reject', $business) }}" method="POST">
-              @csrf
-              <div class="modal-header">
-                <h5 class="modal-title" id="rejectModalLabel">Tolak Usaha</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p>Apakah Anda yakin ingin menolak usaha <strong>{{ $business->name }}</strong>?</p>
-                <div class="mb-3">
-                  <label for="rejection_reason" class="form-label">Alasan Penolakan <span
-                      class="text-danger">*</span></label>
-                  <textarea class="form-control @error('rejection_reason') is-invalid @enderror" id="rejection_reason"
-                    name="rejection_reason" rows="4" required placeholder="Masukkan alasan penolakan...">{{ old('rejection_reason') }}</textarea>
-                  @error('rejection_reason')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                  @enderror
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-danger">Tolak Usaha</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    @endcan
-  @endif
-
-  @if ($errors->has('rejection_reason'))
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
-        rejectModal.show();
-      });
-    </script>
-  @endif
 @endsection
