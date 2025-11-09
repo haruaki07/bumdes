@@ -43,13 +43,17 @@ Route::middleware(['auth'])->group(function () {
     // Role Management
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
-    // // Funding Management
-    // Route::resource('funding-requests', FundingRequestController::class);
-    // Route::post('/funding-requests/{funding_request}/approve', [FundingRequestController::class, 'approve'])->name('funding-requests.approve');
-    // Route::post('/funding-requests/{funding_request}/reject', [FundingRequestController::class, 'reject'])->name('funding-requests.reject');
-    // Route::post('/funding-requests/{funding_request}/disburse', [FundingRequestController::class, 'disburse'])->name('funding-requests.disburse');
-    // Route::post('/funding-requests/{funding_request}/upload-mou', [FundingRequestController::class, 'uploadMou'])->name('funding-requests.upload-mou');
-    // Route::post('/funding-requests/{funding_request}/approve-mou', [FundingRequestController::class, 'approveMou'])->name('funding-requests.approve-mou');
+    // Funding Management
+    Route::middleware(['profile.completed'])->group(function () {
+        Route::resource('funding-requests', \App\Http\Controllers\FundingRequestController::class);
+        Route::post('/funding-requests/{fundingRequest}/approve', [\App\Http\Controllers\FundingRequestController::class, 'approve'])->name('funding-requests.approve');
+        Route::post('/funding-requests/{fundingRequest}/reject', [\App\Http\Controllers\FundingRequestController::class, 'reject'])->name('funding-requests.reject');
+        Route::post('/funding-requests/{fundingRequest}/upload-mou', [\App\Http\Controllers\FundingRequestController::class, 'uploadMou'])->name('funding-requests.upload-mou');
+        Route::post('/funding-requests/{fundingRequest}/sign-mou', [\App\Http\Controllers\FundingRequestController::class, 'signMou'])->name('funding-requests.sign-mou');
+        Route::post('/funding-requests/{fundingRequest}/disburse', [\App\Http\Controllers\FundingRequestController::class, 'disburse'])->name('funding-requests.disburse');
+        Route::post('/funding-requests/{fundingRequest}/repayments', [\App\Http\Controllers\FundingRequestController::class, 'storeRepayment'])->name('funding-requests.repayments.store');
+        Route::post('/repayments/{repayment}/verify', [\App\Http\Controllers\FundingRequestController::class, 'verifyRepayment'])->name('repayments.verify');
+    });
 
     // // Internet Service Management
     // Route::resource('internet-services', InternetServiceController::class);

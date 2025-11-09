@@ -124,34 +124,27 @@
               <div class="card-header">
                 <h3 class="card-title">Riwayat Pengajuan Dana</h3>
               </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-vcenter card-table">
-                    <thead>
+              <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Jumlah</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($business->fundingRequests()->orderBy('created_at', 'desc')->get() as $request)
                       <tr>
-                        <th>Tanggal</th>
-                        <th>Jumlah</th>
-                        <th>Tujuan</th>
-                        <th>Status</th>
+                        <td>{{ $request->created_at->format('d/m/Y') }}</td>
+                        <td>Rp {{ number_format($request->amount, 0, ',', '.') }}</td>
+                        <td>
+                          <x-modules.funding-request.status-badge :status="$request->status" />
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      @foreach ($business->fundingRequests as $request)
-                        <tr>
-                          <td>{{ $request->created_at->format('d/m/Y') }}</td>
-                          <td>Rp {{ number_format($request->amount, 0, ',', '.') }}</td>
-                          <td>{{ $request->purpose }}</td>
-                          <td>
-                            <span
-                              class="badge bg-{{ $request->status === 'approved' ? 'success' : ($request->status === 'rejected' ? 'danger' : 'warning') }}">
-                              {{ ucfirst($request->status) }}
-                            </span>
-                          </td>
-                        </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
+                    @endforeach
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

@@ -84,4 +84,44 @@ class User extends Authenticatable implements MustVerifyEmail
             && ! empty($this->wargaProfile->phone)
             && ! empty($this->wargaProfile->address);
     }
+
+    /**
+     * Get the funding requests submitted by this user.
+     */
+    public function fundingRequests()
+    {
+        return $this->hasMany(FundingRequest::class);
+    }
+
+    /**
+     * Get the funding requests approved by this user (admin/operator).
+     */
+    public function approvedFundingRequests()
+    {
+        return $this->hasMany(FundingRequest::class, 'approved_by');
+    }
+
+    /**
+     * Get the funding requests rejected by this user (admin/operator).
+     */
+    public function rejectedFundingRequests()
+    {
+        return $this->hasMany(FundingRequest::class, 'rejected_by');
+    }
+
+    /**
+     * Get the disbursements made by this user (operator).
+     */
+    public function disbursements()
+    {
+        return $this->hasMany(FundingDisbursement::class, 'disbursed_by');
+    }
+
+    /**
+     * Get the repayments verified by this user (operator).
+     */
+    public function verifiedRepayments()
+    {
+        return $this->hasMany(FundingRepayment::class, 'verified_by');
+    }
 }

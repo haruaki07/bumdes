@@ -168,6 +168,12 @@ return [
         ],
 
         [
+            'text' => 'Pengajuan Pendanaan',
+            'icon' => 'ti ti-cash',
+            'route' => 'funding-requests.index',
+        ],
+
+        [
             'text' => 'Manajemen User',
             'icon' => 'ti ti-users',
             'route' => 'users.index',

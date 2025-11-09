@@ -22,7 +22,7 @@ class ProfileController extends Controller
 
         // Redirect if profile is already completed
         if ($user->hasCompletedProfile()) {
-            return redirect()->route('home')->with('info', 'Profil Anda sudah lengkap.');
+            return redirect()->route('dashboard')->with('info', 'Profil Anda sudah lengkap.');
         }
 
         $profile = $user->wargaProfile;
@@ -43,7 +43,7 @@ class ProfileController extends Controller
             $request->validated()
         );
 
-        return redirect()->route('home')->with('success', 'Profil berhasil dilengkapi!');
+        return redirect()->route('dashboard')->with('success', 'Profil berhasil dilengkapi!');
     }
 
     /**
