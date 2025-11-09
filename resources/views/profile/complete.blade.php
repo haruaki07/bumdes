@@ -18,6 +18,8 @@
 
   <div class="page-body">
     <div class="container-xl">
+      @include('tablar::common.alert')
+
       <div class="row row-cards">
         <div class="col-md-12">
           <form action="{{ route('profile.store') }}" method="POST" class="card">

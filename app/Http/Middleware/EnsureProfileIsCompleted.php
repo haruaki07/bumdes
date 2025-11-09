@@ -36,7 +36,7 @@ class EnsureProfileIsCompleted
         // Check if profile is completed
         if (! $user->hasCompletedProfile()) {
             return redirect()->route('profile.complete')
-                ->with('warning', 'Silakan lengkapi profil Anda terlebih dahulu untuk mengakses fitur ini.');
+                ->with('warning', 'Silakan lengkapi profil Anda terlebih dahulu untuk mengakses fitur lebih lanjut.');
         }
 
         return $next($request);

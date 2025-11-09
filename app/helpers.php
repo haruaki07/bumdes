@@ -19,16 +19,22 @@ if (! function_exists('get_initials')) {
      */
     function get_initials(string $name): string
     {
-        $words = preg_split('/\s+/', trim($name));
-
-        if (empty($words)) {
-            return '';
+        $words = explode(' ', $name);
+        if (count($words) >= 2) {
+            return mb_strtoupper(
+                mb_substr($words[0], 0, 1, 'UTF-8').
+                    mb_substr(end($words), 0, 1, 'UTF-8'),
+                'UTF-8'
+            );
         }
 
-        $firstInitial = strtoupper($words[0][0]);
-        $lastInitial = strtoupper($words[count($words) - 1][0]);
+        preg_match_all('#([A-Z]+)#', $name, $capitals);
 
-        return $firstInitial.$lastInitial;
+        if (count($capitals[1]) >= 2) {
+            return mb_substr(implode('', $capitals[1]), 0, 2, 'UTF-8');
+        }
+
+        return mb_strtoupper(mb_substr($name, 0, 2, 'UTF-8'), 'UTF-8');
     }
 }
 

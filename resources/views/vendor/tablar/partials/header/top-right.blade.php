@@ -36,10 +36,21 @@
       @if ($guard === 'ebil')
         @php($settings_url = route('e-billing.settings.show', ['group' => 'account']))
       @else
-        @php($settings_url = '#')
+        @php($settings_url = route('profile.edit'))
       @endif
 
-      <a href="{{ $settings_url }}" class="dropdown-item">Pengaturan</a>
+      <a href="{{ $settings_url }}" class="dropdown-item">
+        <i class="ti ti-user icon"></i>
+        Profil
+      </a>
+
+      @if ($guard === 'ebil')
+        <a href="{{ route('e-billing.settings.show', ['group' => 'account']) }}" class="dropdown-item">
+          <i class="ti ti-settings icon"></i>
+          Pengaturan
+        </a>
+      @endif
+
       <div class="dropdown-divider"></div>
 
       <a class="dropdown-item text-danger" href="#"
