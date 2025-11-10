@@ -22,23 +22,23 @@ class BusinessPolicy
         }
 
         return $user->role === 'admin' ||
-            $user->role === 'petugas' ||
+            $user->role === 'operator' ||
             $business->owner_id === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $user->role === 'admin' || $user->role === 'petugas';
+        return $user->role === 'admin' || $user->role === 'operator';
     }
 
     public function update(User $user, Business $business): bool
     {
-        return $user->role === 'admin' || $user->role === 'petugas';
+        return $user->role === 'admin' || $user->role === 'operator';
     }
 
     public function delete(User $user, Business $business): bool
     {
-        return $user->role === 'admin' || $user->role === 'petugas';
+        return $user->role === 'admin' || $user->role === 'operator';
     }
 
     public function requestNameChange(User $user, Business $business): bool
@@ -48,11 +48,11 @@ class BusinessPolicy
 
     public function approveNameChange(User $user, Business $business): bool
     {
-        return ($user->role === 'admin' || $user->role === 'petugas') && $business->hasNameChangeRequest();
+        return ($user->role === 'admin' || $user->role === 'operator') && $business->hasNameChangeRequest();
     }
 
     public function rejectNameChange(User $user, Business $business): bool
     {
-        return ($user->role === 'admin' || $user->role === 'petugas') && $business->hasNameChangeRequest();
+        return ($user->role === 'admin' || $user->role === 'operator') && $business->hasNameChangeRequest();
     }
 }

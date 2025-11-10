@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\BusinessStatus;
 use App\Enums\FundingRequestStatus;
+use App\Enums\UserRole;
 use App\Models\Business;
 use App\Models\FundingRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -19,7 +21,77 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $user = Auth::user();
+        $role = $user->role;
+
+        // Redirect to role-specific dashboard
+        if ($role === UserRole::WARGA->value) {
+            return $this->wargaDashboard();
+        } elseif ($role === UserRole::OPERATOR->value) {
+            return $this->operatorDashboard();
+        }
+
+        // Admin gets full dashboard
+        return view('dashboard.admin');
+    }
+
+    /**
+     * Dashboard for Warga role.
+     */
+    private function wargaDashboard()
+    {
+        $user = Auth::user();
+
+        // Get warga's businesses
+        $myBusinesses = Business::where('owner_id', $user->id)->get();
+
+        // Get warga's funding requests
+        $myFunding = FundingRequest::whereHas('business', function ($query) use ($user) {
+            $query->where('owner_id', $user->id);
+        })->with(['business'])->orderBy('created_at', 'desc')->get();
+
+        return view('dashboard.warga', compact('myBusinesses', 'myFunding'));
+    }
+
+    /**
+     * Dashboard for Operator role.
+     */
+    private function operatorDashboard()
+    {
+        // Operator sees recent businesses and pending funding to process
+        $recentBusinesses = Business::with(['businessType', 'owner'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $pendingFunding = FundingRequest::where('status', FundingRequestStatus::SUBMITTED->value)
+            ->with(['business', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $recentApproved = FundingRequest::whereIn('status', [
+            FundingRequestStatus::APPROVED->value,
+            FundingRequestStatus::MOU_SIGNED->value,
+            FundingRequestStatus::READY_TO_DISBURSE->value,
+        ])->with(['business', 'user'])
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Quick stats for operator
+        $stats = [
+            'pending_funding_count' => FundingRequest::where('status', FundingRequestStatus::SUBMITTED->value)->count(),
+            'total_businesses' => Business::count(),
+            'active_businesses' => Business::where('status', BusinessStatus::ACTIVE->value)->count(),
+            'total_funding' => FundingRequest::whereIn('status', [
+                FundingRequestStatus::DISBURSED->value,
+                FundingRequestStatus::REPAYING->value,
+                FundingRequestStatus::COMPLETED->value,
+            ])->sum('disbursed_amount'),
+        ];
+
+        return view('dashboard.operator', compact('recentBusinesses', 'pendingFunding', 'recentApproved', 'stats'));
     }
 
     /**

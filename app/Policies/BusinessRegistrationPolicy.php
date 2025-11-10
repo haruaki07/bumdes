@@ -30,7 +30,7 @@ class BusinessRegistrationPolicy
         }
 
         return $user->role === 'admin' ||
-            $user->role === 'petugas' ||
+            $user->role === 'operator' ||
             $businessRegistration->applicant_id === $user->id;
     }
 
@@ -41,7 +41,7 @@ class BusinessRegistrationPolicy
 
     public function update(User $user, BusinessRegistration $businessRegistration): bool
     {
-        if ($user->role === 'admin' || $user->role === 'petugas') {
+        if ($user->role === 'admin' || $user->role === 'operator') {
             return true;
         }
 
@@ -51,7 +51,7 @@ class BusinessRegistrationPolicy
 
     public function delete(User $user, BusinessRegistration $businessRegistration): bool
     {
-        if ($user->role === 'admin' || $user->role === 'petugas') {
+        if ($user->role === 'admin' || $user->role === 'operator') {
             return true;
         }
 
@@ -62,17 +62,17 @@ class BusinessRegistrationPolicy
 
     public function approve(User $user, BusinessRegistration $businessRegistration): bool
     {
-        return $user->role === 'admin' || $user->role === 'petugas';
+        return $user->role === 'admin' || $user->role === 'operator';
     }
 
     public function reject(User $user, BusinessRegistration $businessRegistration): bool
     {
-        return $user->role === 'admin' || $user->role === 'petugas';
+        return $user->role === 'admin' || $user->role === 'operator';
     }
 
     public function revise(User $user, BusinessRegistration $businessRegistration): bool
     {
-        if ($user->role === 'admin' || $user->role === 'petugas') {
+        if ($user->role === 'admin' || $user->role === 'operator') {
             return true;
         }
 
