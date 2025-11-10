@@ -65,3 +65,8 @@ i.ti-xxs {
     0 12px 12px rgba(0, 0, 0, 0.03), 0 24px 24px rgba(0, 0, 0, 0.03);
   transform: translateY(-2px);
 }
+
+/* force text color to white */
+.apexcharts-text.apexcharts-pie-label {
+  fill: white !important;
+}

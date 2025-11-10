@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/metrics', [DashboardController::class, 'metrics'])->name('dashboard.metrics');
 
     // Business Registration Management (requires verified email and completed profile)
     Route::middleware(['profile.completed'])->group(function () {
