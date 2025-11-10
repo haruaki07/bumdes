@@ -36,6 +36,7 @@
                     <th>Nama Role</th>
                     <th>Deskripsi</th>
                     <th>Jumlah User</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -43,11 +44,14 @@
                     <tr>
                       <td>{{ $loop->iteration }}</td>
                       <td class="fw-medium">
-                        <x-common.badge :label="$role['name']" :color="$role['color']" />
+                        <x-common.badge :label="$role['name']" light :color="$role['color']" />
                       </td>
                       <td>{{ $role['description'] }}</td>
                       <td>
-                        <x-common.badge :label="$role['users_count'] . ' user'" color="blue" light />
+                        <x-common.badge :label="$role['users_count'] . ' user'" color="blue" />
+                      </td>
+                      <td>
+                        <button class="btn btn-icon invisible"></button>
                       </td>
                     </tr>
                   @endforeach

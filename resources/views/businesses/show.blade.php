@@ -14,20 +14,16 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            @if ($business->status === 'pending')
-              @can('reject', $business)
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                  <i class="icon ti ti-x"></i>
-                  Tolak Usaha
-                </button>
-              @endcan
-            @endif
             @can('update', $business)
               <a href="{{ route('businesses.edit', $business) }}" class="btn btn-warning">
                 <i class="icon ti ti-edit"></i>
                 Edit Usaha
               </a>
             @endcan
+            <a href="{{ route('businesses.index') }}" class="btn btn-secondary">
+              <i class="icon ti ti-arrow-left"></i>
+              Kembali
+            </a>
           </div>
         </div>
       </div>

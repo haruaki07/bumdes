@@ -65,43 +65,20 @@
                   <td>{{ $business->created_at->format('d M Y H:i') }}</td>
                   <td>
                     <div class="btn-list flex-nowrap">
+                      <a href="{{ route('businesses.show', $business) }}" class="btn btn-icon btn-primary"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Detail Usaha">
+                        <i class="ti ti-eye"></i>
+                      </a>
                       @can('update', $business)
-                        <a href="{{ route('businesses.show', $business) }}" class="btn btn-icon btn-primary">
-                          <i class="ti ti-eye"></i>
-                        </a>
-                      @endcan
-                      @can('update', $business)
-                        <a href="{{ route('businesses.edit', $business) }}" class="btn btn-icon btn-warning">
+                        <a href="{{ route('businesses.edit', $business) }}" class="btn btn-icon btn-warning"
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Usaha">
                           <i class="ti ti-edit"></i>
                         </a>
                       @endcan
-                      @if ($business->status === 'pending')
-                        @can('approve', $business)
-                          <form action="{{ route('businesses.approve', $business) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-icon btn-success"
-                              onclick="return confirm('Apakah Anda yakin ingin menyetujui usaha ini?')">
-                              <i class="ti ti-check"></i>
-                            </button>
-                          </form>
-                        @endcan
-                        @can('reject', $business)
-                          <button type="button" class="btn btn-icon btn-danger" data-bs-toggle="modal"
-                            data-bs-target="#rejectModal{{ $business->id }}">
-                            <i class="ti ti-x"></i>
-                          </button>
-                        @endcan
-                      @endif
-                      @can('delete', $business)
-                        <form action="{{ route('businesses.destroy', $business) }}" method="POST" class="d-inline">
-                          @csrf
-                          @method('DELETE')
-                          <button type="submit" class="btn btn-icon btn-danger"
-                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                            <i class="ti ti-trash"></i>
-                          </button>
-                        </form>
-                      @endcan
+                      <button type="submit" class="btn btn-icon btn-danger"
+                        onclick="deleteConfirm('{{ route('businesses.destroy', $business) }}', 'DELETE', {message: 'Apakah Anda yakin ingin menghapus usaha {{ $business->name }}? Tindakan ini tidak dapat dibatalkan.'});">
+                        <i class="ti ti-trash"></i>
+                      </button>
                     </div>
 
                     @if ($business->status === 'pending')

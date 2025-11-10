@@ -144,45 +144,80 @@ return [
     'menu' => [
         // Navbar items:
         [
-            'text' => 'Home',
+            'text' => 'Dashboard',
             'icon' => 'ti ti-home',
             'route' => 'dashboard',
         ],
 
         [
-            'text' => 'Usaha',
-            'icon' => 'ti ti-building',
-            'route' => 'businesses.index',
+            'text' => 'Manajemen Usaha',
+            'icon' => 'ti ti-briefcase',
+            'url' => '#',
+            'active' => ['businesses/*', 'business-registrations/*', 'funding-requests/*'],
+            'role' => ['admin', 'operator'],
+            'submenu' => [
+                [
+                    'text' => 'Usaha',
+                    'icon' => 'ti ti-building',
+                    'route' => 'businesses.index',
+                ],
+                [
+                    'text' => 'Pengajuan Usaha',
+                    'icon' => 'ti ti-briefcase',
+                    'route' => 'business-registrations.index',
+                ],
+                [
+                    'text' => 'Pengajuan Pendanaan',
+                    'icon' => 'ti ti-cash',
+                    'route' => 'funding-requests.index',
+                ],
+            ],
         ],
 
         [
-            'text' => 'Jenis Usaha',
-            'icon' => 'ti ti-category',
-            'route' => 'business-types.index',
+            'text' => 'Usaha Saya',
+            'icon' => 'ti ti-building',
+            'route' => 'businesses.index',
+            'role' => ['warga'],
         ],
-
         [
             'text' => 'Pengajuan Usaha',
             'icon' => 'ti ti-briefcase',
             'route' => 'business-registrations.index',
+            'role' => ['warga'],
         ],
-
         [
             'text' => 'Pengajuan Pendanaan',
             'icon' => 'ti ti-cash',
             'route' => 'funding-requests.index',
+            'role' => ['warga'],
         ],
 
         [
-            'text' => 'Manajemen User',
-            'icon' => 'ti ti-users',
-            'route' => 'users.index',
-        ],
+            'text' => 'Administrasi',
+            'icon' => 'ti ti-file-text',
+            'url' => '#',
+            'active' => ['business-types/*', 'users/*', 'roles/*'],
+            'role' => ['admin', 'operator'],
+            'submenu' => [
+                [
+                    'text' => 'Jenis Usaha',
+                    'icon' => 'ti ti-category',
+                    'route' => 'business-types.index',
+                ],
 
-        [
-            'text' => 'Manajemen Role',
-            'icon' => 'ti ti-shield-lock',
-            'route' => 'roles.index',
+                [
+                    'text' => 'Manajemen User',
+                    'icon' => 'ti ti-users',
+                    'route' => 'users.index',
+                ],
+
+                [
+                    'text' => 'Manajemen Role',
+                    'icon' => 'ti ti-shield-lock',
+                    'route' => 'roles.index',
+                ],
+            ],
         ],
 
         // e-billing app
@@ -307,6 +342,7 @@ return [
         TakiElias\Tablar\Menu\Filters\DataFilter::class,
         \App\Filters\RouteGroupFilter::class,
         \App\Filters\RolePermissionFilter::class,
+        \App\Filters\UserRoleFilter::class,
     ],
 
     /*
