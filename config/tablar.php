@@ -217,6 +217,12 @@ return [
                     'icon' => 'ti ti-shield-lock',
                     'route' => 'roles.index',
                 ],
+
+                [
+                    'text' => 'Backup & Restore',
+                    'icon' => 'ti ti-database',
+                    'route' => 'admin.backups.index',
+                ],
             ],
         ],
 

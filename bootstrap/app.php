@@ -52,5 +52,33 @@ return Application::configure(basePath: dirname(__DIR__))
             ->dailyAt('08:00')
             ->withoutOverlapping()
             ->storeOutput();
+
+        // run automatic backup based on schedule configuration
+        if (config('backup.schedule.enabled')) {
+            $frequency = config('backup.schedule.frequency', 'weekly');
+            $day = config('backup.schedule.day', 0);
+            $time = config('backup.schedule.time', '02:00');
+
+            $backupCommand = $schedule->command('backup:run --type=full')
+                ->timezone('Asia/Jakarta')
+                ->withoutOverlapping()
+                ->storeOutput();
+
+            match ($frequency) {
+                'daily' => $backupCommand->dailyAt($time),
+                'weekly' => $backupCommand->weeklyOn($day, $time),
+                'monthly' => $backupCommand->monthlyOn($day, $time),
+                default => $backupCommand->weeklyOn($day, $time),
+            };
+        }
+
+        // clean old backups daily at 3 AM
+        if (config('backup.retention.enabled')) {
+            $schedule->command('backup:clean --force')
+                ->timezone('Asia/Jakarta')
+                ->dailyAt('03:00')
+                ->withoutOverlapping()
+                ->storeOutput();
+        }
     })
     ->create();

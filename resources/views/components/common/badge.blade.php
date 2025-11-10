@@ -13,5 +13,5 @@
 @endphp
 
 <span {{ $attributes->class(['badge', $bgClass]) }}>
-  {{ $label }}
+  {{ $label ?? $slot }}
 </span>

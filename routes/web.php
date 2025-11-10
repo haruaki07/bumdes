@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
 use App\Http\Controllers\BusinessTypeController;
@@ -25,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/metrics', [DashboardController::class, 'metrics'])->name('dashboard.metrics');
 
-    // Business Registration Management (requires verified email and completed profile)
+    // Business Registration Management
     Route::middleware(['profile.completed'])->group(function () {
         Route::resource('business-registrations', BusinessRegistrationController::class)->except(['edit', 'update']);
         Route::post('/business-registrations/{businessRegistration}/approve', [BusinessRegistrationController::class, 'approve'])->name('business-registrations.approve');
@@ -56,5 +57,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/funding-requests/{fundingRequest}/disburse', [\App\Http\Controllers\FundingRequestController::class, 'disburse'])->name('funding-requests.disburse');
         Route::post('/funding-requests/{fundingRequest}/repayments', [\App\Http\Controllers\FundingRequestController::class, 'storeRepayment'])->name('funding-requests.repayments.store');
         Route::post('/repayments/{repayment}/verify', [\App\Http\Controllers\FundingRequestController::class, 'verifyRepayment'])->name('repayments.verify');
+    });
+
+    // Backup & Restore
+    Route::name('admin.')->group(function () {
+        Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::get('/backups/create', [BackupController::class, 'create'])->name('backups.create');
+        Route::post('/backups', [BackupController::class, 'store'])->name('backups.store');
+        Route::delete('/backups/clean', [BackupController::class, 'clean'])->name('backups.clean');
+        Route::post('/backups/clean-old', [BackupController::class, 'cleanOld'])->name('backups.clean-old');
+        Route::get('/backups/{backup}', [BackupController::class, 'show'])->name('backups.show');
+        Route::get('/backups/{backup}/download', [BackupController::class, 'download'])->name('backups.download');
+        Route::post('/backups/{backup}/restore', [BackupController::class, 'restore'])->name('backups.restore');
+        Route::delete('/backups/{backup}', [BackupController::class, 'destroy'])->name('backups.destroy');
+        Route::get('/backups-statistics', [BackupController::class, 'statistics'])->name('backups.statistics');
     });
 });

@@ -234,8 +234,8 @@ class DashboardController extends Controller
 
         return [
             'ongoing_count' => $ongoingCount,
-            'total_amount' => $totalAmount,
-            'disbursed_amount' => $disbursedAmount,
+            'total_amount' => (int) $totalAmount,
+            'disbursed_amount' => (int) $disbursedAmount,
             'new_requests_this_period' => $newRequestsThisPeriod,
         ];
     }
@@ -260,10 +260,10 @@ class DashboardController extends Controller
         $completedCount = FundingRequest::where('status', FundingRequestStatus::COMPLETED->value)->count();
 
         return [
-            'total_disbursed' => $totalDisbursed,
-            'total_repaid' => $totalRepaid,
-            'outstanding' => $outstanding,
-            'completed_count' => $completedCount,
+            'total_disbursed' => (int) $totalDisbursed,
+            'total_repaid' => (int) $totalRepaid,
+            'outstanding' => (int) $outstanding,
+            'completed_count' => (int) $completedCount,
             'repayment_rate' => $totalDisbursed > 0 ? ($totalRepaid / $totalDisbursed) * 100 : 0,
         ];
     }
