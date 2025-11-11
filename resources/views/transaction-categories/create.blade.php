@@ -15,7 +15,6 @@
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
             <a href="{{ route('transaction-categories.index') }}" class="btn btn-secondary">
-              <i class="icon ti ti-arrow-left"></i>
               Kembali
             </a>
           </div>
