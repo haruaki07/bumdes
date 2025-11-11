@@ -75,53 +75,13 @@
                           <i class="ti ti-edit"></i>
                         </a>
                       @endcan
-                      <button type="submit" class="btn btn-icon btn-danger"
-                        onclick="deleteConfirm('{{ route('businesses.destroy', $business) }}', 'DELETE', {message: 'Apakah Anda yakin ingin menghapus usaha {{ $business->name }}? Tindakan ini tidak dapat dibatalkan.'});">
-                        <i class="ti ti-trash"></i>
-                      </button>
-                    </div>
-
-                    @if ($business->status === 'pending')
-                      @can('reject', $business)
-                        <!-- Reject Modal -->
-                        <div class="modal fade" id="rejectModal{{ $business->id }}" tabindex="-1"
-                          aria-labelledby="rejectModalLabel{{ $business->id }}" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <form action="{{ route('businesses.reject', $business) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="business_id" value="{{ $business->id }}">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="rejectModalLabel{{ $business->id }}">Tolak Usaha
-                                  </h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <p>Apakah Anda yakin ingin menolak usaha
-                                    <strong>{{ $business->name }}</strong>?
-                                  </p>
-                                  <div class="mb-3">
-                                    <label for="rejection_reason{{ $business->id }}" class="form-label">Alasan Penolakan
-                                      <span class="text-danger">*</span></label>
-                                    <textarea class="form-control @error('rejection_reason') is-invalid @enderror" id="rejection_reason{{ $business->id }}"
-                                      name="rejection_reason" rows="4" required placeholder="Masukkan alasan penolakan...">{{ old('rejection_reason') }}</textarea>
-                                    @error('rejection_reason')
-                                      <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                  <button type="submit" class="btn btn-danger">Tolak
-                                    Usaha</button>
-                                </div>
-                              </form>
-                            </div>
-                          </div>
-                        </div>
+                      @can('delete', $business)
+                        <button type="submit" class="btn btn-icon btn-danger"
+                          onclick="deleteConfirm('{{ route('businesses.destroy', $business) }}', 'DELETE', {message: 'Apakah Anda yakin ingin menghapus usaha {{ $business->name }}? Tindakan ini tidak dapat dibatalkan.'});">
+                          <i class="ti ti-trash"></i>
+                        </button>
                       @endcan
-                    @endif
+                    </div>
                   </td>
                 </tr>
               @empty
