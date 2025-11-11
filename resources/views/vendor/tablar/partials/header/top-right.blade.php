@@ -28,6 +28,8 @@
         <div>{{ $user->name }}</div>
         @if ($guard === 'ebil')
           <div class="mt-1 small text-muted">{{ $user->getRoleNames()->first() }}</div>
+        @else
+          <div class="mt-1 small text-muted">{{ ucfirst($user->role) }}</div>
         @endif
       </div>
     </a>
