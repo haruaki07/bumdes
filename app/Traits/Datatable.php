@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 trait Datatable
 {
-    public function scopeDatatable(Builder $query)
+    public function scopeDatatable(Builder $query, $subQuery = null)
     {
         $model = $query->getModel();
         $columns = $model->dataTableColumns ?? [];
@@ -52,6 +52,11 @@ trait Datatable
         });
 
         $limit = (int) $request->query('limit', 10);
+
+        if ($subQuery) {
+            $subQuery($query);
+        }
+
         $result = $query->paginate($limit)->withQueryString();
 
         return $result;

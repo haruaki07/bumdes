@@ -3,6 +3,7 @@
     'label' => '',
     'currentSort' => null,
     'class' => '',
+    'center' => false,
 ])
 
 @aware(['tableId'])
@@ -30,9 +31,10 @@
 @endphp
 
 <th @if ($class) class="{{ $class }}" @endif>
-  <button class="table-sort{{ $sortClass }} gap-2" type="button"title="{{ $tooltip }}" data-bs-toggle="tooltip"
-    data-bs-placement="top" data-datatable-sort="{{ $tableId }}" data-datatable-sort-field="{{ $field }}"
-    data-datatable-sort-direction="{{ $direction }}" data-datatable-sort-next-direction="{{ $nextDirection }}">
+  <button class="table-sort{{ $sortClass }} gap-2 d-inline" type="button"title="{{ $tooltip }}"
+    data-bs-toggle="tooltip" data-bs-placement="top" data-datatable-sort="{{ $tableId }}"
+    data-datatable-sort-field="{{ $field }}" data-datatable-sort-direction="{{ $direction }}"
+    data-datatable-sort-next-direction="{{ $nextDirection }}">
     {{ $label }}
   </button>
 </th>

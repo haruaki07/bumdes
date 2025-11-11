@@ -5,7 +5,12 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessRegistrationController;
 use App\Http\Controllers\BusinessTypeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FundingRequestController;
+use App\Http\Controllers\LabaRugiController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TransactionCategoryController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -15,12 +20,12 @@ Auth::routes(['verify' => true]);
 
 Route::middleware(['auth'])->group(function () {
     // Profile Completion
-    Route::get('/profile/complete', [\App\Http\Controllers\ProfileController::class, 'complete'])->name('profile.complete');
-    Route::post('/profile/complete', [\App\Http\Controllers\ProfileController::class, 'store'])->name('profile.store');
-    Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/warga', [\App\Http\Controllers\ProfileController::class, 'updateWargaProfile'])->name('profile.warga.update');
-    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/profile/complete', [ProfileController::class, 'complete'])->name('profile.complete');
+    Route::post('/profile/complete', [ProfileController::class, 'store'])->name('profile.store');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/warga', [ProfileController::class, 'updateWargaProfile'])->name('profile.warga.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -49,15 +54,31 @@ Route::middleware(['auth'])->group(function () {
 
     // Funding Management
     Route::middleware(['profile.completed'])->group(function () {
-        Route::resource('funding-requests', \App\Http\Controllers\FundingRequestController::class);
-        Route::post('/funding-requests/{fundingRequest}/approve', [\App\Http\Controllers\FundingRequestController::class, 'approve'])->name('funding-requests.approve');
-        Route::post('/funding-requests/{fundingRequest}/reject', [\App\Http\Controllers\FundingRequestController::class, 'reject'])->name('funding-requests.reject');
-        Route::post('/funding-requests/{fundingRequest}/upload-mou', [\App\Http\Controllers\FundingRequestController::class, 'uploadMou'])->name('funding-requests.upload-mou');
-        Route::post('/funding-requests/{fundingRequest}/sign-mou', [\App\Http\Controllers\FundingRequestController::class, 'signMou'])->name('funding-requests.sign-mou');
-        Route::post('/funding-requests/{fundingRequest}/disburse', [\App\Http\Controllers\FundingRequestController::class, 'disburse'])->name('funding-requests.disburse');
-        Route::post('/funding-requests/{fundingRequest}/repayments', [\App\Http\Controllers\FundingRequestController::class, 'storeRepayment'])->name('funding-requests.repayments.store');
-        Route::post('/repayments/{repayment}/verify', [\App\Http\Controllers\FundingRequestController::class, 'verifyRepayment'])->name('repayments.verify');
+        Route::resource('funding-requests', FundingRequestController::class);
+        Route::post('/funding-requests/{fundingRequest}/approve', [FundingRequestController::class, 'approve'])->name('funding-requests.approve');
+        Route::post('/funding-requests/{fundingRequest}/reject', [FundingRequestController::class, 'reject'])->name('funding-requests.reject');
+        Route::post('/funding-requests/{fundingRequest}/upload-mou', [FundingRequestController::class, 'uploadMou'])->name('funding-requests.upload-mou');
+        Route::post('/funding-requests/{fundingRequest}/sign-mou', [FundingRequestController::class, 'signMou'])->name('funding-requests.sign-mou');
+        Route::post('/funding-requests/{fundingRequest}/disburse', [FundingRequestController::class, 'disburse'])->name('funding-requests.disburse');
+        Route::post('/funding-requests/{fundingRequest}/repayments', [FundingRequestController::class, 'storeRepayment'])->name('funding-requests.repayments.store');
+        Route::post('/repayments/{repayment}/verify', [FundingRequestController::class, 'verifyRepayment'])->name('repayments.verify');
     });
+
+    // Laba Rugi (Profit & Loss Report)
+    Route::prefix('laba-rugi')->name('laba-rugi.')->group(function () {
+        Route::get('/', [LabaRugiController::class, 'index'])->name('index');
+        Route::post('/generate', [LabaRugiController::class, 'generate'])->name('generate');
+        Route::post('/export-pdf', [LabaRugiController::class, 'exportPdf'])->name('export-pdf');
+    });
+
+    // Transaction Categories Management
+    Route::resource('transaction-categories', TransactionCategoryController::class)->except(['show']);
+    Route::post('/transaction-categories/{transactionCategory}/toggle-active', [TransactionCategoryController::class, 'toggleActive'])->name('transaction-categories.toggle-active');
+
+    // Transactions Management
+    Route::resource('transactions', TransactionController::class);
+    Route::patch('/transactions/{transaction}/verify', [TransactionController::class, 'verify'])->name('transactions.verify');
+    Route::patch('/transactions/{transaction}/unverify', [TransactionController::class, 'unverify'])->name('transactions.unverify');
 
     // Backup & Restore
     Route::name('admin.')->group(function () {

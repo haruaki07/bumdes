@@ -194,6 +194,31 @@ return [
         ],
 
         [
+            'text' => 'Keuangan',
+            'icon' => 'ti ti-coin',
+            'url' => '#',
+            'active' => ['transactions/*', 'transaction-categories/*', 'laba-rugi/*'],
+            'role' => ['admin'],
+            'submenu' => [
+                [
+                    'text' => 'Transaksi',
+                    'icon' => 'ti ti-credit-card',
+                    'route' => 'transactions.index',
+                ],
+                [
+                    'text' => 'Kategori Transaksi',
+                    'icon' => 'ti ti-category',
+                    'route' => 'transaction-categories.index',
+                ],
+                [
+                    'text' => 'Laporan Laba Rugi',
+                    'icon' => 'ti ti-report-money',
+                    'route' => 'laba-rugi.index',
+                ],
+            ],
+        ],
+
+        [
             'text' => 'Administrasi',
             'icon' => 'ti ti-file-text',
             'url' => '#',
