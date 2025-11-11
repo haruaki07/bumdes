@@ -80,5 +80,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->withoutOverlapping()
                 ->storeOutput();
         }
+
+        $schedule->command('interest:record')
+            ->monthlyOn(28, '23:00')
+            ->timezone('Asia/Jakarta');
     })
     ->create();
